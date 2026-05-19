@@ -1,0 +1,144 @@
+{
+  "entities": {
+    "rawCoffeeLot": {
+      "title": "Raw Coffee Lot",
+      "description": "Lote de café cru",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "low_stock", "depleted", "reserved", "archived"] },
+        "purchaseDate": { "type": "string", "format": "date-time" },
+        "supplier": { "type": "string" },
+        "purchasedKg": { "type": "number" },
+        "availableKg": { "type": "number" },
+        "usedKg": { "type": "number" },
+        "reservedKg": { "type": "number" },
+        "lowStockThresholdKg": { "type": "number" }
+      },
+      "required": ["name", "code", "status", "purchasedKg", "availableKg"]
+    },
+    "roastBatch": {
+      "title": "Roast Batch",
+      "description": "Lote de café torrado",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date-time" },
+        "roasterId": { "type": "string" },
+        "roasterName": { "type": "string" },
+        "rawLotId": { "type": "string" },
+        "rawLotName": { "type": "string" },
+        "rawKgUsed": { "type": "number" },
+        "roastedKgOutput": { "type": "number" },
+        "lossKg": { "type": "number" },
+        "lossPercent": { "type": "number" },
+        "roastProfile": { "type": "string" },
+        "status": { "type": "string", "enum": ["registrada", "revisada", "aprovada"] },
+        "timeEntryId": { "type": "string" }
+      },
+      "required": ["date", "roasterId", "rawLotId", "rawKgUsed", "roastedKgOutput", "status"]
+    },
+    "packagingRun": {
+      "title": "Packaging Run",
+      "description": "Registro de empacotamento",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date-time" },
+        "roastBatchId": { "type": "string" },
+        "roastBatchName": { "type": "string" },
+        "responsibleId": { "type": "string" },
+        "responsibleName": { "type": "string" },
+        "packageFormat": { "type": "string" },
+        "unitWeightKg": { "type": "number" },
+        "quantityUnits": { "type": "number" },
+        "totalKg": { "type": "number" },
+        "destination": { "type": "string", "enum": ["estoque", "pedido", "consignacao", "cortesia"] }
+      },
+      "required": ["date", "roastBatchId", "responsibleId", "packageFormat", "quantityUnits", "totalKg", "destination"]
+    },
+    "stockItem": {
+      "title": "Stock Item",
+      "description": "Item de estoque real-time",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["raw", "roasted", "finished"] },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "rawLotId": { "type": "string" },
+        "availableUnits": { "type": "number" },
+        "availableKg": { "type": "number" },
+        "consignedUnits": { "type": "number" },
+        "status": { "type": "string", "enum": ["available", "low", "empty", "reserved", "inactive"] }
+      },
+      "required": ["type", "status"]
+    },
+    "stockMovement": {
+      "title": "Stock Movement",
+      "description": "Log de movimentação de estoque",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "stockItemId": { "type": "string" },
+        "productId": { "type": "string" },
+        "rawLotId": { "type": "string" },
+        "quantityUnits": { "type": "number" },
+        "quantityKg": { "type": "number" },
+        "reason": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["type", "userId"]
+    },
+    "roasterTimeEntry": {
+      "title": "Roaster Time Entry",
+      "description": "Registro de horas do mestre de torra",
+      "type": "object",
+      "properties": {
+        "roasterId": { "type": "string" },
+        "roasterName": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "totalHours": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "paid"] }
+      },
+      "required": ["roasterId", "date", "startTime", "endTime", "totalHours", "status"]
+    },
+    "weeklyPayroll": {
+      "title": "Weekly Payroll",
+      "description": "Fechamento semanal de pagamentos",
+      "type": "object",
+      "properties": {
+        "roasterId": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "totalHours": { "type": "number" },
+        "totalValue": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "paid"] }
+      },
+      "required": ["roasterId", "totalHours", "totalValue", "status"]
+    },
+    "consignment": {
+      "title": "Consignment",
+      "description": "Controle de consignação",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "status": { "type": "string" },
+        "totalValue": { "type": "number" },
+        "pendingValue": { "type": "number" }
+      },
+      "required": ["code", "recipientName", "status"]
+    }
+  },
+  "firestore": {
+    "/rawCoffeeLots/{lotId}": { "schema": "rawCoffeeLot", "description": "Lotes de café cru" },
+    "/roastBatches/{batchId}": { "schema": "roastBatch", "description": "Lotes de café torrado" },
+    "/packagingRuns/{runId}": { "schema": "packagingRun", "description": "Execuções de empacotamento" },
+    "/stockItems/{itemId}": { "schema": "stockItem", "description": "Inventário consolidado" },
+    "/stockMovements/{movementId}": { "schema": "stockMovement", "description": "Histórico de auditoria de estoque" },
+    "/roasterTimeEntries/{entryId}": { "schema": "roasterTimeEntry", "description": "Horas trabalhadas" },
+    "/weeklyPayrolls/{payrollId}": { "schema": "weeklyPayroll", "description": "Pagamentos semanais" },
+    "/consignments/{consignmentId}": { "schema": "consignment", "description": "Consignações" }
+  }
+}

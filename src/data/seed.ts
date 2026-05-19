@@ -1,0 +1,83 @@
+import { Product, Partner } from '../types';
+
+export const mockProducts: Product[] = [
+  {
+    id: "kit-1",
+    name: "Kit Primeira Xícara CofCof",
+    slug: "kit-primeira-xicara",
+    category: "kit",
+    price: 89,
+    shortDescription: "Talvez você não precise gostar mais de café. Talvez só precise provar um café melhor.",
+    description: "Ideal para a primeira experiência. Contém 1 pacote do nosso premiado Cerrado Doce (250g), card explicando a origem e notas, QR Code com vídeo do produtor, e o guia rápido 'Como preparar para não estragar um café premiado'. Além disso, inclui um cupom para sua primeira fatura de assinatura.",
+    sensoryNotes: ["Caramelo", "Chocolate", "Nozes"],
+    origin: "Cerrado Mineiro",
+    region: "Patrocínio - MG",
+    producer: "Família Barbosa",
+    farm: "Fazenda Primavera",
+    altitude: "1150m",
+    variety: "Catuaí Amarelo",
+    process: "Natural",
+    roastLevel: "média",
+    formats: ["Grão", "Moído"],
+    image: "https://images.unsplash.com/photo-1606757599550-9c244c4b9cd5?auto=format&fit=crop&q=80",
+    featured: true,
+    stock: 50,
+    isAwardWinning: true,
+    awardName: "Best of Cerrado",
+    awardYear: "2024",
+    cuppingScore: 86.5,
+    whySelected: "Este kit foi pensado para quebrar a barreira do café comum, entregando a melhor experiência inicial possível.",
+    originStory: "Toda grande jornada com cafés especiais começa com um gole que muda tudo.",
+    bestPreparation: "V60, Prensa Francesa",
+    recommendedFor: "Quem quer descobrir o que é um café especial brasileiro de verdade."
+  },
+  {
+    id: "1",
+    name: "Cerrado Doce",
+    slug: "cerrado-doce",
+    category: "grão",
+    price: 65,
+    shortDescription: "Nosso café assinatura com notas de caramelo e chocolate.",
+    description: "Um café fácil de beber, perfeito para o dia a dia. Baixa acidez, corpo aveludado e doçura alta.",
+    sensoryNotes: ["Caramelo", "Chocolate", "Nozes"],
+    origin: "Cerrado Mineiro",
+    region: "Patrocínio - MG",
+    producer: "Família Barbosa",
+    farm: "Fazenda Primavera",
+    altitude: "1150m",
+    variety: "Catuaí Amarelo",
+    process: "Natural",
+    roastLevel: "média",
+    formats: ["Grão", "Moído", "Moka", "Prensa"],
+    image: "https://images.unsplash.com/photo-1559525839-b184a4d698c7?auto=format&fit=crop&q=80",
+    featured: true,
+    stock: 120,
+    isAwardWinning: true,
+    awardName: "Best of Cerrado",
+    awardYear: "2024",
+    cuppingScore: 86.5,
+    whySelected: "Este lote representa perfeitamente o terroir do Cerrado, com uma doçura natural impressionante que não precisa de açúcar.",
+    originStory: "A Fazenda Primavera está na mesma família há 3 gerações, focando sempre em processos naturais que realçam a doçura.",
+    bestPreparation: "Espresso, Mocha, V60",
+    recommendedFor: "Quem quer um café doce e encorpado para todos os dias."
+  }
+];
+
+export const mockPartners: Partner[] = [
+  {
+    id: '1',
+    name: 'Café da Praça',
+    type: 'Cafeteria',
+    address: 'Praça da Liberdade, 100',
+    neighborhood: 'Savassi',
+    city: 'Belo Horizonte',
+    state: 'MG',
+    lat: -19.932,
+    lng: -43.938,
+    phone: '(31) 99999-9999',
+    instagram: '@cafedapraca',
+    ifoodUrl: 'https://ifood.com.br/delivery/belo-horizonte-mg/cafe-da-praca-savassi',
+    availableProducts: ['Cerrado Clássico', 'Gotejador'],
+    openingHours: 'Seg-Sáb: 08h-20h / Dom: 09h-15h'
+  }
+];

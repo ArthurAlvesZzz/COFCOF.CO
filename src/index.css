@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --color-cof-black: #0a0a0a;
+  --color-cof-coffee: #111111;
+  --color-cof-caramel: #B06A32;
+  --color-cof-gold: #c9a263;
+  --color-cof-cream: #F6F1EB;
+  --color-cof-green: #263A2B;
+  --color-cof-gray: #1a1a1a;
+  --color-cof-lightgray: #a3a3a3;
+  
+  --font-sans: "Inter", sans-serif;
+  --font-serif: "Playfair Display", serif;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: var(--color-cof-black);
+  color: var(--color-cof-cream);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utilities for hiding scrollbar while allowing scroll */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
+
+/* Premium Design System Components */
+@layer components {
+  .premium-container {
+    @apply max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-10 py-16 md:py-24 relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-[#a3a3a3]/10 my-12 md:my-20 shadow-2xl bg-[#111111] w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)];
+  }
+  
+  .premium-card {
+    @apply bg-[#1a1a1a] rounded-2xl overflow-hidden hover:shadow-[0_10px_30px_rgba(201,162,99,0.15)] transition-all duration-300 border border-[#a3a3a3]/10;
+  }
+  
+  .premium-badge {
+    @apply inline-flex items-center gap-2 border border-[#c9a263]/30 text-[#c9a263] rounded-full px-4 py-1.5 text-[10px] font-black tracking-widest uppercase bg-[#c9a263]/10 backdrop-blur-md;
+  }
+  
+  .premium-cta {
+    @apply bg-[#c9a263] text-[#0a0a0a] px-8 py-5 rounded-xl font-bold uppercase text-sm tracking-wider hover:bg-[#e0b875] transition-all shadow-[0_10px_30px_rgba(201,162,99,0.3)] hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center;
+  }
+  
+  .premium-cta-ghost {
+    @apply bg-transparent text-white border border-[#c9a263]/30 px-8 py-5 rounded-xl font-bold uppercase text-sm tracking-wider hover:bg-white/5 hover:border-[#c9a263]/50 transition-all backdrop-blur-md inline-flex items-center justify-center;
+  }
+  
+  .premium-data-bar {
+    @apply flex flex-wrap justify-between items-center bg-[#1a1a1a]/80 backdrop-blur-md border border-[#a3a3a3]/10 rounded-xl p-6 shadow-xl;
+  }
+}
+
+.bg-cof-black { background-color: var(--color-cof-black); }
+.bg-cof-coffee { background-color: var(--color-cof-coffee); }
+.bg-cof-caramel { background-color: var(--color-cof-caramel); }
+.bg-cof-gold { background-color: var(--color-cof-gold); }
+.bg-cof-cream { background-color: var(--color-cof-cream); }
+.bg-cof-green { background-color: var(--color-cof-green); }
+
+.text-cof-black { color: var(--color-cof-black); }
+.text-cof-coffee { color: var(--color-cof-coffee); }
+.text-cof-caramel { color: var(--color-cof-caramel); }
+.text-cof-gold { color: var(--color-cof-gold); }
+.text-cof-cream { color: var(--color-cof-cream); }
+.text-cof-green { color: var(--color-cof-green); }
+
+.border-cof-black { border-color: var(--color-cof-black); }
+.border-cof-coffee { border-color: var(--color-cof-coffee); }
+.border-cof-caramel { border-color: var(--color-cof-caramel); }
+.border-cof-gold { border-color: var(--color-cof-gold); }
+.border-cof-cream { border-color: var(--color-cof-cream); }
+.border-cof-green { border-color: var(--color-cof-green); }
