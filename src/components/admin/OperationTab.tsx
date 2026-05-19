@@ -21,7 +21,8 @@ import {
   DollarSign,
   Users,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AdminStatCard } from './AdminStatCard';

@@ -2,6 +2,7 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
+  lot?: string;
   category: "grão" | "moído" | "cápsula" | "kit" | "presente" | "b2b";
   price: number;
   compareAtPrice?: number;

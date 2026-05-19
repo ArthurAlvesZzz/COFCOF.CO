@@ -1,40 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building2, 
   Coffee, 
-  Users, 
-  CupSoda, 
-  Package, 
-  CheckCircle2,
-  Bed,
-  Laptop,
-  Store,
-  UsersRound,
-  Minus,
-  Plus,
-  ArrowRight,
-  Calculator,
+  Bed, 
+  Laptop, 
+  Store, 
+  UsersRound, 
+  CheckCircle2, 
+  Minus, 
+  Plus, 
+  ArrowRight, 
   MessageSquare,
-  ChevronRight,
   Star,
   MapPin,
   TrendingUp,
-  ShieldCheck
+  Package,
+  ChevronDown,
+  Globe,
+  Quote,
+  ShieldCheck,
+  Flame,
+  Award,
+  Truck,
+  ScanLine
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Link } from 'react-router-dom';
-import { publicContentService } from '../services/publicContentService';
-import { ContentBlock } from '../types/admin';
-
-const businessTypes = [
-  { id: 'escritorio', name: 'Escritório', icon: Building2 },
-  { id: 'cafeteria', name: 'Cafeteria', icon: Coffee },
-  { id: 'restaurante', name: 'Restaurante', icon: CupSoda },
-  { id: 'hotel', name: 'Hotel', icon: Bed },
-  { id: 'coworking', name: 'Coworking', icon: Laptop },
-  { id: 'revenda', name: 'Revenda', icon: Store },
-  { id: 'evento', name: 'Evento', icon: UsersRound },
-];
+import { b2bLeadService } from '../services/b2bLeadService';
 
 export default function B2B() {
   const [calcData, setCalcData] = useState({
@@ -56,26 +47,64 @@ export default function B2B() {
 
   const [formLoading, setFormLoading] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
-  const [content, setContent] = useState<Record<string, Partial<ContentBlock>>>({});
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchContent = async () => {
-      const blocks = await publicContentService.getPageContent('empresas');
-      const contentMap: Record<string, Partial<ContentBlock>> = {};
-      blocks.forEach(b => {
-        contentMap[b.key] = b;
-      });
-      setContent(contentMap);
-    };
-    fetchContent();
   }, []);
+
+  const businessTypes = [
+    { id: 'escritorio', name: 'Escritórios', icon: Building2 },
+    { id: 'cafeteria', name: 'Cafeterias', icon: Coffee },
+    { id: 'restaurante', name: 'Restaurantes', icon: Coffee },
+    { id: 'hotel', name: 'Hotéis', icon: Bed },
+    { id: 'coworking', name: 'Coworkings', icon: Laptop },
+    { id: 'revenda', name: 'Revenda', icon: Store },
+  ];
+
+  const estimatedCups = calcData.people * calcData.cupsPerPerson * calcData.daysPerMonth;
+  const estimatedKg = Math.ceil((estimatedCups * 10) / 1000);
+
+  let recommendedPackage = '';
+  let activeProfile = 'Alta aceitação e notas doces';
+  if (estimatedKg <= 5) recommendedPackage = 'B2B Essencial 5kg';
+  else if (estimatedKg <= 10) recommendedPackage = 'B2B Elevado 10kg';
+  else if (estimatedKg <= 20) recommendedPackage = 'B2B Premium 20kg';
+  else if (estimatedKg <= 50) recommendedPackage = 'B2B Volume 50kg';
+  else {
+    recommendedPackage = 'Volume Personalizado';
+    activeProfile = 'Perfil sob medida pelo Mestre de Torra';
+  }
+
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      consumption: `${estimatedKg} kg/mês (Aprox. ${estimatedCups} xícaras)`
+    }));
+  }, [estimatedKg, estimatedCups]);
+
+  const updatePeople = (amount: number) => {
+    setCalcData(prev => {
+      const newVal = prev.people + amount;
+      if (newVal < 1) return { ...prev, people: 1 };
+      if (newVal > 500) return { ...prev, people: 500 };
+      return { ...prev, people: newVal };
+    });
+  };
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  const handleWhatsAppClick = (context: string) => {
+    const text = `Olá! Gostaria de conversar com o comercial B2B. Assunto: ${context}`;
+    window.open(`https://wa.me/5534998728882?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
     try {
-      const { b2bLeadService } = await import('../services/b2bLeadService');
       await b2bLeadService.createLead({
          contactName: formData.name,
          companyName: formData.company,
@@ -111,450 +140,564 @@ export default function B2B() {
     }
   };
 
-  const estimatedCups = calcData.people * calcData.cupsPerPerson * calcData.daysPerMonth;
-  const estimatedKg = Math.ceil((estimatedCups * 10) / 1000);
+  const segmentsStrip = [
+    "Cafeterias", "Escritórios", "Clínicas", "Hotéis", "Restaurantes", 
+    "Coworkings", "Revenda", "Presentes corporativos", "Exportação"
+  ];
 
-  let recommendedPackage = '';
-  let activeProfile = 'Alta aceitação e notas doces';
-  if (estimatedKg <= 5) recommendedPackage = 'B2B Essencial 5kg';
-  else if (estimatedKg <= 10) recommendedPackage = 'B2B Elevado 10kg';
-  else if (estimatedKg <= 20) recommendedPackage = 'B2B Premium 20kg';
-  else if (estimatedKg <= 50) recommendedPackage = 'B2B Volume 50kg';
-  else {
-    recommendedPackage = 'Volume Personalizado';
-    activeProfile = 'Perfil sob medida pelo Mestre de Torra';
-  }
-
-  useEffect(() => {
-    setFormData(prev => ({
-      ...prev,
-      consumption: `${estimatedKg} kg/mês (Aprox. ${estimatedCups} xícaras)`
-    }));
-  }, [estimatedKg, estimatedCups]);
-
-  const handleCalcSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const typeName = businessTypes.find(t => t.id === calcData.type)?.name || calcData.type;
-    const text = `Olá! Gostaria de uma cotação comercial da CofCof. Fizemos uma simulação:\n\n*Operação:* ${typeName}\n*Pessoas:* ${calcData.people}/dia\n*Xícaras:* ${calcData.cupsPerPerson}/pessoa\n*Dias úteis:* ${calcData.daysPerMonth}/mês\n\n*Consumo Estimado:* ${estimatedKg}kg/mês\n*Pacote:* ${recommendedPackage}\n\nPodemos conversar?`;
-    window.open(`https://wa.me/5534998728882?text=${encodeURIComponent(text)}`, '_blank');
-  };
-
-  const updatePeople = (amount: number) => {
-    setCalcData(prev => {
-      const newVal = prev.people + amount;
-      if (newVal < 1) return { ...prev, people: 1 };
-      if (newVal > 500) return { ...prev, people: 500 };
-      return { ...prev, people: newVal };
-    });
-  };
-
-  const updateCups = (amount: number) => {
-    setCalcData(prev => {
-      const newVal = prev.cupsPerPerson + amount;
-      if (newVal < 1) return { ...prev, cupsPerPerson: 1 };
-      if (newVal > 6) return { ...prev, cupsPerPerson: 6 };
-      return { ...prev, cupsPerPerson: newVal };
-    });
-  };
-
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
+  const faqItems = [
+    { q: "Qual o pedido mínimo?", a: "O pedido B2B mínimo padrão é a partir de 10kg, mas trabalhamos com diferentes faixas de volume ajustadas." },
+    { q: "Vocês vendem com nota fiscal?", a: "Sim, todos os volumes corporativos incluem emissão de nota fiscal obrigatória, resguardando sua contabilidade." },
+    { q: "O café é torrado quando?", a: "Sempre na semana do envio (Torra sob demanda). Não temos estoque parado de café torrado para clientes B2B." },
+    { q: "Posso escolher o lote?", a: "Para volumes definidos, você pode criar um perfil fixo. Para baixo volume ou modelo assinatura B2B, enviamos lotes da curadoria mensal." },
+    { q: "Vocês entregam fora de Uberlândia/Minas/Brasil?", a: "Sim, enviamos para todo o Brasil via transportadora. Exportação é sob consulta da documentação." },
+    { q: "Atendem cafeterias?", a: "Sim, é um dos nossos focos. Auxiliamos inclusive na narrativa sensorial do cardápio." },
+    { q: "Atendem hotéis e restaurantes?", a: "Sim, com formatos flexíveis de grão e possibilidade de pacotes de 1kg a fardos de 5kg." },
+    { q: "Tem preço por kg?", a: "Cada faixa (10-20kg, 20-50kg) possui valores gradativos melhores. O consumo afeta diretamente o custo/xícara." },
+    { q: "Posso ajustar o volume mensal?", a: "Sim, sem burocracia. O plano pode crescer junto com seu negócio ou encolher nos meses de férias." },
+    { q: "Como funciona exportação?", a: "Operamos envio direto do Cerrado Mineiro. Preço FOB ou CIF a avaliar; fale direto com a equipe comercial." }
+  ];
 
   return (
-    <div className="w-full bg-[#0a0a0a] min-h-screen pt-32">
-      {/* 1. HERO */}
-      <section className="premium-container mt-0 mb-12 border-none">
-        <div className="absolute inset-0 z-0">
-          <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="Café Corporativo CofCof" className="w-full h-full object-cover opacity-20 mix-blend-lighten" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-[#111111]/80 to-transparent z-0" />
+    <div className="w-full bg-[#0a0a0a] min-h-screen font-sans overflow-x-hidden pt-32">
+      
+      {/* 1. HERO ALTO PADRÃO ESCURO */}
+      <section className="bg-[#111111] text-white pt-10 pb-24 px-6 relative border-b border-[#a3a3a3]/10">
+        <div className="absolute inset-0 z-0 pointer-events-none">
+            <img 
+              src="https://images.unsplash.com/photo-1541167760496-1628856ab772?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+              alt="Café B2B CofCof" 
+              className="w-full h-full object-cover opacity-10 mix-blend-lighten" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-[#111111]/80 to-transparent" />
         </div>
         
-        <div className="max-w-5xl mx-auto text-center relative z-20 pt-8 pb-8">
-          <motion.div 
+        <div className="max-w-4xl mx-auto text-center relative z-20">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            <div className="premium-badge mb-8 mx-auto">
-              <Building2 size={14} /> Soluções B2B Premium
+            <div className="inline-flex items-center gap-2 border border-[#c9a263]/30 text-[#c9a263] rounded-full px-4 py-1.5 mb-8 text-[11px] font-bold tracking-widest uppercase bg-[#c9a263]/10 backdrop-blur-md">
+              B2B · Empresas · Revenda · Hotelaria
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif leading-[1.1] mb-6 max-w-4xl mx-auto text-white">
-              O café da sua empresa <span className="text-[#c9a263] italic font-light drop-shadow-sm">comunica cuidado</span> antes da primeira conversa.
+            
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif text-white mb-6 leading-[1.1] tracking-tight">
+              Sirva um café que comunica cuidado{" "}
+              <span className="text-[#c9a263] italic font-light drop-shadow-sm">antes da primeira reunião.</span>
             </h1>
-            <p className="text-lg md:text-xl text-[#a3a3a3] max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-              Surpreenda clientes e equipe com lotes premiados, rastreáveis e torrados sob demanda para a rotina da sua operação.
+            
+            <p className="text-lg md:text-xl text-[#a3a3a3] mx-auto mb-10 leading-relaxed font-light max-w-3xl">
+              Cafeterias, escritórios, clínicas, hotéis, coworkings e restaurantes com cafés premiados, torrados sob demanda e fornecimento recorrente.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
               <button 
                 onClick={() => scrollToSection('b2b-form')}
-                className="premium-cta w-full sm:w-auto"
+                className="w-full sm:w-auto bg-[#c9a263] text-[#0a0a0a] px-8 py-4 rounded-xl font-bold hover:bg-[#e0b875] hover:scale-[1.02] active:scale-[0.98] transition-all uppercase text-sm"
               >
-                Solicitar Proposta B2B
+                Solicitar proposta B2B
               </button>
               <button 
-                onClick={() => scrollToSection('calculator')}
-                className="premium-cta-ghost w-full sm:w-auto"
+                onClick={() => handleWhatsAppClick('Dúvida sobre proposta comercial/B2B')}
+                className="w-full sm:w-auto border border-[#a3a3a3]/30 text-white bg-white/5 backdrop-blur-md px-8 py-4 rounded-xl font-medium hover:bg-white/10 hover:border-[#a3a3a3]/50 transition-colors uppercase text-sm flex items-center justify-center gap-2"
                >
-                Calcular consumo
+                Falar com comercial no WhatsApp
               </button>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-xs font-bold text-[#a3a3a3] uppercase tracking-widest pt-8 border-t border-white/10 mx-auto w-fit">
-              <span className="flex items-center gap-2"><Star size={14} className="text-[#c9a263]"/> Lotes Premiados</span>
-              <span className="flex items-center gap-2"><Package size={14} className="text-[#c9a263]"/> Fardos Atacado</span>
-              <span className="flex items-center gap-2"><MapPin size={14} className="text-[#c9a263]"/> Torra Sob Demanda</span>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[10px] sm:text-xs font-bold text-[#a3a3a3] uppercase tracking-widest pt-6 border-t border-white/10 mx-auto w-fit">
+              <span className="flex items-center gap-2">86+ SCA</span>
+              <span className="flex items-center gap-2">Cup of Excellence</span>
+              <span className="flex items-center gap-2">Cerrado Mineiro D.O.</span>
+              <span className="flex items-center gap-2">Torra sob demanda</span>
+              <span className="flex items-center gap-2 text-[#c9a263]">A partir de 10kg/mês</span>
+              <span className="flex items-center gap-2">Rastreabilidade QR</span>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* 2. SEGMENTS - PARA QUEM */}
-      <section className="py-20 px-6 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">Para quem é a CofCof B2B?</h2>
-            <p className="text-[#a3a3a3] text-lg max-w-2xl mx-auto font-light">Soluções modulares para cada tipo de operação, projetadas para encantar quem bebe e otimizar quem compra.</p>
+      {/* 2. FAIXA DE SEGMENTOS */}
+      <div className="bg-[#111111] overflow-hidden border-b border-[#a3a3a3]/10 py-4">
+        <div className="flex whitespace-nowrap animate-[marquee_40s_linear_infinite] hover:[animation-play-state:paused]">
+          {[...segmentsStrip, ...segmentsStrip, ...segmentsStrip].map((item, idx) => (
+            <div key={idx} className="flex items-center mx-6 text-xs text-white uppercase tracking-widest font-medium">
+              {item}
+              <span className="mx-6 text-[#c9a263] opacity-50">✦</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. SEÇÃO "PARA QUEM É" */}
+      <section className="bg-[#F6F1EB] py-24 px-6 text-[#111111]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 max-w-3xl mx-auto">
+             <h2 className="text-3xl md:text-5xl font-serif text-[#111111] mb-6 leading-tight">Uma solução de café especial para cada tipo de operação.</h2>
+             <p className="text-[#111111]/70 text-lg font-light">Cada negócio serve café por um motivo diferente. A CofCof ajusta lote, volume e frequência para a experiência que você quer entregar.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            <div className="premium-card p-8 group flex flex-col justify-between">
-              <div>
-                <Building2 className="text-[#c9a263] mb-6 transition-transform group-hover:scale-110" size={32} />
-                <h3 className="font-serif text-2xl text-white mb-3">Escritórios</h3>
-                <p className="text-[#a3a3a3] mb-6 text-sm leading-relaxed font-light">Transforme reuniões, recepção e a rotina da sua equipe em uma experiência de cuidado absoluto.</p>
-              </div>
-              <div className="pt-4 border-t border-[#a3a3a3]/10 text-[11px] font-bold text-[#c9a263] uppercase tracking-widest flex items-center gap-2"><CheckCircle2 size={14} className="text-[#c9a263]" /> Pacotes volumosos</div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-8 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-[#111111]/5 flex flex-col hover:border-[#c9a263]/30 transition-all">
+              <Coffee className="text-[#B06A32] mb-6" size={32} strokeWidth={1.5}/>
+              <h3 className="font-serif font-bold text-xl mb-3 text-[#111111]">Cafeterias</h3>
+              <p className="text-sm text-[#111111]/70 leading-relaxed mb-6 flex-1">Diferencie seu menu com microlotes premiados, origem rastreável e perfil sensorial claro.</p>
+              <button onClick={() => scrollToSection('b2b-form')} className="text-xs uppercase font-bold text-[#B06A32] hover:text-[#111111] transition-colors text-left tracking-widest">
+                Quero revender CofCof <ArrowRight size={14} className="inline ml-1"/>
+              </button>
             </div>
 
-            <div className="premium-card p-8 group flex flex-col justify-between">
-              <div>
-                <Coffee className="text-[#c9a263] mb-6 transition-transform group-hover:scale-110" size={32} />
-                <h3 className="font-serif text-2xl text-white mb-3">Cafeterias</h3>
-                <p className="text-[#a3a3a3] mb-6 text-sm leading-relaxed font-light">Lotes de especialidade com história e rastreabilidade para elevar percepção e ticket médio.</p>
-              </div>
-              <div className="pt-4 border-t border-[#a3a3a3]/10 text-[11px] font-bold text-[#c9a263] uppercase tracking-widest flex items-center gap-2"><CheckCircle2 size={14} className="text-[#c9a263]" /> Curadoria e Treino</div>
+            <div className="bg-white p-8 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-[#111111]/5 flex flex-col hover:border-[#c9a263]/30 transition-all">
+              <Building2 className="text-[#B06A32] mb-6" size={32} strokeWidth={1.5}/>
+              <h3 className="font-serif font-bold text-xl mb-3 text-[#111111]">Escritórios</h3>
+              <p className="text-sm text-[#111111]/70 leading-relaxed mb-6 flex-1">Transforme o café da equipe e das reuniões em uma experiência de marca.</p>
+              <button onClick={() => scrollToSection('b2b-form')} className="text-xs uppercase font-bold text-[#B06A32] hover:text-[#111111] transition-colors text-left tracking-widest">
+                Montar plano para escritório <ArrowRight size={14} className="inline ml-1"/>
+              </button>
             </div>
 
-            <div className="premium-card p-8 group flex flex-col justify-between">
-              <div>
-                <CupSoda className="text-[#c9a263] mb-6 transition-transform group-hover:scale-110" size={32} />
-                <h3 className="font-serif text-2xl text-white mb-3">Restaurantes</h3>
-                <p className="text-[#a3a3a3] mb-6 text-sm leading-relaxed font-light">Finalize a experiência gastronômica dos seus clientes com um café à altura dos seus melhores pratos.</p>
-              </div>
-              <div className="pt-4 border-t border-[#a3a3a3]/10 text-[11px] font-bold text-[#c9a263] uppercase tracking-widest flex items-center gap-2"><CheckCircle2 size={14} className="text-[#c9a263]" /> Alta doçura</div>
+            <div className="bg-white p-8 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-[#111111]/5 flex flex-col hover:border-[#c9a263]/30 transition-all">
+              <ShieldCheck className="text-[#B06A32] mb-6" size={32} strokeWidth={1.5}/>
+              <h3 className="font-serif font-bold text-xl mb-3 text-[#111111]">Clínicas premium</h3>
+              <p className="text-sm text-[#111111]/70 leading-relaxed mb-6 flex-1">Um café melhor muda a percepção do atendimento antes da consulta começar.</p>
+              <button onClick={() => scrollToSection('b2b-form')} className="text-xs uppercase font-bold text-[#B06A32] hover:text-[#111111] transition-colors text-left tracking-widest">
+                Solicitar proposta para clínica <ArrowRight size={14} className="inline ml-1"/>
+              </button>
             </div>
 
-            <div className="premium-card p-8 group flex flex-col justify-between">
-              <div>
-                <Bed className="text-[#c9a263] mb-6 transition-transform group-hover:scale-110" size={32} />
-                <h3 className="font-serif text-2xl text-white mb-3">Hotéis</h3>
-                <p className="text-[#a3a3a3] mb-6 text-sm leading-relaxed font-light">A hospitalidade começa nos menores detalhes. Inclusive no café servido no desjejum e no quarto.</p>
-              </div>
-              <div className="pt-4 border-t border-[#a3a3a3]/10 text-[11px] font-bold text-[#c9a263] uppercase tracking-widest flex items-center gap-2"><CheckCircle2 size={14} className="text-[#c9a263]" /> Experiência premium</div>
+            <div className="bg-white p-8 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-[#111111]/5 flex flex-col hover:border-[#c9a263]/30 transition-all">
+              <Bed className="text-[#B06A32] mb-6" size={32} strokeWidth={1.5}/>
+              <h3 className="font-serif font-bold text-xl mb-3 text-[#111111]">Hotéis e restaurantes</h3>
+              <p className="text-sm text-[#111111]/70 leading-relaxed mb-6 flex-1">Entregue uma experiência memorável no café da manhã, sobremesa ou pós-refeição.</p>
+              <button onClick={() => scrollToSection('b2b-form')} className="text-xs uppercase font-bold text-[#B06A32] hover:text-[#111111] transition-colors text-left tracking-widest">
+                Quero CofCof no meu menu <ArrowRight size={14} className="inline ml-1"/>
+              </button>
             </div>
 
-            <div className="premium-card p-8 group flex flex-col justify-between lg:col-span-2 relative overflow-hidden bg-[#111111]">
-              <div className="absolute top-0 right-0 p-8 opacity-5 transition-transform duration-700 group-hover:scale-110">
-                <Store size={150} />
-              </div>
-              <div className="relative z-10 w-full h-full flex flex-col sm:flex-row gap-6">
-                <div className="flex-1">
-                  <div className="mb-2 text-[#c9a263] font-bold uppercase tracking-widest text-[10px]">Expansão</div>
-                  <h3 className="font-serif text-3xl text-white mb-4">Revendedores</h3>
-                  <p className="text-[#a3a3a3] mb-6 leading-relaxed font-light max-w-sm">Produto premium com narrativa forte, embalagem magnética e marca reconhecida para vender com melhor margem na sua gôndola.</p>
-                </div>
-                <div className="sm:border-l sm:border-[#a3a3a3]/10 sm:pl-6 flex flex-col justify-center">
-                  <div className="flex items-center gap-3 text-white font-medium mb-3">
-                    <CheckCircle2 size={18} className="text-[#c9a263]" /> Display Retail
-                  </div>
-                  <div className="flex items-center gap-3 text-white font-medium mb-3">
-                    <CheckCircle2 size={18} className="text-[#c9a263]" /> Mkt Kits
-                  </div>
-                  <div className="flex items-center gap-3 text-white font-medium">
-                    <CheckCircle2 size={18} className="text-[#c9a263]" /> Margem B2B
-                  </div>
-                </div>
-              </div>
+            <div className="bg-white p-8 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-[#111111]/5 flex flex-col hover:border-[#c9a263]/30 transition-all">
+              <Laptop className="text-[#B06A32] mb-6" size={32} strokeWidth={1.5}/>
+              <h3 className="font-serif font-bold text-xl mb-3 text-[#111111]">Coworkings</h3>
+              <p className="text-sm text-[#111111]/70 leading-relaxed mb-6 flex-1">Use café especial como diferencial de retenção e experiência para membros.</p>
+              <button onClick={() => scrollToSection('b2b-form')} className="text-xs uppercase font-bold text-[#B06A32] hover:text-[#111111] transition-colors text-left tracking-widest">
+                Montar plano para coworking <ArrowRight size={14} className="inline ml-1"/>
+              </button>
             </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-[#111111]/5 flex flex-col hover:border-[#c9a263]/30 transition-all">
+              <Package className="text-[#B06A32] mb-6" size={32} strokeWidth={1.5}/>
+              <h3 className="font-serif font-bold text-xl mb-3 text-[#111111]">Presentes corporativos</h3>
+              <p className="text-sm text-[#111111]/70 leading-relaxed mb-6 flex-1">Kits premium para clientes, parceiros e datas comemorativas.</p>
+              <button onClick={() => scrollToSection('b2b-form')} className="text-xs uppercase font-bold text-[#B06A32] hover:text-[#111111] transition-colors text-left tracking-widest">
+                Ver kits corporativos <ArrowRight size={14} className="inline ml-1"/>
+              </button>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-[#111111]/5 flex flex-col hover:border-[#c9a263]/30 transition-all">
+              <Store className="text-[#B06A32] mb-6" size={32} strokeWidth={1.5}/>
+              <h3 className="font-serif font-bold text-xl mb-3 text-[#111111]">Revendas e empórios</h3>
+              <p className="text-sm text-[#111111]/70 leading-relaxed mb-6 flex-1">Produto premium com história, origem e margem para uma gôndola mais forte.</p>
+              <button onClick={() => scrollToSection('b2b-form')} className="text-xs uppercase font-bold text-[#B06A32] hover:text-[#111111] transition-colors text-left tracking-widest">
+                Quero revender <ArrowRight size={14} className="inline ml-1"/>
+              </button>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.03)] border border-[#111111]/5 flex flex-col hover:border-[#c9a263]/30 transition-all">
+              <Globe className="text-[#B06A32] mb-6" size={32} strokeWidth={1.5}/>
+              <h3 className="font-serif font-bold text-xl mb-3 text-[#111111]">Exportação e grandes volumes</h3>
+              <p className="text-sm text-[#111111]/70 leading-relaxed mb-6 flex-1">Fornecimento recorrente para operações maiores, revenda e pedidos sob consulta.</p>
+              <button onClick={() => scrollToSection('export-section')} className="text-xs uppercase font-bold text-[#B06A32] hover:text-[#111111] transition-colors text-left tracking-widest">
+                Falar sobre grandes volumes <ArrowRight size={14} className="inline ml-1"/>
+              </button>
+            </div>
+
           </div>
+        </div>
       </section>
 
-      {/* 3. BENEFITS PILLARS */}
-      <section className="py-20 px-6 max-w-7xl mx-auto border-t border-[#a3a3a3]/10">
-           <div className="grid md:grid-cols-3 gap-12 lg:gap-16">
-              <div className="flex flex-col">
-                <div className="text-[#c9a263] mb-6">
-                  <Star size={32} strokeWidth={1.5} />
-                </div>
-                <h3 className="text-2xl font-serif text-white mb-3">1. Café comunica marca</h3>
-                <p className="text-[#a3a3a3] leading-relaxed font-light text-sm">
-                  Cada xícara servida reforça cuidado. Servir um café amargo depõe contra o nível do seu próprio serviço.
-                </p>
-              </div>
-              <div className="flex flex-col">
-                <div className="text-[#c9a263] mb-6">
-                  <TrendingUp size={32} strokeWidth={1.5} />
-                </div>
-                <h3 className="text-2xl font-serif text-white mb-3">2. Previsibilidade</h3>
-                <p className="text-[#a3a3a3] leading-relaxed font-light text-sm">
-                  Pacotes recorrentes B2B e fornecimento ajustado ao consumo real, sem faltar e sem sobrar perdendo frescor.
-                </p>
-              </div>
-              <div className="flex flex-col">
-                <div className="text-[#c9a263] mb-6">
-                  <MapPin size={32} strokeWidth={1.5} />
-                </div>
-                <h3 className="text-2xl font-serif text-white mb-3">3. Lotes com história</h3>
-                <p className="text-[#a3a3a3] leading-relaxed font-light text-sm">
-                  Cafés premiados, origem D.O. Cerrado Mineiro e rastreabilidade para que seu cliente saiba o privilégio do que bebe.
-                </p>
-              </div>
-           </div>
+      {/* 4. PROBLEMA DO FORNECEDOR ATUAL (Comparação) */}
+      <section className="py-24 px-6 bg-[#0a0a0a]">
+         <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+               <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">Seu café atual representa o padrão da sua empresa?</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+               <div className="bg-[#111111] rounded-3xl p-8 border border-[#a3a3a3]/10 opacity-70">
+                 <h3 className="text-2xl font-serif text-[#a3a3a3] mb-8 pb-4 border-b border-[#a3a3a3]/20">Fornecedor comum</h3>
+                 <ul className="space-y-5">
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><div className="w-1.5 h-1.5 rounded-full bg-[#a3a3a3]/50 shrink-0" /> Origem genérica</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><div className="w-1.5 h-1.5 rounded-full bg-[#a3a3a3]/50 shrink-0" /> Torra antiga</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><div className="w-1.5 h-1.5 rounded-full bg-[#a3a3a3]/50 shrink-0" /> Sem rastreabilidade</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><div className="w-1.5 h-1.5 rounded-full bg-[#a3a3a3]/50 shrink-0" /> Atendimento padronizado</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><div className="w-1.5 h-1.5 rounded-full bg-[#a3a3a3]/50 shrink-0" /> Pouca diferenciação</li>
+                 </ul>
+               </div>
+
+               <div className="bg-[#1a1a1a] rounded-3xl p-8 border border-[#c9a263]/30 shadow-[0_0_40px_rgba(201,162,99,0.1)] relative">
+                 <div className="absolute -top-4 -right-4 bg-[#c9a263] text-[#0a0a0a] rounded-full p-3 shadow-xl"><CheckCircle2 size={24}/></div>
+                 <h3 className="text-2xl font-serif text-white mb-8 pb-4 border-b border-[#c9a263]/30">CofCof B2B</h3>
+                 <ul className="space-y-5">
+                    <li className="flex items-center gap-3 text-sm text-white font-medium"><CheckCircle2 className="text-[#c9a263] shrink-0" size={18} /> Origem rastreada</li>
+                    <li className="flex items-center gap-3 text-sm text-white font-medium"><CheckCircle2 className="text-[#c9a263] shrink-0" size={18} /> Torra sob demanda</li>
+                    <li className="flex items-center gap-3 text-sm text-white font-medium"><CheckCircle2 className="text-[#c9a263] shrink-0" size={18} /> Perfil sensorial real</li>
+                    <li className="flex items-center gap-3 text-sm text-white font-medium"><CheckCircle2 className="text-[#c9a263] shrink-0" size={18} /> Atendimento dedicado</li>
+                    <li className="flex items-center gap-3 text-sm text-white font-medium"><CheckCircle2 className="text-[#c9a263] shrink-0" size={18} /> Proposta por volume</li>
+                    <li className="flex items-center gap-3 text-sm text-white font-medium"><CheckCircle2 className="text-[#c9a263] shrink-0" size={18} /> QR com origem e lote</li>
+                 </ul>
+               </div>
+            </div>
+         </div>
       </section>
 
-      {/* 4. CALCULATOR - SIMULADOR */}
-      <section id="calculator" className="py-24 px-6 relative">
-        <div className="max-w-7xl mx-auto premium-container !my-0 !rounded-[2rem] border-x-0 border-y sm:border">
+      {/* 5. COMO FUNCIONA */}
+      <section className="bg-[#111111] border-y border-[#a3a3a3]/10 py-24 px-6">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="premium-badge mb-6">
-              <Calculator size={14} /> Simulador B2B CofCof
-            </div>
-            <h2 className="text-3xl md:text-5xl font-serif text-white mb-4">Calcule o volume ideal</h2>
-            <p className="text-lg text-[#a3a3a3] max-w-xl mx-auto font-light">
-              Receba uma estimativa precisa de consumo mensal para sua operação.
-            </p>
+             <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">Como funciona</h2>
           </div>
-
-          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start relative z-10">
-            {/* Left: Controls */}
-            <div className="lg:col-span-7 space-y-8">
-              
-              {/* Type Selection */}
-              <div>
-                <label className="block text-[10px] font-bold tracking-widest uppercase text-[#a3a3a3] mb-3">Que tipo de negócio?</label>
-                <div className="flex flex-wrap gap-2">
-                  {businessTypes.map((b) => (
-                    <button
-                      key={b.id}
-                      type="button"
-                      onClick={() => setCalcData({...calcData, type: b.id})}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition-all ${
-                        calcData.type === b.id 
-                          ? 'bg-[#c9a263] text-[#0a0a0a] border-[#c9a263] font-bold shadow-md' 
-                          : 'bg-[#1a1a1a] text-[#a3a3a3] border-[#a3a3a3]/10 hover:border-[#c9a263]/30 font-medium'
-                      }`}
-                    >
-                      <b.icon size={14} className={calcData.type === b.id ? 'text-[#0a0a0a]' : 'text-[#c9a263]'} />
-                      {b.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* People Stepper & Slider */}
-              <div className="premium-card p-6 md:p-8">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-bold tracking-widest uppercase text-[#a3a3a3] mb-1">Pessoas Atendidas / Dia</label>
-                  </div>
-                  
-                  <div className="flex items-center bg-[#111111] rounded-xl p-1 border border-[#a3a3a3]/10 w-fit">
-                    <button onClick={() => updatePeople(-5)} className="w-10 h-10 flex items-center justify-center text-white hover:text-[#c9a263] transition-colors"><Minus size={16} /></button>
-                    <div className="w-20 text-center font-serif text-2xl text-white">{calcData.people}</div>
-                    <button onClick={() => updatePeople(5)} className="w-10 h-10 flex items-center justify-center text-white hover:text-[#c9a263] transition-colors"><Plus size={16} /></button>
-                  </div>
-                </div>
-                
-                <input
-                  type="range"
-                  min="1"
-                  max="500"
-                  value={calcData.people}
-                  onChange={(e) => setCalcData({...calcData, people: Number(e.target.value)})}
-                  className="w-full h-1 bg-[#a3a3a3]/20 rounded-lg appearance-none cursor-pointer accent-[#c9a263]"
-                />
-              </div>
-
-              {/* Cups & Days */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="premium-card p-6">
-                   <label className="block text-[11px] font-bold tracking-widest uppercase text-[#a3a3a3] mb-4">Xícaras / Pessoa / Dia</label>
-                   <div className="grid grid-cols-4 gap-2 bg-[#111111] p-1.5 rounded-xl border border-[#a3a3a3]/10">
-                     {[1, 2, 3, 4].map((cup) => (
-                       <button
-                         key={cup}
-                         onClick={() => setCalcData({...calcData, cupsPerPerson: cup})}
-                         className={`py-2 rounded-lg font-medium text-sm transition-all ${
-                           calcData.cupsPerPerson === cup
-                             ? 'bg-[#c9a263] text-[#0a0a0a]'
-                             : 'text-[#a3a3a3] hover:text-white'
-                         }`}
-                       >
-                         {cup}{cup === 4 ? '+' : ''}
-                       </button>
-                     ))}
-                   </div>
-                </div>
-                
-                <div className="premium-card p-6">
-                   <label className="block text-[11px] font-bold tracking-widest uppercase text-[#a3a3a3] mb-4">Dias Úteis / Mês</label>
-                   <div className="grid grid-cols-4 gap-2 bg-[#111111] p-1.5 rounded-xl border border-[#a3a3a3]/10">
-                     {[20, 22, 26, 30].map((days) => (
-                       <button
-                         key={days}
-                         onClick={() => setCalcData({...calcData, daysPerMonth: days})}
-                         className={`py-2 rounded-lg font-medium text-sm transition-all ${
-                           calcData.daysPerMonth === days
-                             ? 'bg-[#c9a263] text-[#0a0a0a]'
-                             : 'text-[#a3a3a3] hover:text-white'
-                         }`}
-                       >
-                         {days}d
-                       </button>
-                     ))}
-                   </div>
-                </div>
-              </div>
+          
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="flex flex-col">
+               <div className="text-[#c9a263] font-serif text-4xl mb-4 text-left">01</div>
+               <h3 className="text-white font-bold mb-2">Conte sobre sua operação</h3>
+               <p className="text-[#a3a3a3] text-sm leading-relaxed">Tipo de empresa, cidade, consumo mensal, preparo e objetivo.</p>
             </div>
-
-            {/* Right: Consultative Result */}
-            <div className="lg:col-span-5 sticky top-32">
-              <div className="premium-card bg-[#1a1a1a]/80 backdrop-blur-md p-8 rounded-[2rem] border border-[#c9a263]/20 shadow-[0_10px_30px_rgba(201,162,99,0.1)] relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-5">
-                  <Coffee size={150} />
-                </div>
-                <h3 className="text-[#c9a263] text-[10px] font-bold uppercase tracking-widest mb-6 relative z-10">Diagnóstico</h3>
-                
-                <div className="mb-8 relative z-10">
-                  <span className="text-[#a3a3a3] text-sm font-medium">Demanda mensal estimada</span>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-6xl font-serif text-white tracking-tight">{estimatedKg}</span>
-                    <span className="text-2xl text-[#a3a3a3] font-serif">Kg</span>
-                  </div>
-                  <p className="text-[#a3a3a3] mt-2 font-mono text-xs tracking-widest">≈ {estimatedCups.toLocaleString('pt-BR')} XÍCARAS</p>
-                </div>
-
-                <div className="space-y-4 pt-6 border-t border-[#a3a3a3]/10 mb-8 relative z-10">
-                  <div>
-                    <span className="block text-[10px] text-[#a3a3a3] uppercase tracking-widest font-bold mb-1">Lote Recomendado</span>
-                    <span className="block text-white font-medium">{recommendedPackage}</span>
-                  </div>
-                  <div>
-                    <span className="block text-[10px] text-[#a3a3a3] uppercase tracking-widest font-bold mb-1">Perfil Sensorial</span>
-                    <span className="block text-white italic font-light">{activeProfile}</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-4 relative z-10">
-                  <button onClick={handleCalcSubmit} className="premium-cta w-full gap-2">
-                    <MessageSquare size={16} /> Cotação no WhatsApp
-                  </button>
-                  <button onClick={() => scrollToSection('b2b-form')} className="w-full text-center text-xs font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-white py-2 transition-colors">
-                    Ou preencha o formulário
-                  </button>
-                </div>
-              </div>
+            <div className="flex flex-col">
+               <div className="text-[#c9a263] font-serif text-4xl mb-4 text-left">02</div>
+               <h3 className="text-white font-bold mb-2">Receba uma proposta sob medida</h3>
+               <p className="text-[#a3a3a3] text-sm leading-relaxed">Preço por kg, lote ideal, frequência, volume, pagamento e entrega.</p>
+            </div>
+            <div className="flex flex-col">
+               <div className="text-[#c9a263] font-serif text-4xl mb-4 text-left">03</div>
+               <h3 className="text-white font-bold mb-2">Receba café torrado sob demanda</h3>
+               <p className="text-[#a3a3a3] text-sm leading-relaxed">Envios recorrentes, emissão de nota fiscal, lote rastreável e suporte.</p>
+            </div>
+            <div className="flex flex-col">
+               <div className="text-[#c9a263] font-serif text-4xl mb-4 text-left">04</div>
+               <h3 className="text-white font-bold mb-2">Ajuste conforme sua rotina</h3>
+               <p className="text-[#a3a3a3] text-sm leading-relaxed">Aumente volume, troque lote, pause ou ajuste frequência.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 5. FORMULÁRIO B2B - PROPOSTA */}
-      <section id="b2b-form" className="py-24 px-6 max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-serif text-white mb-4">Proposta Comercial</h2>
-            <p className="text-[#a3a3a3] text-lg max-w-xl mx-auto font-light">Informe seus dados e retornaremos em até 24h úteis.</p>
-          </div>
-          
-          <div className="premium-card p-8 md:p-12">
-            {formSuccess ? (
-              <div className="text-center py-12 px-6">
-                 <div className="w-16 h-16 bg-[#c9a263]/10 text-[#c9a263] border border-[#c9a263]/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle2 className="w-8 h-8" />
-                 </div>
-                 <h3 className="text-2xl font-serif text-white mb-3">Recebemos seus dados.</h3>
-                 <p className="text-[#a3a3a3] text-sm mb-8">Vamos te chamar com uma sugestão de fornecimento.</p>
-                 <button onClick={handleCalcSubmit} className="premium-cta mx-auto inline-flex items-center gap-2">
-                   <MessageSquare size={16} /> Falar agora no WhatsApp
-                 </button>
-              </div>
-            ) : (
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-bold tracking-widest uppercase text-[#a3a3a3]">Seu Nome</label>
-                  <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263] outline-none rounded-xl px-5 py-4 text-white text-sm" placeholder="Como devemos te chamar" />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-bold tracking-widest uppercase text-[#a3a3a3]">Empresa</label>
-                  <input required type="text" value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263] outline-none rounded-xl px-5 py-4 text-white text-sm" placeholder="Nome do seu negócio" />
-                </div>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-bold tracking-widest uppercase text-[#a3a3a3]">WhatsApp</label>
-                  <input required type="tel" value={formData.whatsapp} onChange={(e) => setFormData({...formData, whatsapp: e.target.value})} className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263] outline-none rounded-xl px-5 py-4 text-white text-sm" placeholder="(00) 00000-0000" />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-bold tracking-widest uppercase text-[#a3a3a3]">Cidade ou Estado</label>
-                  <input required type="text" value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263] outline-none rounded-xl px-5 py-4 text-white text-sm" placeholder="Ex: Belo Horizonte / MG" />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-bold tracking-widest uppercase text-[#a3a3a3]">Segmento Principal</label>
-                  <select value={formData.segment} onChange={(e) => setFormData({...formData, segment: e.target.value})} className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263] outline-none rounded-xl px-5 py-4 text-white text-sm" required>
-                    <option value="" disabled>Selecione um segmento</option>
-                    <option value="coffee_shop">Cafeteria / Empório</option>
-                    <option value="restaurant">Restaurante</option>
-                    <option value="office">Escritório Corporativo</option>
-                    <option value="hotel">Hotelaria</option>
-                    <option value="other">Outro Modelo</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-bold tracking-widest uppercase text-[#a3a3a3]">Volume Estimado</label>
-                  <input type="text" value={formData.consumption || `${estimatedKg}kg por mês`} onChange={(e) => setFormData({...formData, consumption: e.target.value})} className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263] outline-none rounded-xl px-5 py-4 text-white text-sm font-medium" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                 <label className="block text-[10px] font-bold tracking-widest uppercase text-[#a3a3a3]">Instruções adicionais</label>
-                 <textarea rows={2} value={formData.notes || ''} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263] outline-none rounded-xl px-5 py-4 text-white text-sm resize-none" placeholder="Opcional. Ex: Já temos máquina de espresso, precisamos de moinhos..." />
-              </div>
-              
-              <button disabled={formLoading} type="submit" className="premium-cta w-full mt-4 disabled:opacity-50 gap-2 text-center">
-                {formLoading ? 'Calculando melhor opção...' : 'Solicitar Proposta'} {!formLoading && <ArrowRight size={16} />}
-              </button>
-            </form>
-            )}
-          </div>
+      {/* 6. DIFERENCIAIS B2B */}
+      <section className="py-24 px-6 bg-[#0a0a0a]">
+         <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12">
+               <div>
+                  <h3 className="text-2xl font-serif text-white mb-8 pb-4 border-b border-[#a3a3a3]/20 flex items-center gap-3">
+                    <Award className="text-[#c9a263]" strokeWidth={1.5} size={28}/> Qualidade percebida
+                  </h3>
+                  <ul className="space-y-4">
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> 86+ SCA</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Cup of Excellence</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Cerrado Mineiro D.O.</li>
+                  </ul>
+               </div>
+               <div>
+                  <h3 className="text-2xl font-serif text-white mb-8 pb-4 border-b border-[#a3a3a3]/20 flex items-center gap-3">
+                    <Flame className="text-[#c9a263]" strokeWidth={1.5} size={28}/> Frescor e experiência
+                  </h3>
+                  <ul className="space-y-4">
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Torra sob demanda</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Torra na semana do envio</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Perfil sensorial real</li>
+                  </ul>
+               </div>
+               <div>
+                  <h3 className="text-2xl font-serif text-white mb-8 pb-4 border-b border-[#a3a3a3]/20 flex items-center gap-3">
+                    <Building2 className="text-[#c9a263]" strokeWidth={1.5} size={28}/> Operação B2B
+                  </h3>
+                  <ul className="space-y-4">
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Emissão de nota fiscal</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Recorrência</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Atendimento dedicado</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Ajuste de volume</li>
+                  </ul>
+               </div>
+               <div>
+                  <h3 className="text-2xl font-serif text-white mb-8 pb-4 border-b border-[#a3a3a3]/20 flex items-center gap-3">
+                    <ScanLine className="text-[#c9a263]" strokeWidth={1.5} size={28}/> Rastreabilidade
+                  </h3>
+                  <ul className="space-y-4">
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> QR de origem</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Produtor e fazenda</li>
+                    <li className="flex items-center gap-3 text-sm text-[#a3a3a3]"><CheckCircle2 className="text-[#c9a263] shrink-0" size={16}/> Lote, safra, processo</li>
+                  </ul>
+               </div>
+            </div>
+         </div>
       </section>
-      {/* 6. FAQ ESPECÍFICO */}
-      <section className="py-24 md:py-32 px-6 bg-[#0a0a0a]">
+
+      {/* 7. CALCULATOR & 9. FORMS */}
+      <section id="calculator" className="py-24 px-6 bg-[#111111] border-y border-[#a3a3a3]/10 relative">
+        <div className="absolute inset-0 bg-[#c9a263]/5 opacity-10 mix-blend-overlay"></div>
+        <div className="max-w-7xl mx-auto relative z-10 grid lg:grid-cols-2 gap-16">
+            
+            {/* Calculadora */}
+            <div>
+               <div className="mb-10">
+                 <h2 className="text-3xl md:text-5xl font-serif text-white mb-4">Não sabe quanto sua empresa consome?</h2>
+               </div>
+               
+               <div className="space-y-6">
+                 <div>
+                   <label className="block text-[10px] uppercase tracking-widest text-[#a3a3a3] font-bold mb-3">Tipo de negócio</label>
+                   <div className="flex flex-wrap gap-2">
+                     {businessTypes.map((b) => (
+                       <button
+                         key={b.id}
+                         onClick={() => setCalcData({...calcData, type: b.id})}
+                         className={`px-4 py-2 border rounded-xl text-sm transition-all ${
+                           calcData.type === b.id 
+                             ? 'bg-[#c9a263] text-[#0a0a0a] border-[#c9a263] font-bold' 
+                             : 'bg-[#1a1a1a] text-[#a3a3a3] border-[#a3a3a3]/10 hover:border-[#c9a263]/30'
+                         }`}
+                       >
+                         {b.name}
+                       </button>
+                     ))}
+                   </div>
+                 </div>
+
+                 <div className="bg-[#1a1a1a] border border-[#a3a3a3]/10 p-6 rounded-2xl">
+                     <div className="flex items-center justify-between mb-4">
+                       <label className="block text-[10px] uppercase tracking-widest text-[#a3a3a3] font-bold">Pessoas/Clientes por dia</label>
+                       <div className="flex items-center gap-3">
+                         <button onClick={() => updatePeople(-5)} className="w-8 h-8 rounded-full border border-[#a3a3a3]/20 flex justify-center items-center text-[#a3a3a3] hover:text-[#c9a263]"><Minus size={14}/></button>
+                         <span className="text-xl font-serif text-white w-10 text-center">{calcData.people}</span>
+                         <button onClick={() => updatePeople(5)} className="w-8 h-8 rounded-full border border-[#a3a3a3]/20 flex justify-center items-center text-[#a3a3a3] hover:text-[#c9a263]"><Plus size={14}/></button>
+                       </div>
+                     </div>
+                     <input type="range" min="1" max="500" value={calcData.people} onChange={(e) => setCalcData({...calcData, people: Number(e.target.value)})} className="w-full h-1 bg-[#a3a3a3]/20 rounded-lg appearance-none cursor-pointer accent-[#c9a263]" />
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-[#1a1a1a] border border-[#a3a3a3]/10 p-6 rounded-2xl">
+                        <label className="block text-[10px] uppercase tracking-widest text-[#a3a3a3] font-bold mb-4">Xícaras por pessoa</label>
+                        <select 
+                          value={calcData.cupsPerPerson} 
+                          onChange={(e) => setCalcData({...calcData, cupsPerPerson: Number(e.target.value)})}
+                          className="w-full bg-[#111111] text-white border border-[#a3a3a3]/20 rounded-xl px-3 py-2 outline-none focus:border-[#c9a263] text-sm"
+                        >
+                            {[1,2,3,4,5].map(v => <option key={v} value={v}>{v}</option>)}
+                        </select>
+                    </div>
+                    <div className="bg-[#1a1a1a] border border-[#a3a3a3]/10 p-6 rounded-2xl">
+                        <label className="block text-[10px] uppercase tracking-widest text-[#a3a3a3] font-bold mb-4">Dias úteis/Mês</label>
+                        <select 
+                          value={calcData.daysPerMonth} 
+                          onChange={(e) => setCalcData({...calcData, daysPerMonth: Number(e.target.value)})}
+                          className="w-full bg-[#111111] text-white border border-[#a3a3a3]/20 rounded-xl px-3 py-2 outline-none focus:border-[#c9a263] text-sm"
+                        >
+                            {[15,20,22,26,30].map(v => <option key={v} value={v}>{v}</option>)}
+                        </select>
+                    </div>
+                 </div>
+
+                 <div className="bg-[#1a1a1a] border border-[#c9a263]/30 p-6 rounded-2xl shadow-[0_0_20px_rgba(201,162,99,0.05)] mt-4 flex items-center justify-between">
+                     <div>
+                       <span className="block text-[10px] uppercase tracking-widest text-[#c9a263] font-bold mb-1">Consumo Estimado</span>
+                       <div className="flex items-baseline gap-2">
+                         <span className="text-4xl font-serif text-white">{estimatedKg}kg</span>
+                         <span className="text-[#a3a3a3] text-xs">/ mês</span>
+                       </div>
+                       <p className="text-[11px] text-[#a3a3a3] mt-2">({estimatedCups} xícara(s) de 10g)</p>
+                     </div>
+                     <div className="text-right">
+                       <span className="block text-[10px] uppercase tracking-widest text-[#a3a3a3] font-bold mb-1">Faixa</span>
+                       <span className="block text-white font-medium text-sm">
+                          {estimatedKg <= 20 ? '10–20kg' : estimatedKg <= 50 ? '20–50kg' : '50kg+'}
+                       </span>
+                     </div>
+                 </div>
+                 
+                 <button onClick={() => scrollToSection('b2b-form')} className="w-full text-center border border-[#a3a3a3]/30 text-white hover:bg-[#1a1a1a] py-4 rounded-xl uppercase text-xs font-bold tracking-wider transition-colors pt-4 pb-4">
+                    Usar este consumo na proposta
+                 </button>
+               </div>
+            </div>
+            
+            {/* 9. Formulário B2B */}
+            <div id="b2b-form" className="bg-[#1a1a1a] p-8 md:p-10 rounded-[2rem] border border-[#a3a3a3]/10 h-fit">
+               {formSuccess ? (
+                  <div className="text-center py-16 px-6">
+                     <div className="w-16 h-16 bg-[#c9a263]/10 text-[#c9a263] border border-[#c9a263]/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <CheckCircle2 className="w-8 h-8" />
+                     </div>
+                     <h3 className="text-2xl font-serif text-white mb-3">Recebemos sua solicitação.</h3>
+                     <p className="text-[#a3a3a3] text-sm mb-8 leading-relaxed">A equipe CofCof vai montar uma proposta de fornecimento para seu perfil.</p>
+                     <button onClick={() => handleWhatsAppClick('Dúvida pós envio do form B2B')} className="w-full border border-[#c9a263] text-[#c9a263] bg-transparent hover:bg-[#c9a263] hover:text-[#0a0a0a] transition-all py-4 rounded-xl flex items-center justify-center gap-2 font-bold uppercase text-xs tracking-wider">
+                       <MessageSquare size={16} /> Falar agora no WhatsApp
+                     </button>
+                  </div>
+               ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="mb-8 items-start">
+                     <h3 className="text-2xl font-serif text-white mb-2">Monte uma proposta para sua empresa.</h3>
+                     <p className="text-[#a3a3a3] text-sm">Informe seu segmento, cidade e consumo estimado. A equipe CofCof indica lote, volume e frequência ideal.</p>
+                  </div>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4">
+                     <input required type="text" value={formData.name} onChange={(e)=>setFormData({...formData, name: e.target.value})} placeholder="Nome" className="bg-[#111111] text-white text-sm border border-[#a3a3a3]/10 rounded-xl px-4 py-3 outline-none focus:border-[#c9a263] w-full"/>
+                     <input required type="text" value={formData.company} onChange={(e)=>setFormData({...formData, company: e.target.value})} placeholder="Empresa" className="bg-[#111111] text-white text-sm border border-[#a3a3a3]/10 rounded-xl px-4 py-3 outline-none focus:border-[#c9a263] w-full"/>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                     <select required value={formData.segment} onChange={(e)=>setFormData({...formData, segment: e.target.value})} className="bg-[#111111] text-[#a3a3a3] focus:text-white text-sm border border-[#a3a3a3]/10 rounded-xl px-4 py-3 outline-none focus:border-[#c9a263] w-full">
+                        <option value="" disabled>Segmento principal</option>
+                        <option value="coffee_shop">Cafeteria / Empório</option>
+                        <option value="office">Escritório Corporativo</option>
+                        <option value="clinic">Clínica / Recepção</option>
+                        <option value="restaurant">Restaurante / Hotel</option>
+                        <option value="other">Outro</option>
+                     </select>
+                     <input required type="text" value={formData.city} onChange={(e)=>setFormData({...formData, city: e.target.value})} placeholder="Cidade e Estado" className="bg-[#111111] text-white text-sm border border-[#a3a3a3]/10 rounded-xl px-4 py-3 outline-none focus:border-[#c9a263] w-full"/>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                     <input required type="tel" value={formData.whatsapp} onChange={(e)=>setFormData({...formData, whatsapp: e.target.value})} placeholder="WhatsApp" className="bg-[#111111] text-white text-sm border border-[#a3a3a3]/10 rounded-xl px-4 py-3 outline-none focus:border-[#c9a263] w-full"/>
+                     <input required type="text" value={formData.consumption} onChange={(e)=>setFormData({...formData, consumption: e.target.value})} placeholder="Consumo mensal estimado (kg)" className="bg-[#111111] text-[#c9a263] font-medium text-sm border border-[#c9a263]/30 rounded-xl px-4 py-3 outline-none focus:border-[#c9a263] w-full"/>
+                  </div>
+                  <textarea rows={2} value={formData.notes} onChange={(e)=>setFormData({...formData, notes: e.target.value})} placeholder="Observação (opcional)." className="bg-[#111111] text-white text-sm border border-[#a3a3a3]/10 rounded-xl px-4 py-3 outline-none focus:border-[#c9a263] w-full resize-none"></textarea>
+                  
+                  <div className="pt-2">
+                     <button disabled={formLoading} type="submit" className="w-full bg-[#c9a263] text-[#0a0a0a] py-4 rounded-xl font-bold uppercase text-xs tracking-wider hover:bg-[#e0b875] transition-colors shadow-[0_5px_15px_rgba(201,162,99,0.3)] disabled:opacity-70">
+                       {formLoading ? 'Enviando...' : 'Receber proposta com esse consumo'}
+                     </button>
+                     <p className="text-center text-[#a3a3a3] text-[10px] mt-3 uppercase tracking-widest">Resposta personalizada. Sem compromisso.</p>
+                  </div>
+                </form>
+               )}
+            </div>
+        </div>
+      </section>
+
+      {/* 8. FAIXAS B2B */}
+      <section className="py-24 px-6 bg-[#0a0a0a]">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+           {/* Faixa 1 */}
+           <div className="bg-[#111111] border border-[#a3a3a3]/10 p-8 rounded-2xl flex flex-col justify-between hover:border-[#c9a263]/30 transition-all">
+              <div>
+                <h3 className="font-serif text-3xl text-white mb-2">10–20kg</h3>
+                <span className="text-[#c9a263] font-bold text-xs uppercase tracking-widest block mb-4">/ mês</span>
+                <p className="text-[#a3a3a3] text-sm">Escritórios, clínicas e recepções premium.</p>
+              </div>
+              <button onClick={() => scrollToSection('b2b-form')} className="mt-8 text-xs font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#c9a263] text-left">Solicitar proposta <ArrowRight size={14} className="inline ml-1"/></button>
+           </div>
+           
+           {/* Faixa 2 */}
+           <div className="bg-[#111111] border border-[#c9a263]/20 p-8 rounded-2xl flex flex-col justify-between hover:border-[#c9a263] transition-all relative">
+              <div>
+                <h3 className="font-serif text-3xl text-white mb-2 mt-2">20–50kg</h3>
+                <span className="text-[#c9a263] font-bold text-xs uppercase tracking-widest block mb-4">/ mês</span>
+                <p className="text-[#a3a3a3] text-sm mt-4">Restaurantes, cafeterias, coworkings e operações recorrentes.</p>
+              </div>
+              <button onClick={() => scrollToSection('b2b-form')} className="mt-8 text-xs font-bold uppercase tracking-widest text-[#c9a263] hover:text-white text-left">Solicitar proposta <ArrowRight size={14} className="inline ml-1"/></button>
+           </div>
+           
+           {/* Faixa 3 */}
+           <div className="bg-[#111111] border border-[#a3a3a3]/10 p-8 rounded-2xl flex flex-col justify-between hover:border-[#c9a263]/30 transition-all">
+              <div>
+                <h3 className="font-serif text-3xl text-white mb-2">50kg+</h3>
+                <span className="text-[#c9a263] font-bold text-xs uppercase tracking-widest block mb-4">/ mês</span>
+                <p className="text-[#a3a3a3] text-sm">Hotéis, redes e revenda.</p>
+              </div>
+              <button onClick={() => scrollToSection('b2b-form')} className="mt-8 text-xs font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#c9a263] text-left">Solicitar proposta <ArrowRight size={14} className="inline ml-1"/></button>
+           </div>
+           
+           {/* Faixa Exportação */}
+           <div className="bg-[#1a1a1a] border border-[#a3a3a3]/10 p-8 rounded-2xl flex flex-col justify-between hover:border-[#c9a263]/30 transition-all">
+              <div>
+                <Globe className="text-[#a3a3a3] mb-4" size={24}/>
+                <h3 className="font-serif text-3xl text-white mb-2">Exportação</h3>
+                <p className="text-[#a3a3a3] text-sm">Grandes volumes e operações sob consulta.</p>
+              </div>
+               <button onClick={() => scrollToSection('export-section')} className="mt-8 text-xs font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#c9a263] text-left">Solicitar proposta <ArrowRight size={14} className="inline ml-1"/></button>
+           </div>
+        </div>
+      </section>
+
+      {/* 10. EXPORTAÇÃO */}
+      <section id="export-section" className="bg-[#111111] py-16 px-6 border-y border-[#a3a3a3]/10">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8 justify-between">
+           <div className="flex-1">
+             <div className="flex items-center gap-3 mb-4">
+                <Globe className="text-[#c9a263]" size={24}/>
+                <h3 className="text-2xl font-serif text-white">Exportação e grandes volumes</h3>
+             </div>
+             <p className="text-[#a3a3a3] text-sm leading-relaxed">
+               Para revenda, recorrência e operações acima de alto volume, fale com a equipe comercial para avaliar disponibilidade, documentação e logística.
+             </p>
+           </div>
+           <div className="shrink-0">
+             <button onClick={() => handleWhatsAppClick('Mercado Internacional / Grandes Volumes Gerais')} className="border border-[#c9a263] text-[#c9a263] hover:bg-[#c9a263] hover:text-[#0a0a0a] transition-all px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+                Falar com a equipe
+             </button>
+           </div>
+        </div>
+      </section>
+
+      {/* 11. FAQ B2B */}
+      <section className="py-24 px-6 bg-[#0a0a0a]">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">Perguntas Frequentes (B2B)</h2>
-            <p className="text-[#a3a3a3] text-lg font-light">Tudo o que sua equipe precisa saber antes de fechar parceria.</p>
+            <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">Perguntas Frequentes</h2>
           </div>
 
           <div className="space-y-4">
-              <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Faturam por CNPJ?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Sim. Emitimos nota fiscal eletrônica de todos os pedidos corporativos, garantindo a conformidade da sua contabilidade de insumos.</p>
+            {faqItems.map((faq, idx) => (
+              <div key={idx} className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden transition-all duration-300 shadow-sm">
+                <button 
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-[#111111] transition-colors"
+                  aria-expanded={openFaq === idx}
+                >
+                  <h3 className="font-serif text-lg text-white pr-8">{faq.q}</h3>
+                  <ChevronDown size={20} className={`text-[#c9a263] transition-transform duration-300 shrink-0 ${openFaq === idx ? 'rotate-180' : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {openFaq === idx && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
+                      <p className="p-6 pt-0 text-[#a3a3a3] font-light leading-relaxed border-t border-[#a3a3a3]/10 mt-2 pt-4 bg-[#111111]/50">
+                        {faq.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">A torra também é sob demanda para parceiros B2B?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Sim, o princípio do frescor não muda. Nós montamos uma programação de torra mensal para sua operação, assim o café chega no ápice sensorial no fim do tempo de descanso.</p>
-              </div>
-              <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Comodato: Fornecem máquinas e moinhos?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Nosso foco é exclusivamente o grão. Porém, dependendo do volume estimado, indicamos parceiros diretos experientes em maquinário (La Spaziale, Fiamma, Mahlkönig) para atender sua necessidade.</p>
-              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 12. CTA FINAL */}
+      <section className="bg-[#111111] text-white py-32 px-6 text-center relative overflow-hidden font-sans border-t border-[#a3a3a3]/10">
+        <div className="absolute inset-0 bg-[#c9a263]/5 opacity-10 mix-blend-overlay"></div>
+        <div className="max-w-4xl mx-auto relative z-10">
+          <h2 className="text-4xl md:text-5xl lg:text-7xl font-serif leading-[1.1] mb-6 tracking-tight">
+            Pronto para servir um café <br/>
+            <span className="text-[#c9a263] italic font-light drop-shadow-sm">à altura da sua marca?</span>
+          </h2>
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8 mt-12">
+            <button onClick={() => scrollToSection('b2b-form')} className="bg-[#c9a263] text-[#0a0a0a] px-10 py-5 rounded-xl font-bold hover:bg-[#e0b875] transition-all shadow-[0_10px_25px_rgba(201,162,99,0.3)] hover:scale-[1.02] active:scale-[0.98] uppercase text-sm tracking-wider">
+               Solicitar proposta B2B
+            </button>
+            <button onClick={() => handleWhatsAppClick('Desejo iniciar volume B2B')} className="bg-transparent text-white border border-[#c9a263]/30 bg-white/5 backdrop-blur-md px-10 py-5 rounded-xl font-bold hover:bg-white/10 hover:border-[#c9a263]/50 transition-colors uppercase text-sm tracking-wider">
+               Falar no WhatsApp
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest mx-auto w-fit">
+              <span className="flex items-center gap-1">86+ SCA</span>
+              <span className="flex items-center gap-1">•</span>
+              <span className="flex items-center gap-1">Cup of Excellence</span>
+              <span className="flex items-center gap-1">•</span>
+              <span className="flex items-center gap-1">Torra sob demanda</span>
+              <span className="flex items-center gap-1">•</span>
+              <span className="flex items-center gap-1">Rastreabilidade QR</span>
+              <span className="flex items-center gap-1">•</span>
+              <span className="flex items-center gap-1 text-[#c9a263]">A partir de 10kg/mês</span>
           </div>
         </div>
       </section>

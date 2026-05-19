@@ -81,6 +81,7 @@ export default function Footer() {
                   <p className="flex items-center gap-2"><Building2 size={12} className="text-[#a3a3a3]/50"/> Cof Cof Cafés Especiais do Cerrado LTDA</p>
                   <p className="flex items-center gap-2"><CheckCircle2 size={12} className="text-[#a3a3a3]/50"/> CNPJ: 52.639.486/0001-06</p>
                   <p className="flex items-center gap-2"><MapPin size={12} className="text-[#a3a3a3]/50"/> Patrocínio / MG · Cerrado Mineiro</p>
+                  <p className="flex items-center gap-2"><CheckCircle2 size={12} className="text-[#a3a3a3]/50"/> ola@cofcof.com.br</p>
                </div>
             </div>
           </div>
