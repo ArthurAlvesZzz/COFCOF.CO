@@ -76,49 +76,60 @@ export function RoasterHoursControl({ onAction }: RoasterHoursControlProps) {
     <div className="space-y-10">
       {/* 1. Statistics & Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-         <div className="bg-[#1C1A17] p-8 rounded-[2.5rem] text-white flex flex-col justify-between">
+         <div className="bg-[#111111] border border-[#c9a263]/20 p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgba(201,162,99,0.05)] text-white flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a263]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+            <div className="relative z-10">
+               <Clock className="text-[#c9a263] mb-4" size={24} />
+               <p className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3]">Horas Pendentes</p>
+               <p className="text-4xl font-serif mt-2 text-[#c9a263]">{pendingHours}<span className="text-xl font-sans text-white/50 ml-2">h</span></p>
+            </div>
+            <p className="text-[9px] font-bold text-white/70 uppercase tracking-widest mt-8 relative z-10">
+              Previsão Financeira: <span className="text-white">R$ {(pendingHours * 50).toLocaleString('pt-BR')}</span>
+            </p>
+         </div>
+
+         <div className="bg-[#111111] p-8 rounded-[2.5rem] border border-[#a3a3a3]/10 flex flex-col justify-between">
             <div>
-               <Clock className="text-[#B06A32] mb-4" size={24} />
-               <p className="text-[10px] font-black uppercase tracking-widest text-white/40">HorasPendentes</p>
-               <p className="text-4xl font-black mt-2">{pendingHours}<span className="text-xl font-medium text-white/40 ml-2">h</span></p>
+                <Calendar className="text-[#a3a3a3] mb-4" size={24} />
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3]">Próximo Fechamento</p>
+                <p className="text-2xl font-serif text-white mt-2">Sexta-feira</p>
             </div>
-            <p className="text-[9px] font-bold text-[#B06A32] uppercase tracking-widest mt-8">Previsão: R$ {(pendingHours * 50).toLocaleString('pt-BR')}</p>
+            <p className="text-[9px] font-bold text-[#c9a263] bg-[#c9a263]/10 border border-[#c9a263]/20 px-3 py-1.5 rounded-lg uppercase tracking-widest mt-4 w-max">
+              Conciliação Automática
+            </p>
          </div>
 
-         <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <Calendar className="text-indigo-600 mb-4" size={24} />
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Próximo Pagamento</p>
-            <p className="text-2xl font-black text-[#1C1A17] mt-2">Sexta-feira</p>
-            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-4">Automático</p>
-         </div>
-
-         <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+         <div className="bg-[#111111] p-8 rounded-[2.5rem] border border-[#a3a3a3]/10 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-               <AlertCircle className="text-amber-500" size={24} />
-               <div className="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[9px] font-black uppercase tracking-widest">{pendingEntries.length > 0 ? 'Pendente' : 'Fechado'}</div>
+               <AlertCircle className={pendingEntries.length > 0 ? "text-[#c9a263]" : "text-emerald-500"} size={24} />
+               <div className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border ${pendingEntries.length > 0 ? 'bg-[#c9a263]/10 text-[#c9a263] border-[#c9a263]/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}`}>
+                 {pendingEntries.length > 0 ? 'Ação Necessária' : 'Fechado'}
+               </div>
             </div>
-            <p className="text-xl font-black text-[#1C1A17]">{pendingEntries.length} registros</p>
-            <button 
-              disabled={pendingEntries.length === 0}
-              onClick={() => setIsConfirmOpen(true)} 
-              className={`text-[9px] text-left font-bold underline uppercase tracking-widest mt-4 transition-colors ${pendingEntries.length === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 cursor-pointer hover:text-[#1C1A17]'}`}
-            >
-              {pendingEntries.length > 0 ? 'Aprovar todos agora' : 'Nenhuma hora pendente'}
-            </button>
+            <div>
+               <p className="text-xl font-serif text-white mb-4">{pendingEntries.length} registros à revisar</p>
+               <button 
+                 disabled={pendingEntries.length === 0}
+                 onClick={() => setIsConfirmOpen(true)} 
+                 className={`w-full py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${pendingEntries.length === 0 ? 'bg-[#1a1a1a] text-[#a3a3a3] cursor-not-allowed border border-[#a3a3a3]/10' : 'bg-[#c9a263] text-black hover:bg-white border border-[#c9a263] shadow-[0_0_15px_rgba(201,162,99,0.2)]'}`}
+               >
+                 {pendingEntries.length > 0 ? 'Aprovar todos agora' : 'Tudo em dia'}
+               </button>
+            </div>
          </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-12 pt-6">
          {/* Table of Entries */}
          <div className="xl:col-span-2 space-y-6">
-            <div className="flex items-center justify-between">
-               <h3 className="text-sm font-black uppercase tracking-widest text-[#1C1A17]">Registros de Atividade</h3>
-               <div className="flex items-center gap-1.5 p-1 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+               <h3 className="text-sm font-serif text-white">Registros de Atividade</h3>
+               <div className="flex items-center gap-1 p-1 bg-[#111111] rounded-xl border border-[#a3a3a3]/10">
                   {['pending', 'approved', 'paid', 'all'].map(s => (
                     <button 
                       key={s} 
                       onClick={() => setFilter(s as any)}
-                      className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${filter === s ? 'bg-white text-[#1C1A17] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                      className={`px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all ${filter === s ? 'bg-[#1a1a1a] text-[#c9a263] border border-[#c9a263]/30 shadow-sm' : 'text-[#a3a3a3] hover:text-white'}`}
                     >
                       {s === 'pending' ? 'Pendente' : s === 'approved' ? 'Aprovado' : s === 'paid' ? 'Pago' : 'Todos'}
                     </button>
@@ -126,57 +137,57 @@ export function RoasterHoursControl({ onAction }: RoasterHoursControlProps) {
                </div>
             </div>
 
-            <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-sm">
-               <table className="w-full text-left border-collapse">
+            <div className="bg-[#111111] rounded-[24px] border border-[#a3a3a3]/10 overflow-x-auto hide-scrollbar">
+               <table className="w-full text-left border-collapse min-w-[600px]">
                   <thead>
-                    <tr className="bg-gray-50/50">
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Data</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Mestre</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Atividade</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Horas</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ação</th>
+                    <tr className="bg-[#1a1a1a]/50 border-b border-[#a3a3a3]/10">
+                      <th className="px-6 py-5 text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest whitespace-nowrap">Data e Hora</th>
+                      <th className="px-6 py-5 text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest">Colaborador</th>
+                      <th className="px-6 py-5 text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest">Atividade</th>
+                      <th className="px-6 py-5 text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest text-center">Horas</th>
+                      <th className="px-6 py-5 text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest text-right">Ação</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-[#a3a3a3]/5">
                     {filteredEntries.map(entry => (
-                      <tr key={entry.id} className="group hover:bg-gray-50/50 transition-colors">
-                        <td className="px-6 py-4">
-                           <p className="text-xs font-black text-[#1C1A17]">{format(new Date(entry.date), 'dd/MM/yyyy')}</p>
-                           <p className="text-[9px] font-bold text-gray-400 uppercase">{entry.startTime} - {entry.endTime}</p>
+                      <tr key={entry.id} className="group hover:bg-[#1a1a1a]/50 transition-colors">
+                        <td className="px-6 py-5 whitespace-nowrap">
+                           <p className="text-sm font-medium text-white">{format(new Date(entry.date), 'dd/MM/yyyy')}</p>
+                           <p className="text-[10px] font-bold text-[#a3a3a3] uppercase">{entry.startTime} - {entry.endTime}</p>
                         </td>
-                        <td className="px-6 py-4 text-xs font-bold text-gray-600 uppercase">{entry.roasterName}</td>
-                        <td className="px-6 py-4">
-                           <span className="px-2.5 py-1 bg-gray-50 rounded-lg text-[9px] font-black text-[#B06A32] uppercase tracking-widest">
+                        <td className="px-6 py-5 text-sm font-medium text-white">{entry.roasterName}</td>
+                        <td className="px-6 py-5">
+                           <span className="px-3 py-1 bg-[#1a1a1a] border border-[#a3a3a3]/10 rounded-lg text-[9px] font-bold text-[#c9a263] uppercase tracking-widest">
                              {entry.activity}
                            </span>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                           <p className="text-sm font-black text-[#1C1A17]">{entry.totalHours}h</p>
+                        <td className="px-6 py-5 text-center">
+                           <p className="text-base font-serif text-white">{entry.totalHours} <span className="text-[#a3a3a3] text-sm font-sans">h</span></p>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-5 text-right w-32">
                            {entry.status === 'pending' && (
                              <div className="flex justify-end gap-2">
-                                <button onClick={() => approveEntry(entry.id)} className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
+                                <button onClick={() => approveEntry(entry.id)} className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all shadow-sm">
                                    <Check size={16} />
                                 </button>
-                                <button className="w-8 h-8 rounded-lg bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                                <button className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm">
                                    <X size={16} />
                                 </button>
                              </div>
                            )}
-                           {entry.status === 'approved' && <CheckCircle2 size={18} className="text-indigo-500 ml-auto" />}
-                           {entry.status === 'paid' && <CheckCircle2 size={18} className="text-emerald-500 ml-auto" />}
+                           {entry.status === 'approved' && <CheckCircle2 size={18} className="text-[#c9a263] ml-auto" title="Aprovado" />}
+                           {entry.status === 'paid' && <CheckCircle2 size={18} className="text-emerald-500 ml-auto" title="Pago" />}
                         </td>
                       </tr>
                     ))}
                     {filteredEntries.length === 0 && (
                       <tr>
                         <td colSpan={5} className="p-0">
-                           <div className="py-12 flex justify-center">
+                           <div className="py-16 flex justify-center">
                               <OperationEmptyState
                                 icon={Clock}
-                                title="Nenhuma hora lançada"
-                                description="Você ainda não lançou trabalho do mestre de torra."
+                                title="Nenhum Registro"
+                                description="Não há registros de atividade para este filtro."
                                 actionLabel="Registrar Horas"
                                 onAction={() => onAction?.('log_hours')}
                               />
@@ -191,45 +202,45 @@ export function RoasterHoursControl({ onAction }: RoasterHoursControlProps) {
 
          {/* Weekly Payrolls Section */}
          <div className="space-y-6">
-            <h3 className="text-sm font-black uppercase tracking-widest text-[#1C1A17]">Fechamentos Semanais</h3>
+            <h3 className="text-sm font-serif text-white">Fechamentos Concluídos</h3>
             <div className="space-y-4">
                {payrolls.map(pay => (
-                 <div key={pay.id} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-3">
-                       <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${pay.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : pay.status === 'approved' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}`}>
+                 <div key={pay.id} className="bg-[#111111] p-6 rounded-[24px] border border-[#a3a3a3]/10 cursor-pointer hover:border-[#c9a263]/30 transition-all relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4">
+                       <span className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border ${pay.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : pay.status === 'approved' ? 'bg-[#c9a263]/10 text-[#c9a263] border-[#c9a263]/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
                          {pay.status === 'paid' ? 'PAGO' : pay.status === 'approved' ? 'APROVADO' : 'PENDENTE'}
                        </span>
                     </div>
                     
-                    <div className="mb-6">
-                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Período</p>
-                       <p className="text-xs font-black text-[#1C1A17] uppercase tracking-wider">{format(new Date(pay.startDate), 'dd/MM')} — {format(new Date(pay.endDate), 'dd/MM')}</p>
+                    <div className="mb-6 mt-1">
+                       <p className="text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest mb-1">Período de Apuração</p>
+                       <p className="text-sm font-medium text-white">{format(new Date(pay.startDate), 'dd/MM/yyyy')} — {format(new Date(pay.endDate), 'dd/MM/yyyy')}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="grid grid-cols-2 gap-4 mb-6 bg-[#1a1a1a] p-4 rounded-xl border border-[#a3a3a3]/5">
                        <div>
-                          <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">Total Horas</p>
-                          <p className="text-sm font-black text-[#1C1A17]">{pay.totalHours}h</p>
+                          <p className="text-[9px] font-bold text-[#a3a3a3] uppercase mb-1">Total</p>
+                          <p className="text-base font-serif text-white">{pay.totalHours} <span className="text-xs font-sans text-[#a3a3a3]">h</span></p>
                        </div>
                        <div>
-                          <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">Valor Final</p>
-                          <p className="text-sm font-black text-[#B06A32]">R$ {pay.totalValue.toLocaleString()}</p>
+                          <p className="text-[9px] font-bold text-[#a3a3a3] uppercase mb-1">Repasse Base</p>
+                          <p className="text-base font-serif text-[#c9a263]">R$ {pay.totalValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                        </div>
                     </div>
 
-                    <div className="pt-6 border-t border-gray-50 flex items-center gap-2">
-                       <button onClick={() => copySummaryWhatsApp(pay)} className="flex-1 px-4 py-2 bg-gray-50 hover:bg-[#1C1A17] hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest text-gray-600 transition-all flex items-center justify-center gap-2">
+                    <div className="pt-4 flex items-center gap-2">
+                       <button onClick={() => copySummaryWhatsApp(pay)} className="flex-1 px-4 py-3 bg-[#1a1a1a] hover:bg-[#c9a263] hover:text-black border border-[#a3a3a3]/10 hover:border-[#c9a263] rounded-xl text-[9px] font-bold uppercase tracking-widest text-white transition-all flex items-center justify-center gap-2">
                           <MessageCircle size={14} /> WhatsApp
                        </button>
-                       <button className="px-4 py-2 bg-gray-50 hover:bg-indigo-600 hover:text-white rounded-xl text-gray-600 transition-all">
+                       <button className="px-4 py-3 bg-[#1a1a1a] hover:bg-white hover:text-black border border-[#a3a3a3]/10 rounded-xl text-[#a3a3a3] transition-all">
                           <Printer size={14} />
                        </button>
                     </div>
                  </div>
                ))}
                {payrolls.length === 0 && (
-                 <div className="p-8 text-center bg-[#FDFCFB] rounded-[2.5rem] border border-dashed border-gray-200">
-                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Nenhum fechamento gerado</p>
+                 <div className="p-10 text-center bg-[#111111] rounded-[24px] border border-dashed border-[#a3a3a3]/20">
+                    <p className="text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest">Nenhum fechamento gerado</p>
                  </div>
                )}
             </div>

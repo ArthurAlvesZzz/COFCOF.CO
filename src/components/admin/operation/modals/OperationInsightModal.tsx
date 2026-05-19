@@ -196,73 +196,82 @@ export function OperationInsightModal({ isOpen, onClose, type, dates, stats, onA
                    
                    {/* Special Summaries based on type */}
                    {type === 'raw_stock' && (
-                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kg Total</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.rawKgAvailable || 0}</p>
+                     <div className="flex flex-wrap items-center gap-6 pb-6 mb-6 border-b border-gray-100">
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kg Total</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.rawKgAvailable || 0}</p>
                          </div>
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lotes</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.activeLotsCount || 0}</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Quantidade de Lotes</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.activeLotsCount || 0}</p>
                          </div>
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Custo Médio</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">R$ {stats?.averageRawCostPerKg?.toFixed(2) || 0}</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Custo Médio / Kg</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">R$ {stats?.averageRawCostPerKg?.toFixed(2) || 0}</p>
                          </div>
                      </div>
                    )}
 
                    {type === 'lots_launched' && (
-                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lotes</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.rawLotsLaunchedInPeriod || 0}</p>
+                     <div className="flex flex-wrap items-center gap-6 pb-6 mb-6 border-b border-gray-100">
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lotes no Período</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.rawLotsLaunchedInPeriod || 0}</p>
                          </div>
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Comprados</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.rawKgPurchasedInPeriod || 0}kg</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kg Comprados</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.rawKgPurchasedInPeriod || 0}kg</p>
                          </div>
-                         <div className="bg-blue-50 border-blue-100 p-4 rounded-xl shadow-sm col-span-2">
-                            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Valor Investido</p>
-                            <p className="text-2xl font-black text-blue-900">R$ {stats?.rawInvestmentInPeriod?.toLocaleString('pt-BR') || 0}</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-[#c9a263] uppercase tracking-widest">Valor Investido</p>
+                             <p className="text-xl font-serif text-[#c9a263]">R$ {stats?.rawInvestmentInPeriod?.toLocaleString('pt-BR') || 0}</p>
                          </div>
                      </div>
                    )}
 
                    {type === 'roasted' && (
-                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Torrado Total</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.roastedKgInPeriod || 0}kg</p>
+                     <div className="flex flex-wrap items-center gap-6 pb-6 mb-6 border-b border-gray-100">
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Torrado Total Líquido</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.roastedKgInPeriod || 0}kg</p>
                          </div>
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Torras</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.roastsCountInPeriod || 0}</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total de Torras</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.roastsCountInPeriod || 0}</p>
                          </div>
-                         <div className="bg-orange-50 border-orange-100 p-4 rounded-xl shadow-sm">
-                            <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Perda Média</p>
-                            <p className="text-2xl font-black text-orange-900">{stats?.averageRoastLossPercent?.toFixed(1) || 0}%</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Cru Utilizado</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.rawKgUsedInPeriod || 0}kg</p>
                          </div>
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Cru Usado</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.rawKgUsedInPeriod || 0}kg</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-orange-600 uppercase tracking-widest">Perda Média</p>
+                             <p className="text-xl font-serif text-orange-600">{stats?.averageRoastLossPercent?.toFixed(1) || 0}%</p>
                          </div>
                      </div>
                    )}
                    
                    {type === 'roaster_hours' && (
-                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Horas</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.roasterHoursInPeriod || 0}h</p>
+                     <div className="flex flex-wrap items-center gap-6 pb-6 mb-6 border-b border-gray-100">
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total de Horas</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.roasterHoursInPeriod || 0}h</p>
                          </div>
-                         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pendentes</p>
-                            <p className="text-2xl font-black text-[#1C1A17]">{stats?.pendingRoasterHours || 0}h</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Horas Pendentes</p>
+                             <p className="text-xl font-serif text-[#1C1A17]">{stats?.pendingRoasterHours || 0}h</p>
                          </div>
-                         <div className="bg-pink-50 border-pink-100 p-4 rounded-xl shadow-sm col-span-2">
-                            <p className="text-[10px] font-bold text-pink-500 uppercase tracking-widest">A pagar Mestre</p>
-                            <p className="text-2xl font-black text-pink-900">R$ {stats?.estimatedPayrollValue?.toLocaleString('pt-BR') || 0}</p>
+                         <div className="w-px h-8 bg-gray-200"></div>
+                         <div className="flex flex-col">
+                             <p className="text-[10px] font-bold text-pink-600 uppercase tracking-widest">Estimativa Folha</p>
+                             <p className="text-xl font-serif text-pink-600">R$ {stats?.estimatedPayrollValue?.toLocaleString('pt-BR') || 0}</p>
                          </div>
                      </div>
                    )}
@@ -397,12 +406,22 @@ export function OperationInsightModal({ isOpen, onClose, type, dates, stats, onA
                  )}
              </div>
              
-             <button
-                onClick={onClose}
-                className="flex items-center justify-center gap-2 bg-[#1C1A17] hover:bg-[#2a2723] text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg w-full sm:w-auto active:scale-95"
-             >
-                Fechar Painel <ArrowRight size={16} />
-             </button>
+             <div className="flex items-center w-full sm:w-auto gap-3">
+                 <button
+                    onClick={onClose}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-[#1C1A17] px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all w-full sm:w-auto active:scale-95"
+                 >
+                    Fechar
+                 </button>
+                 {config.emptyBtn && config.emptyAction && onAction && data.length > 0 && (
+                     <button
+                        onClick={() => { onClose(); onAction(config.emptyAction); }}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#111111] hover:bg-[#2a2723] text-[#c9a263] border border-[#c9a263]/30 px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg w-full sm:w-auto active:scale-95"
+                     >
+                        {config.emptyBtn} <ArrowRight size={16} />
+                     </button>
+                 )}
+             </div>
           </div>
         </motion.div>
       </div>

@@ -5,7 +5,7 @@ let mockCustomers: CustomerAdmin[] = [
     id: "cus_1",
     name: "João Silva",
     email: "joao@example.com",
-    whatsapp: "31999998888",
+    whatsapp: "34998728882",
     cpf: "111.111.111-11",
     type: "b2c",
     status: "active",
@@ -73,7 +73,7 @@ let mockCustomers: CustomerAdmin[] = [
   {
     id: "cus_3",
     name: "Maria Oliveira",
-    whatsapp: "31988887777",
+    whatsapp: "34998728882",
     type: "b2c",
     status: "pending_payment",
     address: {

@@ -62,7 +62,7 @@ export default function Subscription() {
 
   const handleWhatsAppClick = (planName: string) => {
     const text = `Olá, quero saber mais sobre a assinatura CofCof. Tenho interesse no plano ${planName}.`;
-    window.open(`https://wa.me/5531999999999?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/5534998728882?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const faqs = [

@@ -32,7 +32,7 @@ export default function CartDrawer() {
     text += `\nTotal: R$ ${cartTotal.toFixed(2)}`;
     
     const encodedText = encodeURIComponent(text);
-    window.open(`https://wa.me/5531999999999?text=${encodedText}`, '_blank');
+    window.open(`https://wa.me/5534998728882?text=${encodedText}`, '_blank');
   };
 
   const handleCheckout = () => {

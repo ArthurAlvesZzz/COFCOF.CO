@@ -136,7 +136,7 @@ export default function B2B() {
     e.preventDefault();
     const typeName = businessTypes.find(t => t.id === calcData.type)?.name || calcData.type;
     const text = `Olá! Gostaria de uma cotação comercial da CofCof. Fizemos uma simulação:\n\n*Operação:* ${typeName}\n*Pessoas:* ${calcData.people}/dia\n*Xícaras:* ${calcData.cupsPerPerson}/pessoa\n*Dias úteis:* ${calcData.daysPerMonth}/mês\n\n*Consumo Estimado:* ${estimatedKg}kg/mês\n*Pacote:* ${recommendedPackage}\n\nPodemos conversar?`;
-    window.open(`https://wa.me/5531999999999?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/5534998728882?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const updatePeople = (amount: number) => {

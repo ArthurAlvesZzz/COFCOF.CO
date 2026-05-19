@@ -6,7 +6,7 @@ let mockSellers: Seller[] = [
     name: 'João Silva',
     status: 'active',
     type: 'internal',
-    contact: { whatsapp: '11999999999', email: 'joao@cofcof.co' },
+    contact: { whatsapp: '34998728882', email: 'joao@cofcof.co' },
     location: { city: 'São Paulo', state: 'SP' },
     joinedAt: new Date(Date.now() - 100 * 86400000).toISOString(),
     commissionRule: {

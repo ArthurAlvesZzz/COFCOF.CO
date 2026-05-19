@@ -367,7 +367,7 @@ export const operationService = {
     
     await adminLogService.logAdminAction({
       userId,
-      userEmail: 'admin@cofcof.co',
+      userEmail: 'contato@cofcof.co',
       action: 'APPROVE_HOURS',
       entity: 'timeEntry',
       entityId: id,

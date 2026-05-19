@@ -92,11 +92,11 @@ export function PackagingModal({ isOpen, onClose, onSave }: PackagingModalProps)
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
            <div className="space-y-6">
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Lote de Torra (Origem)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Lote de Torra (Origem)</label>
                 <select 
                   value={formData.roastBatchId}
                   onChange={e => setFormData({...formData, roastBatchId: e.target.value})}
-                  className="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-[#B06A32]/10 transition-all outline-none appearance-none"
+                  className="w-full bg-[#111111] border border-[#a3a3a3]/10 rounded-xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 focus:border-[#c9a263]/50 transition-all outline-none appearance-none"
                 >
                   <option value="">Selecione o lote torrado...</option>
                   {roasts.map(r => (
@@ -106,14 +106,14 @@ export function PackagingModal({ isOpen, onClose, onSave }: PackagingModalProps)
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Formato / Unidade</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Formato / Unidade</label>
                 <div className="grid grid-cols-2 gap-3">
                    {formats.map(f => (
                      <button
                        key={f.label}
                        type="button"
                        onClick={() => setFormData({...formData, packageFormat: f.label, unitWeightKg: f.weight})}
-                       className={`px-4 py-3 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all ${formData.packageFormat === f.label ? 'border-[#c9a263] bg-[#c9a263]/5 text-[#c9a263] shadow-[0_0_15px_rgba(201,162,99,0.1)]' : 'border-[#a3a3a3]/20 bg-white text-[#a3a3a3] hover:border-[#a3a3a3]/50'}`}
+                       className={`px-4 py-3 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all ${formData.packageFormat === f.label ? 'border-[#c9a263] bg-[#c9a263]/10 text-[#c9a263] shadow-[0_0_15px_rgba(201,162,99,0.1)]' : 'border-[#a3a3a3]/10 bg-[#1a1a1a] text-[#a3a3a3] hover:border-[#a3a3a3]/30 hover:text-white'}`}
                      >
                        {f.label}
                      </button>
@@ -122,14 +122,14 @@ export function PackagingModal({ isOpen, onClose, onSave }: PackagingModalProps)
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Destino do Produzido</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Destino do Produzido</label>
                 <div className="flex gap-2">
                    {['estoque', 'pedido', 'consignacao'].map(d => (
                      <button
                         key={d}
                         type="button"
                         onClick={() => setFormData({...formData, destination: d as any})}
-                        className={`flex-1 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${formData.destination === d ? 'bg-[#111111] text-[#c9a263]' : 'bg-white border border-[#a3a3a3]/20 text-[#a3a3a3]'}`}
+                        className={`flex-1 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all border ${formData.destination === d ? 'bg-[#c9a263]/10 border-[#c9a263]/30 text-[#c9a263]' : 'bg-[#111111] border-[#a3a3a3]/10 text-[#a3a3a3] hover:border-[#a3a3a3]/30 hover:text-white'}`}
                      >
                         {d}
                      </button>
@@ -138,19 +138,20 @@ export function PackagingModal({ isOpen, onClose, onSave }: PackagingModalProps)
               </div>
            </div>
 
-           <div className="bg-[#fcfaf8] p-8 rounded-[2.5rem] border border-[#a3a3a3]/10 space-y-8">
-              <h3 className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a263]">Produção de Unidades</h3>
+           <div className="bg-[#111111] p-8 rounded-[24px] border border-[#a3a3a3]/10 space-y-8 relative overflow-hidden shadow-[0_8px_30px_rgba(201,162,99,0.05)]">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a263]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+              <h3 className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a263] border-b border-[#a3a3a3]/10 pb-4 relative z-10">Produção de Unidades</h3>
               
-              <div className="space-y-6">
+              <div className="space-y-6 relative z-10">
                  <div>
                     <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Quantidade de Unidades</label>
                     <div className="relative">
-                       <Box size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#a3a3a3]" />
+                       <Box size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#a3a3a3]/50" />
                        <input 
                          type="number" 
                          value={formData.quantityUnits}
                          onChange={e => setFormData({...formData, quantityUnits: Number(e.target.value)})}
-                         className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 rounded-2xl pl-12 pr-5 py-4 text-xl font-serif text-[#111111] outline-none transition-all shadow-[0_0_15px_rgba(201,162,99,0.05)]"
+                         className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 rounded-xl pl-12 pr-5 py-4 text-xl font-serif text-white outline-none transition-all shadow-[0_0_15px_rgba(201,162,99,0.05)] focus:ring-2 focus:ring-[#c9a263]/10"
                          placeholder="0"
                        />
                     </div>
@@ -163,29 +164,29 @@ export function PackagingModal({ isOpen, onClose, onSave }: PackagingModalProps)
                     </div>
                     <div className="text-right">
                        <p className="text-[9px] font-bold text-[#a3a3a3] uppercase tracking-widest">Saldo Torrado Disp.</p>
-                       <p className="text-xs font-bold text-[#a3a3a3]">---</p>
+                       <p className="text-sm font-serif text-white">---</p>
                     </div>
                  </div>
 
-                 <div className="flex items-center gap-2 p-3 bg-white border border-[#a3a3a3]/10 text-gray-500 rounded-xl text-[10px] font-bold uppercase tracking-wider">
-                    <Layers size={14} className="shrink-0 text-[#c9a263]" /> Baixa automática de café torrado
+                 <div className="flex items-center gap-2 p-3 bg-[#c9a263]/5 border border-[#c9a263]/20 text-[#c9a263] rounded-xl text-[10px] font-bold uppercase tracking-wider">
+                    <Layers size={14} className="shrink-0" /> Baixa automática de café torrado
                  </div>
               </div>
            </div>
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-6 border-t border-[#a3a3a3]/10">
-           <button type="button" onClick={onClose} className="px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#111111] transition-colors">Cancelar</button>
+           <button type="button" onClick={onClose} className="px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-white transition-colors">Cancelar</button>
            <div className="relative group">
               <button 
                 type="submit"
                 disabled={!canSave || loading}
-                className="bg-[#111111] text-[#c9a263] border border-[#a3a3a3]/10 px-10 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-black/5 hover:bg-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-[#c9a263] text-black hover:bg-white px-10 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(201,162,99,0.2)] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Processando...' : 'Registrar Empacotamento'}
               </button>
               {!canSave && (
-                 <div className="absolute bottom-full mb-2 right-0 w-max max-w-xs whitespace-normal bg-black text-white text-[10px] font-bold py-2 px-3 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                 <div className="absolute bottom-full mb-2 right-0 w-max max-w-xs whitespace-normal bg-[#111111] text-white border border-[#a3a3a3]/10 text-[10px] font-bold py-2 px-3 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                      Obrigatório: {missingFields.join(', ')}
                  </div>
               )}

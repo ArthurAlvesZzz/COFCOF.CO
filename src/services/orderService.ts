@@ -8,7 +8,7 @@ let mockOrders: OrderAdmin[] = [
     customer: {
       name: "João Silva",
       email: "joao@example.com",
-      whatsapp: "31999998888",
+      whatsapp: "34998728882",
     },
     shipping: {
       type: "delivery",
@@ -54,7 +54,7 @@ let mockOrders: OrderAdmin[] = [
     orderNumber: "CFC-002",
     customer: {
       name: "Maria Oliveira",
-      whatsapp: "31988887777",
+      whatsapp: "34998728882",
     },
     shipping: {
       type: "pickup",

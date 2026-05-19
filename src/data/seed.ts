@@ -74,7 +74,7 @@ export const mockPartners: Partner[] = [
     state: 'MG',
     lat: -19.932,
     lng: -43.938,
-    phone: '(31) 99999-9999',
+    phone: '(34) 99872-8882',
     instagram: '@cafedapraca',
     ifoodUrl: 'https://ifood.com.br/delivery/belo-horizonte-mg/cafe-da-praca-savassi',
     availableProducts: ['Cerrado Clássico', 'Gotejador'],

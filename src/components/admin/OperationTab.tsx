@@ -20,7 +20,8 @@ import {
   Briefcase,
   DollarSign,
   Users,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AdminStatCard } from './AdminStatCard';
@@ -54,7 +55,7 @@ import { AdjustStockModal } from './operation/modals/AdjustStockModal';
 import { CourtesyModal } from './operation/modals/CourtesyModal';
 import { adminLogService } from '../../services/adminLogService';
 
-import { OperationPrerequisiteModal, OperationComingSoonModal, OperationConfirmModal } from './operation/modals/OperationFeedbackModals';
+import { OperationPrerequisiteModal, OperationConfirmModal } from './operation/modals/OperationFeedbackModals';
 
 type OperationMode = 'flow' | 'diario' | 'estoque' | 'consignacoes' | 'financeiro' | 'horas' | 'auditoria';
 type PeriodOption = 'today' | 'yesterday' | 'last7' | 'last30' | 'thisMonth' | 'lastMonth' | 'custom';
@@ -83,7 +84,6 @@ export function OperationTab() {
 
   // Modais de feedback
   const [prerequisiteModal, setPrerequisiteModal] = useState<{isOpen: boolean, actionParams: any}>({isOpen: false, actionParams: null});
-  const [comingSoonModal, setComingSoonModal] = useState<{isOpen: boolean, feature: string}>({isOpen: false, feature: ''});
 
   const handleOperationAction = (actionType: string) => {
     // Fecha menu de operações se estiver aberto
@@ -205,7 +205,7 @@ export function OperationTab() {
           
           adminLogService.logAdminAction({
              userId: user?.id || 'user',
-             userEmail: user?.email || 'admin@cofcof.co',
+             userEmail: user?.email || 'contato@cofcof.co',
              action: 'EXPORT_CSV',
              entity: 'operation',
              entityId: 'period',
@@ -279,9 +279,6 @@ export function OperationTab() {
          setMode('horas');
          break;
 
-      case 'coming_soon':
-         setComingSoonModal({isOpen: true, feature: 'Funcionalidade mapeada (Em breve)'});
-         break;
       default:
         toast.error("Ação não mapeada.");
     }
@@ -414,15 +411,49 @@ export function OperationTab() {
 
       <div className="p-4 md:p-8 w-full max-w-[1440px] mx-auto min-w-0">
          {/* GRID PRINCIPAL */}
-         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start w-full">
+         <div className="flex flex-col gap-6 items-start w-full">
             
-            {/* COLUNA PRINCIPAL */}
-            <div className="flex flex-col gap-6 min-w-0 w-full">
-               
-               {/* 4 CARDS PRINCIPAIS */}
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+            {/* NOVEL: STATUS GERAL E PRÓXIMA AÇÃO NA MESMA LINHA/FAIXAS */}
+            <div className="grid grid-cols-1 lg:grid-cols bg-[#111111] rounded-[24px] shadow-xl overflow-hidden relative border border-[#c9a263]/20 w-full mb-2">
+                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#c9a263]/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                 
+                 <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 w-full">
+                     <div className="flex items-start gap-4">
+                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${
+                             (stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) 
+                             ? 'bg-red-900/20 text-red-400 border-red-500/20' 
+                             : 'bg-[#c9a263]/10 text-[#c9a263] border-[#c9a263]/20'
+                         }`}>
+                             {(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? <AlertTriangle size={28} strokeWidth={1.5} /> : <CheckCircle2 size={28} strokeWidth={1.5} />}
+                         </div>
+                         <div>
+                             <h2 className="text-2xl font-serif text-white leading-tight">
+                               {(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? `${stats?.criticalAlertsCount + stats?.overdueConsignmentsCount} Pendências Críticas` : 'Tudo certo'}
+                             </h2>
+                             <p className="text-[#a3a3a3] text-sm mt-1">
+                               {(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? 'Existem inconsistências que precisam da sua atenção.' : `Operação saudável no período de ${getPeriodLabel().toLowerCase()}.`}
+                             </p>
+                         </div>
+                     </div>
+                     
+                     <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+                         {(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? (
+                            <button onClick={() => setInsightModal({ isOpen: true, type: 'alerts' })} className="bg-red-600 hover:bg-red-700 text-white px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-sm active:scale-95 w-full sm:w-auto text-center flex items-center justify-center gap-2">
+                                Resolver Agora
+                            </button>
+                         ) : (
+                            <button onClick={() => setMode('diario')} className="bg-[#1a1a1a] hover:bg-[#222] border border-[#a3a3a3]/20 text-[#a3a3a3] hover:text-[#c9a263] px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-sm active:scale-95 w-full sm:w-auto text-center">
+                                Ver Status
+                            </button>
+                         )}
+                     </div>
+                 </div>
+            </div>
+
+            {/* 4 CARDS PRINCIPAIS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                   {/* Card 1: Café Cru */}
-                  <div onClick={() => (stats?.rawKgAvailable > 0) ? setInsightModal({ isOpen: true, type: 'raw_stock' }) : handleOperationAction('launch_lot')} className="group relative bg-white p-6 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-[#a3a3a3]/10 overflow-hidden cursor-pointer hover:shadow-lg hover:border-[#c9a263]/30 transition-all min-h-[160px] flex flex-col justify-between">
+                  <div onClick={() => (stats?.rawKgAvailable > 0) ? setInsightModal({ isOpen: true, type: 'raw_stock' }) : handleOperationAction('launch_lot')} className="group relative bg-[#fcfaf8] p-6 rounded-[24px] shadow-sm border border-[#a3a3a3]/10 overflow-hidden cursor-pointer hover:shadow-lg hover:border-[#c9a263]/30 transition-all min-h-[160px] flex flex-col justify-between">
                      <div className="flex items-start justify-between mb-2">
                         <span className="text-[11px] font-bold text-[#a3a3a3] uppercase tracking-widest leading-tight">Café Cru<br/>Disponível</span>
                         <Target size={16} className="text-[#a3a3a3] group-hover:text-[#c9a263] transition-colors" />
@@ -436,15 +467,15 @@ export function OperationTab() {
                             </div>
                         ) : (
                             <div className="flex items-center justify-between mt-3">
-                                <span className="text-[11px] font-bold text-[#a3a3a3]">Nenhum lote ativo</span>
-                                <span className="text-[10px] font-bold uppercase text-[#c9a263] bg-[#c9a263]/10 px-2 py-0.5 rounded-md border border-[#c9a263]/20">Lançar lote</span>
+                                <span className="text-[11px] font-bold text-[#a3a3a3]">Nenhum lote</span>
+                                <span className="text-[10px] font-bold uppercase text-[#c9a263] flex items-center gap-1 group-hover:translate-x-1 transition-transform">Lançar <ChevronRight size={12}/></span>
                             </div>
                         )}
                      </div>
                   </div>
 
                   {/* Card 2: Produção */}
-                  <div onClick={() => (stats?.roastedKgInPeriod > 0) ? setInsightModal({ isOpen: true, type: 'roasted' }) : handleOperationAction('register_roast')} className="group relative bg-white p-6 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-[#a3a3a3]/10 overflow-hidden cursor-pointer hover:shadow-lg hover:border-[#c9a263]/30 transition-all min-h-[160px] flex flex-col justify-between">
+                  <div onClick={() => (stats?.roastedKgInPeriod > 0) ? setInsightModal({ isOpen: true, type: 'roasted' }) : handleOperationAction('register_roast')} className="group relative bg-[#fcfaf8] p-6 rounded-[24px] shadow-sm border border-[#a3a3a3]/10 overflow-hidden cursor-pointer hover:shadow-lg hover:border-[#c9a263]/30 transition-all min-h-[160px] flex flex-col justify-between">
                      <div className="flex items-start justify-between mb-2">
                         <span className="text-[11px] font-bold text-[#a3a3a3] uppercase tracking-widest leading-tight">Produção<br/>(Período)</span>
                         <Flame size={16} className="text-[#a3a3a3] group-hover:text-[#c9a263] transition-colors" />
@@ -454,19 +485,19 @@ export function OperationTab() {
                         {stats?.roastedKgInPeriod > 0 ? (
                             <div className="flex items-center justify-between mt-3">
                                 <span className="text-[11px] font-bold text-[#a3a3a3]">{stats?.packagedUnitsInPeriod || 0} pacotes</span>
-                                <span className="text-[11px] font-bold text-[#c9a263] bg-[#c9a263]/10 px-2 py-0.5 rounded-full">Perda: {stats?.averageRoastLossPercent?.toFixed(1) || 0}%</span>
+                                <span className="text-[11px] font-bold text-[#c9a263]">Perda: {stats?.averageRoastLossPercent?.toFixed(1) || 0}%</span>
                             </div>
                         ) : (
                             <div className="flex items-center justify-between mt-3">
-                                <span className="text-[11px] font-bold text-[#a3a3a3]">Sem torras recentes</span>
-                                <span className="text-[10px] font-bold uppercase text-[#c9a263] bg-[#c9a263]/10 px-2 py-0.5 rounded-md border border-[#c9a263]/20">Torrar</span>
+                                <span className="text-[11px] font-bold text-[#a3a3a3]">Nenhuma torra</span>
+                                <span className="text-[10px] font-bold uppercase text-[#c9a263] flex items-center gap-1 group-hover:translate-x-1 transition-transform">Torrar <ChevronRight size={12}/></span>
                             </div>
                         )}
                      </div>
                   </div>
 
                   {/* Card 3: Estoque Pronto */}
-                  <div onClick={() => (stats?.finishedStockUnits > 0) ? setInsightModal({ isOpen: true, type: 'finished_stock' }) : handleOperationAction('package_coffee')} className="group relative bg-white p-6 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-[#a3a3a3]/10 overflow-hidden cursor-pointer hover:shadow-lg hover:border-[#c9a263]/30 transition-all min-h-[160px] flex flex-col justify-between">
+                  <div onClick={() => (stats?.finishedStockUnits > 0) ? setInsightModal({ isOpen: true, type: 'finished_stock' }) : handleOperationAction('package_coffee')} className="group relative bg-[#fcfaf8] p-6 rounded-[24px] shadow-sm border border-[#a3a3a3]/10 overflow-hidden cursor-pointer hover:shadow-lg hover:border-[#c9a263]/30 transition-all min-h-[160px] flex flex-col justify-between">
                      <div className="flex items-start justify-between mb-2">
                         <span className="text-[11px] font-bold text-[#a3a3a3] uppercase tracking-widest leading-tight">Estoque<br/>Pronto</span>
                         <Layers size={16} className="text-[#a3a3a3] group-hover:text-[#c9a263] transition-colors" />
@@ -481,37 +512,87 @@ export function OperationTab() {
                         ) : (
                             <div className="flex items-center justify-between mt-3">
                                 <span className="text-[11px] font-bold text-[#a3a3a3]">Estoque zerado</span>
-                                <span className="text-[10px] font-bold uppercase text-[#c9a263] bg-[#c9a263]/10 px-2 py-0.5 rounded-md border border-[#c9a263]/20">Empacotar</span>
+                                <span className="text-[10px] font-bold uppercase text-[#c9a263] flex items-center gap-1 group-hover:translate-x-1 transition-transform">Empacotar <ChevronRight size={12}/></span>
                             </div>
                         )}
                      </div>
                   </div>
 
                   {/* Card 4: Pendências */}
-                  <div onClick={() => handleOperationAction('view_alerts')} className={`group relative p-6 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border overflow-hidden cursor-pointer hover:shadow-lg transition-all min-h-[160px] flex flex-col justify-between ${(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? 'bg-[#fff5f5] border-red-200' : 'bg-white border-[#a3a3a3]/10 hover:border-[#c9a263]/30'}`}>
+                  <div onClick={() => handleOperationAction('view_alerts')} className={`group relative p-6 rounded-[24px] shadow-sm border overflow-hidden cursor-pointer hover:shadow-md transition-all min-h-[160px] flex flex-col justify-between ${(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? 'bg-[#fff5f5] border-red-200' : 'bg-[#fcfaf8] border-[#a3a3a3]/10 hover:border-[#c9a263]/30'}`}>
                      <div className="flex items-start justify-between mb-2">
-                        <span className={`text-[11px] font-bold uppercase tracking-widest leading-tight ${(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? 'text-red-500' : 'text-[#a3a3a3]'}`}>Pendências<br/>Críticas</span>
+                        <span className={`text-[11px] font-bold uppercase tracking-widest leading-tight ${(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? 'text-red-500' : 'text-[#a3a3a3]'}`}>Alerta<br/>Operacional</span>
                         <AlertTriangle size={16} className={(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? 'text-red-500' : 'text-[#a3a3a3]'} />
                      </div>
                      <div>
                         <p className={`text-4xl font-serif ${(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount > 0) ? 'text-red-600' : 'text-[#0a0a0a]'}`}>{stats?.criticalAlertsCount + stats?.overdueConsignmentsCount || 0}</p>
                         {(stats?.criticalAlertsCount + stats?.overdueConsignmentsCount) > 0 ? (
                             <div className="flex items-center justify-between mt-3">
-                                <span className={`text-[11px] font-bold ${(stats?.overdueConsignmentsCount > 0) ? 'text-red-600' : 'text-[#a3a3a3]'}`}>{stats?.overdueConsignmentsCount || 0} em atraso</span>
-                                <span className="text-[11px] font-bold text-[#a3a3a3]">{stats?.criticalAlertsCount || 0} sistêmicas</span>
+                                <span className={`text-[11px] font-bold ${(stats?.overdueConsignmentsCount > 0) ? 'text-red-600' : 'text-[#a3a3a3]'}`}>{stats?.overdueConsignmentsCount || 0} atrasos</span>
+                                <span className="text-[10px] font-bold uppercase text-red-500 flex items-center gap-1 group-hover:translate-x-1 transition-transform">Check <ChevronRight size={12}/></span>
                             </div>
                         ) : (
                             <div className="flex items-center justify-between mt-3">
                                 <span className="text-[11px] font-bold text-[#a3a3a3]">Tudo em ordem</span>
-                                <span className="text-[10px] font-bold uppercase text-[#a3a3a3] bg-[#fcfaf8] px-2 py-0.5 rounded-md border border-[#a3a3a3]/10">Até o momento</span>
+                                <span className="text-[10px] font-bold uppercase text-[#a3a3a3]">✓ Normal</span>
                             </div>
                         )}
                      </div>
                   </div>
-               </div>
+            </div>
 
-               {/* INDICADORES SECUNDÁRIOS */}
-               <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar pb-1 w-full snap-x">
+            {/* PRÓXIMA AÇÃO RECOMENDADA */}
+            <div className="w-full relative rounded-[24px] border border-[#c9a263] bg-[#0a0a0a] shadow-[0_10px_30px_rgba(201,162,99,0.1)] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-[0_10px_40px_rgba(201,162,99,0.15)] transition-shadow">
+               <div className="absolute top-0 right-0 w-[400px] h-full overflow-hidden rounded-r-[24px] pointer-events-none opacity-20">
+                    <div className="absolute top-1/2 right-[-50px] w-64 h-64 bg-[#c9a263] rounded-full blur-[100px] -translate-y-1/2"></div>
+               </div>
+               
+               <div className="flex items-start gap-4 relative z-10 w-full">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border bg-[#111111] text-[#c9a263] border-[#c9a263]/20">
+                        <Zap size={24} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                        <h3 className="text-[11px] font-bold text-[#c9a263] uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                             Próxima Ação Recomendada
+                        </h3>
+                        <h2 className="text-xl md:text-2xl font-serif text-white leading-tight mb-2">
+                            {(stats?.issues && stats.issues.length > 0) 
+                              ? stats.issues[0].title 
+                              : (stats?.activeLotsCount === 0 
+                                  ? 'Lançar lote para liberar produção' 
+                                  : 'Registrar torra para alimentar o estoque')}
+                        </h2>
+                        <p className="text-[#a3a3a3] text-sm">
+                            {(stats?.issues && stats.issues.length > 0) 
+                              ? stats.issues[0].description 
+                              : (stats?.activeLotsCount === 0 
+                                  ? 'Você não possui café cru ativo. Lance um lote agora para liberar empacotamento e torra.' 
+                                  : 'O fluxo operacional está livre, mantenha a esteira em movimento registrando as próximas torras.')}
+                        </p>
+                    </div>
+               </div>
+               
+               <div className="shrink-0 relative z-10">
+                   <button 
+                     onClick={() => {
+                        if (stats?.issues && stats.issues.length > 0 && stats.issues[0].actionType) {
+                            handleOperationAction(stats.issues[0].actionType);
+                        } else if (stats?.activeLotsCount === 0) {
+                            handleOperationAction('launch_lot');
+                        } else {
+                            handleOperationAction('register_roast');
+                        }
+                     }} 
+                     className="bg-[#c9a263] hover:bg-white text-[#0a0a0a] px-8 py-3.5 rounded-xl font-bold text-[11px] uppercase tracking-[0.15em] transition-all shadow-[0_0_20px_rgba(201,162,99,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] active:scale-95 w-full sm:w-auto text-center flex items-center justify-center gap-2"
+                   >
+                       {(stats?.issues && stats.issues.length > 0) ? 'Resolver Agora' : (stats?.activeLotsCount === 0 ? 'Lançar Lote' : 'Registrar Torra')}
+                       <ArrowRight size={16} />
+                   </button>
+               </div>
+            </div>
+
+            {/* INDICADORES SECUNDÁRIOS */}
+            <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar pb-1 w-full snap-x">
                   {[
                       { label: 'Custo Médio/kg', val: `R$ ${stats?.averageRawCostPerKg?.toFixed(2) || '0.00'}` },
                       { label: 'Lotes Lançados', val: `${stats?.rawLotsLaunchedInPeriod || 0}` },
@@ -527,40 +608,82 @@ export function OperationTab() {
                   ))}
                </div>
 
-               {/* TIMELINE - LINHA DE PRODUÇÃO */}
-               <div className="bg-white border border-[#a3a3a3]/10 rounded-[24px] p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.02)] relative overflow-hidden w-full">
-                   <h3 className="text-xl font-serif text-[#0a0a0a] mb-6">Linha de Produção & Rastreabilidade</h3>
-                   <div className="relative">
-                       {/* Connection Line Desktop */}
-                       <div className="hidden lg:block absolute top-[28px] left-8 right-8 h-px bg-[#c9a263]/20 z-0"></div>
+               {/* TIMELINE E AÇÕES RÁPIDAS */}
+               <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_340px] gap-6 w-full">
+                   
+                   {/* TIMELINE - LINHA DE PRODUÇÃO */}
+                   <div className="bg-white border border-[#a3a3a3]/10 rounded-[24px] p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.02)] relative overflow-hidden w-full">
+                       <h3 className="text-xl font-serif text-[#0a0a0a] mb-6">Linha de Produção & Rastreabilidade</h3>
+                       <div className="relative">
+                           {/* Connection Line Desktop */}
+                           <div className="hidden lg:block absolute top-[28px] left-8 right-8 h-px bg-[#c9a263]/20 z-0"></div>
+                           
+                           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 lg:gap-2 relative z-10 w-full min-w-0">
+                               {[
+                                   { title: 'Compra', val: `${stats?.rawLotsLaunchedInPeriod || 0} lotes`, desc: stats?.lastLotName ? `Último: ${stats.lastLotName.substring(0, 10)}${stats.lastLotName.length > 10 ? '...' : ''}` : 'Nenhum recente', action: 'novo', onClick: () => handleOperationAction('launch_lot'), icon: Target },
+                                   { title: 'Café Cru', val: `${stats?.rawKgAvailable || 0}kg`, desc: `${stats?.activeLotsCount || 0} lotes ativos`, action: 'torrar', onClick: () => handleOperationAction('view_raw_stock'), icon: Layers },
+                                   { title: 'Torra', val: `${stats?.roastedKgInPeriod || 0}kg`, desc: `Perda ${stats?.averageRoastLossPercent?.toFixed(1) || 0}%`, action: 'empacotar', onClick: () => handleOperationAction('register_roast'), icon: Flame },
+                                   { title: 'Pacotes', val: `${stats?.packagedUnitsInPeriod || 0} pct`, desc: Object.keys(stats?.packagedByFormat || {}).length > 0 ? Object.keys(stats?.packagedByFormat).join(', ') : 'Sem pacotes', action: 'ver', onClick: () => handleOperationAction('package_coffee'), icon: Package },
+                                   { title: 'Estoque', val: `${stats?.finishedStockUnits || 0} un`, desc: stats?.finishedStockUnits > 0 ? 'Disponível' : 'Zerado', action: 'ajustar', onClick: () => handleOperationAction('view_stock'), icon: Layers },
+                                   { title: 'Consig.', val: `${stats?.consignedUnits || 0} fora`, desc: `R$ ${stats?.pendingConsignmentValue?.toLocaleString('pt-BR') || '0,00'}`, action: 'cobrar', onClick: () => handleOperationAction('create_consignment'), icon: Handshake },
+                                   { title: 'Fechamento', val: `R$ ${stats?.totalPendingValue?.toLocaleString('pt-BR') || '0,00'}`, desc: 'Pendente', action: 'finanças', onClick: () => handleOperationAction('view_financial'), icon: Zap },
+                               ].map((step, i) => (
+                                   <div key={i} className="group bg-white lg:bg-transparent p-4 lg:p-0 rounded-2xl border border-[#a3a3a3]/10 lg:border-none shadow-sm lg:shadow-none flex flex-row lg:flex-col items-center lg:text-center gap-4 lg:gap-3 hover:-translate-y-1 transition-transform cursor-pointer min-w-0" onClick={step.onClick}>
+                                       <div className="w-14 h-14 bg-[#111111] border border-[#c9a263]/20 rounded-[16px] flex items-center justify-center text-[#c9a263] group-hover:bg-[#c9a263] group-hover:text-[#111111] transition-colors shadow-sm shrink-0">
+                                           <step.icon size={24} strokeWidth={1.5} />
+                                       </div>
+                                       <div className="flex-1 lg:flex-none min-w-0 flex flex-col justify-center items-start lg:items-center w-full">
+                                           <p className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-1">{step.title}</p>
+                                           <p className="text-lg font-serif text-[#0a0a0a] leading-tight mb-0.5 truncate max-w-full">{step.val}</p>
+                                           <p className="text-[10px] font-bold text-[#a3a3a3] truncate max-w-full">{step.desc}</p>
+                                       </div>
+                                   </div>
+                               ))}
+                           </div>
+                       </div>
+                   </div>
+
+                   {/* AÇÕES RÁPIDAS - VERTICAL */}
+                   <div className="bg-[#111111] border border-[#a3a3a3]/20 rounded-[24px] p-6 shadow-xl w-full flex flex-col justify-center">
+                       <h2 className="text-[12px] font-bold uppercase tracking-widest text-white mb-2">Ações Rápidas</h2>
+                       <p className="text-[11px] font-medium text-[#a3a3a3] mb-6">Atalhos guiados.</p>
                        
-                       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 lg:gap-2 relative z-10 w-full min-w-0">
+                       <div className="flex flex-col gap-2">
                            {[
-                               { title: 'Compra', val: `${stats?.rawLotsLaunchedInPeriod || 0} lotes`, desc: stats?.lastLotName ? `Último: ${stats.lastLotName.substring(0, 10)}${stats.lastLotName.length > 10 ? '...' : ''}` : 'Nenhum recente', action: 'novo', onClick: () => handleOperationAction('launch_lot'), icon: Target },
-                               { title: 'Café Cru', val: `${stats?.rawKgAvailable || 0}kg`, desc: `${stats?.activeLotsCount || 0} lotes ativos`, action: 'torrar', onClick: () => handleOperationAction('view_raw_stock'), icon: Layers },
-                               { title: 'Torra', val: `${stats?.roastedKgInPeriod || 0}kg`, desc: `Perda ${stats?.averageRoastLossPercent?.toFixed(1) || 0}%`, action: 'empacotar', onClick: () => handleOperationAction('register_roast'), icon: Flame },
-                               { title: 'Pacotes', val: `${stats?.packagedUnitsInPeriod || 0} pct`, desc: Object.keys(stats?.packagedByFormat || {}).length > 0 ? Object.keys(stats?.packagedByFormat).join(', ') : 'Sem pacotes', action: 'ver', onClick: () => handleOperationAction('package_coffee'), icon: Package },
-                               { title: 'Estoque', val: `${stats?.finishedStockUnits || 0} un`, desc: stats?.finishedStockUnits > 0 ? 'Disponível' : 'Zerado', action: 'ajustar', onClick: () => handleOperationAction('view_stock'), icon: Layers },
-                               { title: 'Consig.', val: `${stats?.consignedUnits || 0} fora`, desc: `R$ ${stats?.pendingConsignmentValue?.toLocaleString('pt-BR') || '0,00'}`, action: 'cobrar', onClick: () => handleOperationAction('create_consignment'), icon: Handshake },
-                               { title: 'Fechamento', val: `R$ ${stats?.totalPendingValue?.toLocaleString('pt-BR') || '0,00'}`, desc: 'Pendente', action: 'finanças', onClick: () => handleOperationAction('view_financial'), icon: Zap },
-                           ].map((step, i) => (
-                               <div key={i} className="group bg-white lg:bg-transparent p-4 lg:p-0 rounded-2xl border border-[#a3a3a3]/10 lg:border-none shadow-sm lg:shadow-none flex flex-row lg:flex-col items-center lg:text-center gap-4 lg:gap-3 hover:-translate-y-1 transition-transform cursor-pointer min-w-0" onClick={step.onClick}>
-                                   <div className="w-14 h-14 bg-[#111111] border border-[#c9a263]/20 rounded-[16px] flex items-center justify-center text-[#c9a263] group-hover:bg-[#c9a263] group-hover:text-[#111111] transition-colors shadow-sm shrink-0">
-                                       <step.icon size={24} strokeWidth={1.5} />
+                               { id: 'launch_lot', label: 'Registrar Lote', status: 'Disponível', icon: Target, isBlocked: false },
+                               { id: 'register_roast', label: 'Registrar Torra', status: (stats?.activeLotsCount || 0) === 0 && (stats?.rawKgAvailable || 0) === 0 ? 'Bloqueado (S/ Cru)' : 'Disponível', icon: Flame, isBlocked: (stats?.activeLotsCount || 0) === 0 && (stats?.rawKgAvailable || 0) === 0 },
+                               { id: 'package_coffee', label: 'Empacotar Café', status: (stats?.roastedKgAvailable || 0) <= 0 ? 'Bloqueado (S/ Torra)' : 'Disponível', icon: Package, isBlocked: (stats?.roastedKgAvailable || 0) <= 0 },
+                               { id: 'create_consignment', label: 'Nova Consignação', status: (stats?.finishedStockUnits || 0) <= 0 ? 'Bloqueado (S/ Estoque)' : 'Disponível', icon: Handshake, isBlocked: (stats?.finishedStockUnits || 0) <= 0 },
+                               { id: 'settle_consignment', label: 'Acertar Consignação', status: 'Disponível', icon: AlertTriangle, isBlocked: false },
+                               { id: 'launch_hours', label: 'Lançar Horas', status: 'Disponível', icon: Clock, isBlocked: false },
+                           ].map(action => (
+                               <button
+                                   key={action.id}
+                                   onClick={() => handleOperationAction(action.id)}
+                                   className={`flex items-center justify-between p-3 rounded-[12px] border transition-all shadow-sm w-full group ${action.isBlocked ? 'border-[#a3a3a3]/10 bg-[#1a1a1a] opacity-70 cursor-not-allowed' : 'border-[#c9a263]/20 bg-[#171717] hover:bg-[#c9a263]/10 hover:border-[#c9a263]'}`}
+                                   title={action.isBlocked ? 'Exige etapa anterior' : action.label}
+                               >
+                                   <div className="flex items-center gap-3 overflow-hidden">
+                                       <action.icon size={16} strokeWidth={2} className={`shrink-0 ${action.isBlocked ? 'text-[#a3a3a3]' : 'text-[#c9a263]'}`} />
+                                       <span className={`text-[11px] font-bold uppercase tracking-widest truncate ${action.isBlocked ? 'text-[#a3a3a3]' : 'text-white'}`}>
+                                           {action.label}
+                                       </span>
                                    </div>
-                                   <div className="flex-1 lg:flex-none min-w-0 flex flex-col justify-center items-start lg:items-center w-full">
-                                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-1">{step.title}</p>
-                                       <p className="text-lg font-serif text-[#0a0a0a] leading-tight mb-0.5 truncate max-w-full">{step.val}</p>
-                                       <p className="text-[10px] font-bold text-[#a3a3a3] truncate max-w-full">{step.desc}</p>
+                                   <div className="shrink-0 flex items-center">
+                                       {action.isBlocked ? (
+                                           <span className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3]">Bloqueado</span>
+                                       ) : (
+                                           <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                                       )}
                                    </div>
-                               </div>
+                               </button>
                            ))}
                        </div>
                    </div>
                </div>
 
                {/* CENTRO DE CONFERÊNCIA */}
-               <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-[#a3a3a3]/10 overflow-hidden flex flex-col min-h-[600px] min-w-0">
+               <div className="bg-white rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-[#a3a3a3]/10 overflow-hidden flex flex-col min-h-[600px] min-w-0 w-full">
                    <div className="bg-[#fcfaf8] px-6 py-4 flex flex-col md:flex-row md:items-center md:flex-wrap gap-4 border-b border-[#a3a3a3]/10 overflow-x-auto hide-scrollbar">
                        {[
                            { id: 'diario', label: 'Diário', group: 'Conferir' },
@@ -602,7 +725,7 @@ export function OperationTab() {
                            </div>
                        ))}
                    </div>
-                   <div className="flex-1 p-6 relative bg-white min-w-0">
+                   <div className="flex-1 p-6 relative bg-white min-w-0 w-full overflow-hidden">
                       <AnimatePresence mode="wait">
                         <motion.div key={mode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
                           {mode === 'flow' && <DailyOverview dates={dates} stats={stats} onAction={handleOperationAction} />}
@@ -617,80 +740,7 @@ export function OperationTab() {
                       </AnimatePresence>
                    </div>
                </div>
-            </div>
-
-            {/* COLUNA LATERAL (340px) */}
-            <div className="flex flex-col gap-6 w-full min-w-0">
-               
-               {/* AÇÕES RÁPIDAS */}
-               <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
-                   <h2 className="text-[12px] font-black uppercase tracking-[0.1em] text-[#1C1A17] mb-2">Ações Rápidas</h2>
-                   <p className="text-[11px] font-medium text-gray-500 mb-6">Atalhos para operações frequentes.</p>
-                   
-                   <div className="grid grid-cols-2 gap-3">
-                       {[
-                           { id: 'launch_lot', label: 'Lote', desc: 'Comprar cru', icon: Target, bg: 'bg-[#111111]', text: 'text-white', hoverBg: 'hover:bg-[#1a1a1a] hover:border-[#c9a263]/30', hoverIcon: 'group-hover:text-[#c9a263]', isBlocked: false },
-                           { id: 'register_roast', label: 'Torra', desc: 'Cerrado/etc', icon: Flame, bg: 'bg-[#111111]', text: 'text-white', hoverBg: 'hover:bg-[#1a1a1a] hover:border-[#c9a263]/30', hoverIcon: 'group-hover:text-[#c9a263]', isBlocked: (stats?.activeLotsCount || 0) === 0 && (stats?.rawKgAvailable || 0) === 0 },
-                           { id: 'package_coffee', label: 'Pacote', desc: '200g e 1kg', icon: Package, bg: 'bg-[#111111]', text: 'text-white', hoverBg: 'hover:bg-[#1a1a1a] hover:border-[#c9a263]/30', hoverIcon: 'group-hover:text-[#c9a263]', isBlocked: (stats?.roastedKgAvailable || 0) <= 0 },
-                           { id: 'create_consignment', label: 'Consig.', desc: 'Novo parceiro', icon: Handshake, bg: 'bg-[#111111]', text: 'text-white', hoverBg: 'hover:bg-[#1a1a1a] hover:border-[#c9a263]/30', hoverIcon: 'group-hover:text-[#c9a263]', isBlocked: (stats?.finishedStockUnits || 0) <= 0 },
-                           { id: 'settle_consignment', label: 'Acerto', desc: 'Receber', icon: AlertTriangle, bg: 'bg-[#111111]', text: 'text-white', hoverBg: 'hover:bg-red-900/20 hover:border-red-500/30', hoverIcon: 'group-hover:text-red-400', isBlocked: false },
-                           { id: 'launch_hours', label: 'Horas', desc: 'Mestre torra', icon: Clock, bg: 'bg-[#111111]', text: 'text-white', hoverBg: 'hover:bg-[#1a1a1a] hover:border-[#c9a263]/30', hoverIcon: 'group-hover:text-[#c9a263]', isBlocked: false },
-                       ].map(action => (
-                           <button
-                               key={action.id}
-                               onClick={() => handleOperationAction(action.id)}
-                               className={`flex flex-col items-center justify-center p-4 rounded-[16px] border border-[#a3a3a3]/10 transition-all group gap-2 shadow-sm min-w-0 ${action.isBlocked ? 'opacity-60 bg-[#1a1a1a] cursor-not-allowed' : `${action.bg} ${action.hoverBg}`}`}
-                               title={action.isBlocked ? 'Exige etapa anterior (ver bloqueio)' : action.label}
-                           >
-                               <div className={`w-10 h-10 rounded-[12px] bg-[#1a1a1a] border border-[#a3a3a3]/10 flex items-center justify-center transition-colors shadow-sm shrink-0 ${action.isBlocked ? 'text-[#a3a3a3]' : `${action.text} ${action.hoverIcon}`}`}>
-                                 <action.icon size={18} strokeWidth={1.5} />
-                               </div>
-                               <div className="text-center min-w-0 w-full flex flex-col items-center">
-                                 <span className={`block text-[11px] font-bold uppercase tracking-widest leading-none mb-1 w-full truncate relative ${action.isBlocked ? 'text-[#a3a3a3]' : 'text-white'}`}>
-                                   {action.label}
-                                 </span>
-                                 <span className="block text-[9px] font-bold text-[#a3a3a3] truncate w-full px-1">{action.desc}</span>
-                               </div>
-                           </button>
-                       ))}
-                   </div>
-               </div>
-
-               {/* PENDÊNCIAS INTELIGENTES */}
-               <div className="bg-[#111111] rounded-[24px] p-6 shadow-xl border border-[#c9a263]/20 relative overflow-hidden">
-                   <div className="absolute top-0 right-0 w-48 h-48 bg-[#c9a263]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                   <h2 className="text-xl font-serif text-white mb-2 relative z-10">Inteligência Operacional</h2>
-                   <p className="text-[11px] font-bold text-[#a3a3a3] uppercase tracking-widest mb-6 relative z-10">Seu raio-x de pendências.</p>
-                   
-                   <div className="space-y-3 relative z-10 max-h-[400px] overflow-y-auto hide-scrollbar pr-1">
-                       {stats?.issues && stats.issues.length > 0 ? (
-                           stats.issues.map((issue: any) => (
-                               <div key={issue.id} className={`bg-[#1a1a1a] p-5 rounded-[16px] border ${issue.severity === 'critical' ? 'border-red-900/30' : issue.severity === 'warning' ? 'border-orange-900/30' : 'border-[#a3a3a3]/20'}`}>
-                                  <div className={`flex items-center gap-2 mb-2 ${issue.severity === 'critical' ? 'text-red-400' : issue.severity === 'warning' ? 'text-orange-400' : 'text-blue-400'}`}>
-                                      {issue.severity === 'critical' ? <AlertTriangle size={14} /> : <Flame size={14} />}
-                                      <span className="text-[10px] font-bold uppercase tracking-widest">{issue.affectedArea}</span>
-                                  </div>
-                                  <p className="text-lg font-serif text-white">{issue.title}</p>
-                                  <p className="text-[11px] text-[#a3a3a3] mb-4 mt-1 leading-snug">{issue.description}</p>
-                                  {issue.actionType && (
-                                     <button onClick={() => handleOperationAction(issue.actionType)} className="text-[10px] font-bold uppercase tracking-widest bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl w-full text-center transition-colors">{issue.recommendedAction}</button>
-                                  )}
-                               </div>
-                           ))
-                       ) : (
-                           <div className="bg-[#1a1a1a] p-6 rounded-[16px] border border-[#a3a3a3]/10 text-center flex flex-col items-center justify-center min-h-[140px]">
-                               <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-3 text-[#c9a263]">
-                                   <Scale size={20} />
-                               </div>
-                               <p className="text-[11px] font-bold uppercase tracking-widest text-white mb-1">Tudo em Ordem</p>
-                               <p className="text-[11px] text-[#a3a3a3]">Nenhuma pendência crítica encontrada no período selecionado.</p>
-                           </div>
-                       )}
-                   </div>
-               </div>
-
-            </div>
-         </div>
+          </div>
       </div>
 
       <RoastModal isOpen={isRoastModalOpen} onClose={() => setIsRoastModalOpen(false)} onSave={loadStats} />
@@ -715,12 +765,6 @@ export function OperationTab() {
         />
       )}
 
-      <OperationComingSoonModal
-        isOpen={comingSoonModal.isOpen}
-        onClose={() => setComingSoonModal({...comingSoonModal, isOpen: false})}
-        featureName={comingSoonModal.feature}
-      />
-
       <OperationConfirmModal
         isOpen={isConfirmClosePeriodOpen}
         onClose={() => setConfirmClosePeriodOpen(false)}
@@ -731,7 +775,7 @@ export function OperationTab() {
            try {
              await adminLogService.logAdminAction({
                userId: user?.id || 'user',
-               userEmail: user?.email || 'admin@cofcof.co',
+               userEmail: user?.email || 'contato@cofcof.co',
                action: 'CLOSE_PERIOD',
                entity: 'operation',
                entityId: period,

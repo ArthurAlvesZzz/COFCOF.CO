@@ -41,7 +41,7 @@ export default function OrderSuccess() {
             Continuar comprando
           </Link>
           <a 
-            href="https://wa.me/5531999999999" target="_blank" rel="noreferrer"
+            href="https://wa.me/5534998728882" target="_blank" rel="noreferrer"
             className="w-full block bg-transparent text-[#2A160E] py-4 rounded-xl border border-[#2A160E]/10 hover:bg-[#F6F1EB] transition-colors font-medium text-sm"
           >
             Acompanhar pelo WhatsApp

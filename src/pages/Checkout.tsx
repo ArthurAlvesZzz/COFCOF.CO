@@ -527,7 +527,7 @@ export default function Checkout() {
                      Crie sua conta depois para acompanhar pedidos e assinatura.
                    </p>
                    <a 
-                     href="https://wa.me/5531999999999" 
+                     href="https://wa.me/5534998728882" 
                      target="_blank" rel="noreferrer"
                      className="text-[10px] text-[#a3a3a3] hover:text-[#c9a263] uppercase tracking-widest font-bold transition-colors mt-2"
                    >

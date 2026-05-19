@@ -33,7 +33,7 @@ export default function OrderPending() {
             Voltar para a loja
           </Link>
           <a 
-            href="https://wa.me/5531999999999" target="_blank" rel="noreferrer"
+            href="https://wa.me/5534998728882" target="_blank" rel="noreferrer"
             className="w-full flex justify-center items-center gap-2 bg-transparent text-[#2A160E] py-4 rounded-xl font-medium text-sm hover:text-[#B06A32]"
           >
             Falar no WhatsApp <ExternalLink size={14}/>

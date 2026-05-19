@@ -13,7 +13,7 @@ let mockConsignments: Consignment[] = (() => {
     code: 'CONS-4091',
     recipientType: 'partner',
     recipientName: 'Empório do Val do Cerrado',
-    recipientWhatsapp: '5534999999999',
+    recipientWhatsapp: '5534998728882',
     startDate: new Date(Date.now() - 5 * 86400000).toISOString(),
     dueDate: new Date(Date.now() + 10 * 86400000).toISOString(),
     status: 'open',

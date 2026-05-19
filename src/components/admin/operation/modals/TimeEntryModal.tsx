@@ -87,107 +87,117 @@ export function TimeEntryModal({ isOpen, onClose, onSave }: TimeEntryModalProps)
       onClose={onClose} 
       title="Lançar Horas de Trabalho" 
       subtitle="Registre sua atividade para fechamento semanal"
-      size="md"
+      size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-6 py-2">
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Data</label>
-          <input 
-            type="date" 
-            value={formData.date}
-            onChange={e => setFormData({...formData, date: e.target.value})}
-            className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-           <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Entrada</label>
+      <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8 py-2">
+        {/* Lado Esquerdo */}
+        <div className="flex-1 space-y-6">
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Data</label>
               <input 
-                type="time" 
-                value={formData.startTime}
-                onChange={e => setFormData({...formData, startTime: e.target.value})}
+                type="date" 
+                value={formData.date}
+                onChange={e => setFormData({...formData, date: e.target.value})}
                 className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
               />
-           </div>
-           <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Saída</label>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+               <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Entrada</label>
+                  <input 
+                    type="time" 
+                    value={formData.startTime}
+                    onChange={e => setFormData({...formData, startTime: e.target.value})}
+                    className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
+                  />
+               </div>
+               <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Saída</label>
+                  <input 
+                    type="time" 
+                    value={formData.endTime}
+                    onChange={e => setFormData({...formData, endTime: e.target.value})}
+                    className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
+                  />
+               </div>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Pausa (Minutos)</label>
               <input 
-                type="time" 
-                value={formData.endTime}
-                onChange={e => setFormData({...formData, endTime: e.target.value})}
+                type="number" 
+                value={formData.breakMinutes}
+                onChange={e => setFormData({...formData, breakMinutes: Number(e.target.value)})}
                 className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
               />
-           </div>
+            </div>
         </div>
 
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Pausa (Minutos)</label>
-          <input 
-            type="number" 
-            value={formData.breakMinutes}
-            onChange={e => setFormData({...formData, breakMinutes: Number(e.target.value)})}
-            className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 rounded-2xl px-5 py-4 text-sm font-bold outline-none transition-all"
-          />
-        </div>
+        {/* Lado Direito */}
+        <div className="flex-1 space-y-6 flex flex-col justify-between">
+            <div className="space-y-6">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Tipo de Atividade</label>
+                  <div className="flex flex-wrap gap-2">
+                      {activities.map(a => (
+                       <button
+                          key={a.value}
+                          type="button"
+                          onClick={() => setFormData({...formData, activity: a.value})}
+                          className={`px-4 py-2.5 rounded-xl text-[9px] border font-bold uppercase tracking-widest transition-all ${formData.activity === a.value ? 'bg-[#111111] text-[#c9a263] border-[#111111] shadow-[0_0_15px_rgba(201,162,99,0.1)]' : 'bg-white border-[#a3a3a3]/20 text-[#a3a3a3] hover:border-[#a3a3a3]/50'}`}
+                       >
+                          {a.label}
+                       </button>
+                     ))}
+                  </div>
+                </div>
 
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Tipo de Atividade</label>
-          <div className="flex flex-wrap gap-2">
-              {activities.map(a => (
-               <button
-                  key={a.value}
-                  type="button"
-                  onClick={() => setFormData({...formData, activity: a.value})}
-                  className={`px-4 py-2.5 rounded-xl text-[9px] border font-bold uppercase tracking-widest transition-all ${formData.activity === a.value ? 'bg-[#111111] text-[#c9a263] border-[#111111] shadow-[0_0_15px_rgba(201,162,99,0.1)]' : 'bg-white border-[#a3a3a3]/20 text-[#a3a3a3] hover:border-[#a3a3a3]/50'}`}
-               >
-                  {a.label}
-               </button>
-             ))}
-          </div>
-        </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Notas</label>
+                  <textarea 
+                    rows={2}
+                    value={formData.notes}
+                    onChange={e => setFormData({...formData, notes: e.target.value})}
+                    className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 transition-all outline-none resize-none placeholder:text-[#a3a3a3]/50 rounded-2xl px-5 py-4 text-sm font-bold"
+                    placeholder="Opcional..."
+                  />
+                </div>
+            </div>
 
-        <div className="bg-[#111111] p-6 rounded-[2rem] border border-[#a3a3a3]/10 flex items-center justify-between relative overflow-hidden">
-           <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a263]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-           <div className="flex items-center gap-4 relative z-10">
-              <div className="w-12 h-12 bg-[#1a1a1a] border border-[#c9a263]/20 rounded-2xl flex items-center justify-center text-[#c9a263] shadow-inner">
-                 <Clock size={20} />
-              </div>
-              <div>
-                 <p className="text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest">Total Calculado</p>
-                 <p className="text-xl font-serif text-white">{formatTimeStr(totalHours)}</p>
-              </div>
-           </div>
-           <Zap size={24} className="text-[#c9a263]/30 relative z-10" />
-        </div>
+            <div className="space-y-6">
+                <div className="bg-[#111111] p-6 rounded-[2rem] border border-[#a3a3a3]/10 flex items-center justify-between relative overflow-hidden">
+                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a263]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                   <div className="flex items-center gap-4 relative z-10">
+                      <div className="w-12 h-12 bg-[#1a1a1a] border border-[#c9a263]/20 rounded-2xl flex items-center justify-center text-[#c9a263] shadow-inner">
+                         <Clock size={20} />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-bold text-[#a3a3a3] uppercase tracking-widest">Total Calculado</p>
+                         <p className="text-xl font-serif text-white">{formatTimeStr(totalHours)}</p>
+                      </div>
+                   </div>
+                   <Zap size={24} className="text-[#c9a263]/30 relative z-10" />
+                </div>
 
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Notas</label>
-          <textarea 
-            rows={2}
-            value={formData.notes}
-            onChange={e => setFormData({...formData, notes: e.target.value})}
-            className="w-full bg-white border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 focus:ring-2 focus:ring-[#c9a263]/20 transition-all outline-none resize-none placeholder:text-[#a3a3a3]/50 rounded-2xl px-5 py-4 text-sm font-bold"
-            placeholder="Opcional..."
-          />
-        </div>
-
-        <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#a3a3a3]/10 mt-6 pt-6">
-           <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#111111] transition-colors">Cancelar</button>
-           <div className="relative group">
-              <button 
-                type="submit"
-                disabled={!canSave || loading}
-                className="bg-[#111111] border border-[#a3a3a3]/10 text-[#c9a263] px-8 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-black/5 active:scale-95"
-              >
-                {loading ? 'Lançando...' : 'Lançar Horas'}
-              </button>
-              {!canSave && (
-                 <div className="absolute bottom-full mb-2 right-0 w-max max-w-xs whitespace-normal bg-black text-white text-[10px] font-bold py-2 px-3 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                     Obrigatório: {missingFields.join(', ')}
-                 </div>
-              )}
-           </div>
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#a3a3a3]/10">
+                   <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#111111] transition-colors">Cancelar</button>
+                   <div className="relative group">
+                      <button 
+                        type="submit"
+                        disabled={!canSave || loading}
+                        className="bg-[#111111] border border-[#a3a3a3]/10 text-[#c9a263] px-8 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-black/5 active:scale-95"
+                      >
+                        {loading ? 'Lançando...' : 'Lançar'}
+                      </button>
+                      {!canSave && (
+                         <div className="absolute bottom-full mb-2 right-0 w-max max-w-xs whitespace-normal bg-black text-white text-[10px] font-bold py-2 px-3 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                             Obrigatório: {missingFields.join(', ')}
+                         </div>
+                      )}
+                   </div>
+                </div>
+            </div>
         </div>
       </form>
     </AdminPopup>

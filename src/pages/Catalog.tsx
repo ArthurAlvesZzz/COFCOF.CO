@@ -435,7 +435,7 @@ export default function Catalog() {
                       Limpar filtros
                     </button>
                     <a 
-                      href="https://wa.me/5531999999999"
+                      href="https://wa.me/5534998728882"
                       target="_blank"
                       rel="noreferrer"
                       className="premium-cta-ghost"

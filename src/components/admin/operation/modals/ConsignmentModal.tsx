@@ -103,14 +103,14 @@ export function ConsignmentModal({ isOpen, onClose, onSave, stats }: Consignment
                quantityUnits: item.quantitySent,
                reason: `Consignação para ${formData.recipientName}`,
                userId: user?.id || 'user',
-               userName: user?.email || 'admin@cofcof.co'
+               userName: user?.email || 'contato@cofcof.co'
             });
          }
       }
 
       await adminLogService.logAdminAction({
          userId: user?.id || 'user',
-         userEmail: user?.email || 'admin@cofcof.co',
+         userEmail: user?.email || 'contato@cofcof.co',
          action: 'CREATE_CONSIGNMENT',
          entity: 'consignment',
          entityId: newCons.id,
@@ -128,59 +128,60 @@ export function ConsignmentModal({ isOpen, onClose, onSave, stats }: Consignment
   };
 
   return (
-    <AdminPopup isOpen={isOpen} onClose={onClose} size="lg" title="Registrar Consignação" footer={
-        <div className="flex justify-end gap-3 w-full">
-            <button onClick={onClose} className="px-6 py-3 text-sm font-bold text-gray-500">Cancelar</button>
-            <button onClick={handleSubmit} disabled={loading} className="px-6 py-3 bg-[#1C1A17] text-white rounded-xl text-sm font-bold shadow-sm">Confirmar Envio</button>
+    <AdminPopup isOpen={isOpen} onClose={onClose} size="lg" title="Registrar Consignação" subtitle="Envie pacotes para pontos de venda e parceiros" footer={
+        <div className="flex items-center justify-end gap-3 w-full border-t border-[#a3a3a3]/10 pt-6 mt-4">
+            <button onClick={onClose} className="px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-white transition-colors">Cancelar</button>
+            <button onClick={handleSubmit} disabled={loading} className="px-8 py-3 bg-[#c9a263] text-black hover:bg-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(201,162,99,0.2)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">Confirmar Envio</button>
         </div>
     }>
-       <div className="space-y-4 pt-2">
-          <div className="grid grid-cols-2 gap-4">
+       <div className="space-y-8 pt-4">
+          <div className="grid grid-cols-2 gap-6">
              <div>
-                <label className="text-xs font-bold text-gray-400">Destinatário / Parceiro</label>
-                <input className="w-full border p-3 rounded-lg mt-1" value={formData.recipientName} onChange={e => setFormData({...formData, recipientName: e.target.value})} placeholder="Nome do PDV" />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Destinatário / Parceiro</label>
+                <input className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all placeholder:text-[#a3a3a3]/40" value={formData.recipientName} onChange={e => setFormData({...formData, recipientName: e.target.value})} placeholder="Nome do PDV" />
              </div>
              <div>
-                <label className="text-xs font-bold text-gray-400">WhatsApp / Telefone</label>
-                <input className="w-full border p-3 rounded-lg mt-1" value={formData.recipientWhatsapp} onChange={e => setFormData({...formData, recipientWhatsapp: e.target.value})} placeholder="Ex: 553499..." />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">WhatsApp / Telefone</label>
+                <input className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all placeholder:text-[#a3a3a3]/40" value={formData.recipientWhatsapp} onChange={e => setFormData({...formData, recipientWhatsapp: e.target.value})} placeholder="Ex: 553499..." />
              </div>
              <div>
-                <label className="text-xs font-bold text-gray-400">Data de Envio</label>
-                <input type="date" className="w-full border p-3 rounded-lg mt-1" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Data de Envio</label>
+                <input type="date" className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} />
              </div>
              <div>
-                <label className="text-xs font-bold text-gray-400">Data de Acerto (Vencimento)</label>
-                <input type="date" className="w-full border p-3 rounded-lg mt-1" value={formData.dueDate} onChange={e => setFormData({...formData, dueDate: e.target.value})} />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Data de Acerto (Vencimento)</label>
+                <input type="date" className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all" value={formData.dueDate} onChange={e => setFormData({...formData, dueDate: e.target.value})} />
              </div>
           </div>
           <div>
-              <h4 className="font-bold text-sm text-[#1C1A17] mt-4 mb-2">Itens Enviados</h4>
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a263] border-b border-[#a3a3a3]/10 pb-4 mb-4">Itens Enviados</h4>
               {items.map((item, index) => (
-                  <div key={index} className="grid grid-cols-4 gap-3 items-center bg-gray-50 p-3 rounded-lg mb-2">
+                  <div key={index} className="grid grid-cols-4 gap-4 items-center bg-[#111111] border border-[#a3a3a3]/10 p-5 rounded-[24px]">
                       <div className="col-span-1">
-                          <label className="text-xs text-gray-500 block mb-1">Formato</label>
-                          <select className="w-full border p-2 rounded text-sm" value={item.format} onChange={e => { const newItems = [...items]; newItems[index].format = e.target.value; setItems(newItems); }}>
-                              <option value="200g">Pacote 200g (Disp: {availableStock['200g']||0})</option>
-                              <option value="1kg">Pacote 1kg (Disp: {availableStock['1kg']||0})</option>
+                          <label className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Formato</label>
+                          <select className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/10 rounded-xl px-3 py-2 text-sm text-white outline-none appearance-none" value={item.format} onChange={e => { const newItems = [...items]; newItems[index].format = e.target.value; setItems(newItems); }}>
+                              <option value="200g">200g ({availableStock['200g']||0} disp)</option>
+                              <option value="1kg">1kg ({availableStock['1kg']||0} disp)</option>
                           </select>
                       </div>
                       <div className="col-span-1">
-                          <label className="text-xs text-gray-500 block mb-1">Qtd Enviada</label>
-                          <input type="number" min="1" className="w-full border p-2 rounded text-sm" value={item.quantitySent} onChange={e => { const newItems = [...items]; newItems[index].quantitySent = Number(e.target.value); setItems(newItems); }} />
+                          <label className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Unidades</label>
+                          <input type="number" min="1" className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/10 rounded-xl px-3 py-2 text-sm text-white outline-none" value={item.quantitySent} onChange={e => { const newItems = [...items]; newItems[index].quantitySent = Number(e.target.value); setItems(newItems); }} />
                       </div>
                       <div className="col-span-1">
-                          <label className="text-xs text-gray-500 block mb-1">Preço Unitário (R$)</label>
-                          <input type="number" min="0" step="0.1" className="w-full border p-2 rounded text-sm" value={item.unitPrice} onChange={e => { const newItems = [...items]; newItems[index].unitPrice = Number(e.target.value); setItems(newItems); }} />
+                          <label className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Preço Und (R$)</label>
+                          <input type="number" min="0" step="0.1" className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/10 rounded-xl px-3 py-2 text-sm text-[#c9a263] font-serif outline-none" value={item.unitPrice} onChange={e => { const newItems = [...items]; newItems[index].unitPrice = Number(e.target.value); setItems(newItems); }} />
                       </div>
-                      <div className="col-span-1 flex flex-col justify-end">
-                          <span className="text-xs font-bold block mb-1 text-right">Total: R$ {item.quantitySent * item.unitPrice}</span>
+                      <div className="col-span-1 flex flex-col justify-center items-end h-full">
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-1">Total Base</span>
+                          <span className="text-xl font-serif text-white">R$ {(item.quantitySent * item.unitPrice).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
                       </div>
                   </div>
               ))}
           </div>
           <div>
-                <label className="text-xs font-bold text-gray-400">Observações</label>
-                <textarea className="w-full border p-3 rounded-lg mt-1" rows={2} value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} placeholder="Anotações opcionais" />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Observações (Opcional)</label>
+                <textarea className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all placeholder:text-[#a3a3a3]/40 resize-none" rows={2} value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} placeholder="Anotações sobre a consignação..." />
           </div>
        </div>
     </AdminPopup>

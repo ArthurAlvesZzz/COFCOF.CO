@@ -156,7 +156,7 @@ export function CustomerFormDrawer({ customer, isOpen, onClose, onSave }: Custom
                         value={formData.whatsapp}
                         onChange={handleChange}
                         className="w-full pl-11 pr-4 py-3.5 border border-gray-100 bg-gray-50/50 rounded-xl focus:bg-white focus:outline-none focus:border-[#B06A32] transition-all text-sm font-bold" 
-                        placeholder="11 99999-9999"
+                        placeholder="34 99872-8882"
                       />
                    </div>
                  </div>

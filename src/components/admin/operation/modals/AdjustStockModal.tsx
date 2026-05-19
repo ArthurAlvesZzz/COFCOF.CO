@@ -64,12 +64,12 @@ export function AdjustStockModal({ isOpen, onClose, onSave, stats }: AdjustStock
          quantityKg: formData.stockType !== 'finished' ? formData.quantity : undefined,
          reason: formData.reason,
          userId: user?.id || 'user',
-         userName: user?.email || 'admin@cofcof.co'
+         userName: user?.email || 'contato@cofcof.co'
       });
 
       await adminLogService.logAdminAction({
          userId: user?.id || 'user',
-         userEmail: user?.email || 'admin@cofcof.co',
+         userEmail: user?.email || 'contato@cofcof.co',
          action: 'ADJUST_STOCK',
          entity: 'stock',
          entityId: targetId,
@@ -87,43 +87,45 @@ export function AdjustStockModal({ isOpen, onClose, onSave, stats }: AdjustStock
   };
 
   return (
-    <AdminPopup isOpen={isOpen} onClose={onClose} size="md" title="Ajustar Estoque" footer={
-        <div className="flex justify-end gap-3 w-full">
-            <button onClick={onClose} className="px-6 py-3 text-sm font-bold text-gray-500">Cancelar</button>
-            <button onClick={handleSubmit} disabled={loading} className="px-6 py-3 bg-[#1C1A17] text-white rounded-xl text-sm font-bold shadow-sm">Confirmar Ajuste</button>
+    <AdminPopup isOpen={isOpen} onClose={onClose} size="md" title="Ajustar Estoque" subtitle="Correção e inventário manual" footer={
+        <div className="flex items-center justify-end gap-3 w-full border-t border-[#a3a3a3]/10 pt-4">
+            <button onClick={onClose} className="px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-white transition-colors">Cancelar</button>
+            <button onClick={handleSubmit} disabled={loading} className="px-8 py-3 bg-[#c9a263] text-black hover:bg-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(201,162,99,0.2)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">Confirmar Ajuste</button>
         </div>
     }>
-        <div className="space-y-4 pt-2">
+        <div className="space-y-6 pt-2">
              <div>
-                <label className="text-xs font-bold text-gray-400">Tipo de Estoque</label>
-                <select className="w-full border p-3 rounded-lg mt-1" value={formData.stockType} onChange={e => setFormData({...formData, stockType: e.target.value})}>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Tipo de Estoque</label>
+                <select className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all appearance-none" value={formData.stockType} onChange={e => setFormData({...formData, stockType: e.target.value})}>
                     <option value="finished">Produto Acabado (Pacotes)</option>
                     <option value="roasted">Café Torrado</option>
                 </select>
              </div>
              {formData.stockType === 'finished' && (
                  <div>
-                    <label className="text-xs font-bold text-gray-400">Formato</label>
-                    <select className="w-full border p-3 rounded-lg mt-1" value={formData.format} onChange={e => setFormData({...formData, format: e.target.value})}>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Formato</label>
+                    <select className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all appearance-none" value={formData.format} onChange={e => setFormData({...formData, format: e.target.value})}>
                         <option value="200g">Pacote 200g (Disp: {stats?.finishedStockByFormat?.['200g']||0})</option>
                         <option value="1kg">Pacote 1kg (Disp: {stats?.finishedStockByFormat?.['1kg']||0})</option>
                     </select>
                  </div>
              )}
-             <div>
-                <label className="text-xs font-bold text-gray-400">Ação</label>
-                <select className="w-full border p-3 rounded-lg mt-1" value={formData.adjustmentType} onChange={e => setFormData({...formData, adjustmentType: e.target.value})}>
-                    <option value="add">Entrada / Adição</option>
-                    <option value="subtract">Saída / Perda / Correção Negativa</option>
-                </select>
+             <div className="grid grid-cols-2 gap-4">
+                 <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Ação</label>
+                    <select className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all appearance-none" value={formData.adjustmentType} onChange={e => setFormData({...formData, adjustmentType: e.target.value})}>
+                        <option value="add">Entrada (+)</option>
+                        <option value="subtract">Saída (-)</option>
+                    </select>
+                 </div>
+                 <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Quantidade</label>
+                    <input type="number" min="0" className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all" value={formData.quantity} onChange={e => setFormData({...formData, quantity: Number(e.target.value)})} />
+                 </div>
              </div>
              <div>
-                <label className="text-xs font-bold text-gray-400">Quantidade ({formData.stockType==='finished'?'unidades':'kg'})</label>
-                <input type="number" min="0" className="w-full border p-3 rounded-lg mt-1" value={formData.quantity} onChange={e => setFormData({...formData, quantity: Number(e.target.value)})} />
-             </div>
-             <div>
-                <label className="text-xs font-bold text-gray-400">Motivo (Obrigatório)</label>
-                <input className="w-full border p-3 rounded-lg mt-1" value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} placeholder="Ex: Contagem física errada, Perda avaria..." />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Motivo (Obrigatório)</label>
+                <input className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all placeholder:text-[#a3a3a3]/40" value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} placeholder="Ex: Contagem física errada..." />
              </div>
         </div>
     </AdminPopup>

@@ -95,7 +95,7 @@ export function SettleConsignmentModal({ isOpen, onClose, onSave }: SettleConsig
 
       await adminLogService.logAdminAction({
          userId: user?.id || 'user',
-         userEmail: user?.email || 'admin@cofcof.co',
+         userEmail: user?.email || 'contato@cofcof.co',
          action: 'SETTLE_CONSIGNMENT',
          entity: 'consignment',
          entityId: selectedConsignmentId,
@@ -113,19 +113,19 @@ export function SettleConsignmentModal({ isOpen, onClose, onSave }: SettleConsig
   };
 
   return (
-    <AdminPopup isOpen={isOpen} onClose={onClose} size="lg" title="Registrar Acerto" footer={
-        <div className="flex justify-end gap-3 w-full">
-            <button onClick={onClose} className="px-6 py-3 text-sm font-bold text-gray-500">Cancelar</button>
-            <button onClick={handleSubmit} disabled={loading || !selectedConsignmentId} className="px-6 py-3 bg-[#1C1A17] text-white rounded-xl text-sm font-bold shadow-sm">Confirmar Acerto</button>
+    <AdminPopup isOpen={isOpen} onClose={onClose} size="lg" title="Registrar Acerto" subtitle="Baixa de consignações, devoluções e recebimentos" footer={
+        <div className="flex items-center justify-end gap-3 w-full border-t border-[#a3a3a3]/10 pt-4">
+            <button onClick={onClose} className="px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-white transition-colors">Cancelar</button>
+            <button onClick={handleSubmit} disabled={loading || !selectedConsignmentId} className="px-8 py-3 bg-[#c9a263] text-black hover:bg-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(201,162,99,0.2)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">Confirmar Acerto</button>
         </div>
     }>
         {consignments.length === 0 ? (
-            <div className="py-10 text-center text-gray-500">Nenhuma consignação aberta para acertar.</div>
+            <div className="py-16 text-center text-[#a3a3a3] text-sm">Nenhuma consignação pendente de acerto.</div>
         ) : (
-            <div className="space-y-6 pt-2">
+            <div className="space-y-8 pt-2">
                <div>
-                  <label className="text-xs font-bold text-gray-400">Consignação / Parceiro</label>
-                  <select className="w-full border p-3 rounded-lg mt-1" value={selectedConsignmentId} onChange={e => setSelectedConsignmentId(e.target.value)}>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Selecione a Consignação</label>
+                  <select className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 outline-none transition-all appearance-none" value={selectedConsignmentId} onChange={e => setSelectedConsignmentId(e.target.value)}>
                      {consignments.map(c => (
                         <option key={c.id} value={c.id}>{c.recipientName} - {c.code}</option>
                      ))}
@@ -133,51 +133,52 @@ export function SettleConsignmentModal({ isOpen, onClose, onSave }: SettleConsig
                </div>
                
                <div>
-                  <h4 className="font-bold text-sm text-[#1C1A17] mb-2">Itens Pendentes</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a263] border-b border-[#a3a3a3]/10 pb-4 mb-4">Itens Pendentes e Baixas</h4>
                   {items.map((item, index) => (
-                      <div key={index} className="grid grid-cols-5 gap-3 items-center bg-gray-50 p-3 rounded-lg mb-2">
-                         <div className="col-span-1">
-                             <span className="text-xs font-bold block truncate" title={item.productName}>{item.productName}</span>
-                             <span className="text-[10px] text-gray-500">Pend. {item.quantityPending} | R$ {item.unitPrice}</span>
+                      <div key={index} className="grid grid-cols-5 gap-4 items-center bg-[#111111] border border-[#a3a3a3]/10 p-5 rounded-[24px] mb-3">
+                         <div className="col-span-1 border-r border-[#a3a3a3]/10 pr-4">
+                             <span className="text-xs font-bold block truncate text-white mb-1" title={item.productName}>{item.productName}</span>
+                             <span className="text-[9px] font-bold uppercase tracking-wider text-[#a3a3a3]">Pend. {item.quantityPending} | R$ {item.unitPrice}</span>
                          </div>
                          <div className="col-span-1">
-                             <label className="text-[10px] text-gray-500 block mb-1">Qtd Vendida</label>
-                             <input type="number" min="0" max={item.quantityPending} className="w-full border p-2 rounded text-sm" value={item.quantitySold} onChange={e => { const newItems = [...items]; newItems[index].quantitySold = Number(e.target.value); setItems(newItems); }} />
+                             <label className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Vendida</label>
+                             <input type="number" min="0" max={item.quantityPending} className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/10 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50" value={item.quantitySold} onChange={e => { const newItems = [...items]; newItems[index].quantitySold = Number(e.target.value); setItems(newItems); }} />
                          </div>
                          <div className="col-span-1">
-                             <label className="text-[10px] text-gray-500 block mb-1">Qtd Devolvida</label>
-                             <input type="number" min="0" max={item.quantityPending} className="w-full border p-2 rounded text-sm" value={item.quantityReturned} onChange={e => { const newItems = [...items]; newItems[index].quantityReturned = Number(e.target.value); setItems(newItems); }} />
+                             <label className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Devolvida</label>
+                             <input type="number" min="0" max={item.quantityPending} className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/10 rounded-xl px-3 py-2 text-sm text-white outline-none" value={item.quantityReturned} onChange={e => { const newItems = [...items]; newItems[index].quantityReturned = Number(e.target.value); setItems(newItems); }} />
                          </div>
                          <div className="col-span-1">
-                             <label className="text-[10px] text-gray-500 block mb-1">Qtd Perdida</label>
-                             <input type="number" min="0" max={item.quantityPending} className="w-full border p-2 rounded text-sm" value={item.quantityLost} onChange={e => { const newItems = [...items]; newItems[index].quantityLost = Number(e.target.value); setItems(newItems); }} />
+                             <label className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Perdida</label>
+                             <input type="number" min="0" max={item.quantityPending} className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/10 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-red-500/50" value={item.quantityLost} onChange={e => { const newItems = [...items]; newItems[index].quantityLost = Number(e.target.value); setItems(newItems); }} />
                          </div>
-                         <div className="col-span-1 flex flex-col justify-end text-right">
-                             <span className="text-xs font-bold text-emerald-600 block mb-1">R$ {item.quantitySold * item.unitPrice}</span>
+                         <div className="col-span-1 flex flex-col justify-center items-end text-right">
+                             <span className="text-[9px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-1">Subtotal</span>
+                             <span className="text-base font-serif text-emerald-500">R$ {item.quantitySold * item.unitPrice}</span>
                          </div>
                       </div>
                   ))}
                </div>
 
-               <div className="pt-4 border-t border-gray-100">
-                  <h4 className="font-bold text-sm text-[#1C1A17] mb-2">Pagamento & Recebimento</h4>
-                  <div className="grid grid-cols-3 gap-4">
+               <div className="pt-6 border-t border-[#a3a3a3]/10">
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a263] mb-4">Pagamento & Recebimento</h4>
+                  <div className="grid grid-cols-2 gap-6">
                      <div>
-                        <label className="text-[10px] font-bold text-gray-400">Total a Receber</label>
-                        <input type="number" step="0.1" className="w-full border p-3 rounded-lg mt-1 font-bold text-emerald-600" value={payment.value} onChange={e => setPayment({...payment, value: Number(e.target.value)})} />
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Total a Receber</label>
+                        <input type="number" step="0.1" className="w-full bg-[#1a1a1a] border border-emerald-500/30 rounded-xl px-4 py-3 text-lg font-serif text-emerald-500 outline-none" value={payment.value} onChange={e => setPayment({...payment, value: Number(e.target.value)})} />
                      </div>
                      <div>
-                        <label className="text-[10px] font-bold text-gray-400">Método de Pgto</label>
-                        <select className="w-full border p-3 rounded-lg mt-1" value={payment.method} onChange={e => setPayment({...payment, method: e.target.value})}>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Método de Pgto</label>
+                        <select className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white outline-none appearance-none" value={payment.method} onChange={e => setPayment({...payment, method: e.target.value})}>
                             <option value="pix">PIX</option>
                             <option value="transfer">Transferência Bancária</option>
                             <option value="cash">Dinheiro em Espécie</option>
                         </select>
                      </div>
                   </div>
-                  <div className="mt-4">
-                        <label className="text-[10px] font-bold text-gray-400">Observações do Acerto</label>
-                        <textarea className="w-full border p-3 rounded-lg mt-1" rows={2} value={payment.notes} onChange={e => setPayment({...payment, notes: e.target.value})} placeholder="Anotações sobre quebras, devoluções, ou prazo" />
+                  <div className="mt-6">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Observações do Acerto</label>
+                        <textarea className="w-full bg-[#111111] border border-[#a3a3a3]/10 focus:border-[#c9a263]/50 rounded-xl px-4 py-3 text-sm text-white outline-none placeholder:text-[#a3a3a3]/40 resize-none" rows={2} value={payment.notes} onChange={e => setPayment({...payment, notes: e.target.value})} placeholder="Anotações sobre quebras, devoluções, ou prazo" />
                   </div>
                </div>
             </div>

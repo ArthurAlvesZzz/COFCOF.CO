@@ -144,21 +144,27 @@ export function StockOverview({ onAction }: StockOverviewProps) {
                  const reserved = itemsInFormat.reduce((acc, i) => acc + (i.reservedUnits || 0), 0);
                  
                  return (
-                 <div key={format} className="bg-white p-5 rounded-3xl border border-gray-100 group hover:shadow-md transition-all flex flex-col justify-between hover:border-amber-200">
+                 <div key={format} className={`bg-white p-5 rounded-3xl border group hover:shadow-md transition-all flex flex-col justify-between ${available === 0 ? 'border-red-200 hover:border-red-300' : (available < 20 ? 'border-amber-200 hover:border-amber-300' : 'border-[#c9a263]/20 hover:border-[#c9a263]')}`}>
                     <div>
                         <div className="flex items-center justify-between mb-3">
-                            <p className="text-sm font-black text-[#1C1A17] uppercase tracking-widest">{format}</p>
-                            <span className="text-[10px] bg-gray-50 px-2 py-1 rounded text-gray-500 font-bold uppercase tracking-widest">{itemsInFormat.length} tipos</span>
+                            <p className={`text-sm font-black uppercase tracking-widest ${available === 0 ? 'text-red-600' : (available < 20 ? 'text-amber-600' : 'text-[#c9a263]')}`}>{format}</p>
+                            {available === 0 ? (
+                                <span className="text-[9px] bg-red-50 px-2 py-1 rounded text-red-600 font-bold uppercase tracking-widest">Esgotado</span>
+                            ) : available < 20 ? (
+                                <span className="text-[9px] bg-amber-50 px-2 py-1 rounded text-amber-600 font-bold uppercase tracking-widest">Estoque Baixo</span>
+                            ) : (
+                                <span className="text-[9px] bg-[#c9a263]/10 px-2 py-1 rounded text-[#c9a263] font-bold uppercase tracking-widest">Regular</span>
+                            )}
                         </div>
                         
                         <div className="space-y-2 mb-4 mt-2">
                            <div className="flex justify-between items-center text-xs">
-                               <span className="font-bold text-gray-500">Disponível</span>
-                               <span className="font-black text-[#1C1A17] text-sm">{available}</span>
+                               <span className={`font-bold ${available === 0 ? 'text-red-500' : 'text-gray-500'}`}>Disponível</span>
+                               <span className={`font-black text-sm ${available === 0 ? 'text-red-600' : (available < 20 ? 'text-amber-600' : 'text-[#1C1A17]')}`}>{available}</span>
                            </div>
                            <div className="flex justify-between items-center text-xs">
-                               <span className="font-bold text-emerald-600">Consignado</span>
-                               <span className="font-black text-emerald-600">{consigned}</span>
+                               <span className="font-bold text-gray-500">Consignado</span>
+                               <span className="font-black text-gray-500">{consigned}</span>
                            </div>
                            <div className="flex justify-between items-center text-xs">
                                <span className="font-bold text-gray-400">Reservado</span>

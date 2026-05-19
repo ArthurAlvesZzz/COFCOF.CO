@@ -28,7 +28,7 @@ let mockLeads: B2BLead[] = [
     id: "lead_2",
     contactName: "Maria Oliveira",
     companyName: "Bistro da Gabi",
-    whatsapp: "31999998888",
+    whatsapp: "34998728882",
     email: "contato@bistroda.com",
     segment: "restaurant",
     city: "Belo Horizonte",

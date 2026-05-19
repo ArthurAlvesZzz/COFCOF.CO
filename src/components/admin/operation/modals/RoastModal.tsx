@@ -88,36 +88,36 @@ export function RoastModal({ isOpen, onClose, onSave }: RoastModalProps) {
            {/* General Info */}
            <div className="space-y-6">
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Data da Torra</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Data da Torra</label>
                 <div className="relative">
                   <input 
                     type="date" 
                     value={formData.date}
                     onChange={e => setFormData({...formData, date: e.target.value})}
-                    className="w-full bg-white border border-[#a3a3a3]/20 rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-[#c9a263]/20 focus:border-[#c9a263]/50 transition-all outline-none"
+                    className="w-full bg-[#111111] border border-[#a3a3a3]/10 rounded-xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 focus:border-[#c9a263]/50 transition-all outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Mestre de Torra</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Mestre de Torra</label>
                 <div className="relative">
-                   <User size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#a3a3a3]" />
+                   <User size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#a3a3a3]/50" />
                    <input 
                      type="text" 
                      value={formData.roasterName}
                      readOnly
-                     className="w-full bg-white border border-[#a3a3a3]/20 rounded-2xl pl-12 pr-5 py-4 text-sm font-bold text-gray-500 outline-none"
+                     className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/5 rounded-xl pl-12 pr-5 py-4 text-sm text-[#a3a3a3] outline-none"
                    />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Lote de Origem (Cru)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Lote de Origem (Cru)</label>
                 <select 
                   value={formData.rawLotId}
                   onChange={e => setFormData({...formData, rawLotId: e.target.value})}
-                  className="w-full bg-white border border-[#a3a3a3]/20 rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-[#c9a263]/20 focus:border-[#c9a263]/50 transition-all outline-none"
+                  className="w-full bg-[#111111] border border-[#a3a3a3]/10 rounded-xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 focus:border-[#c9a263]/50 transition-all outline-none appearance-none"
                 >
                   <option value="">Selecione o lote...</option>
                   {lots.map(l => (
@@ -127,19 +127,19 @@ export function RoastModal({ isOpen, onClose, onSave }: RoastModalProps) {
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Perfil de Torra (Opcional)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Perfil de Torra (Opcional)</label>
                 <input 
                   type="text" 
                   placeholder="Ex: Média Clara / Perfil #23"
                   value={formData.roastProfile}
                   onChange={e => setFormData({...formData, roastProfile: e.target.value})}
-                  className="w-full bg-white border border-[#a3a3a3]/20 rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-[#c9a263]/20 focus:border-[#c9a263]/50 transition-all outline-none placeholder:text-[#a3a3a3]/50"
+                  className="w-full bg-[#111111] border border-[#a3a3a3]/10 rounded-xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 focus:border-[#c9a263]/50 transition-all outline-none placeholder:text-[#a3a3a3]/40"
                 />
               </div>
            </div>
 
            {/* Metrics */}
-           <div className="bg-[#111111] p-8 rounded-[2.5rem] border border-[#a3a3a3]/10 space-y-8 relative overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+           <div className="bg-[#111111] p-8 rounded-[24px] border border-[#a3a3a3]/10 space-y-8 relative overflow-hidden shadow-[0_8px_30px_rgba(201,162,99,0.05)]">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a263]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
               <h3 className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a263] border-b border-[#a3a3a3]/10 pb-4 relative z-10">Cálculo de Produção</h3>
               
@@ -153,7 +153,7 @@ export function RoastModal({ isOpen, onClose, onSave }: RoastModalProps) {
                          step="0.1"
                          value={formData.rawKgUsed}
                          onChange={e => setFormData({...formData, rawKgUsed: Number(e.target.value)})}
-                         className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 rounded-2xl pl-12 pr-5 py-4 text-xl font-serif text-white outline-none transition-all shadow-inner focus:ring-2 focus:ring-[#c9a263]/10"
+                         className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 rounded-xl pl-12 pr-5 py-4 text-xl font-serif text-white outline-none transition-all shadow-inner focus:ring-2 focus:ring-[#c9a263]/10"
                          placeholder="0.0"
                        />
                     </div>
@@ -168,7 +168,7 @@ export function RoastModal({ isOpen, onClose, onSave }: RoastModalProps) {
                          step="0.1"
                          value={formData.roastedKgOutput}
                          onChange={e => setFormData({...formData, roastedKgOutput: Number(e.target.value)})}
-                         className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 rounded-2xl pl-12 pr-5 py-4 text-xl font-serif text-[#c9a263] outline-none transition-all shadow-[0_0_15px_rgba(201,162,99,0.05)] focus:ring-2 focus:ring-[#c9a263]/10"
+                         className="w-full bg-[#1a1a1a] border border-[#a3a3a3]/20 focus:border-[#c9a263]/50 rounded-xl pl-12 pr-5 py-4 text-xl font-serif text-[#c9a263] outline-none transition-all shadow-[0_0_15px_rgba(201,162,99,0.05)] focus:ring-2 focus:ring-[#c9a263]/10"
                          placeholder="0.0"
                        />
                     </div>
@@ -186,7 +186,7 @@ export function RoastModal({ isOpen, onClose, onSave }: RoastModalProps) {
                  </div>
                  
                  {lossPercent > 20 && (
-                   <div className="flex items-center gap-2 p-3 bg-red-900/10 text-red-400 border border-red-900/30 rounded-xl text-[10px] font-bold uppercase tracking-wider">
+                   <div className="flex items-center gap-2 p-3 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl text-[10px] font-bold uppercase tracking-wider">
                       <Zap size={14} className="shrink-0" /> Perda acima do padrão (15-18%)
                    </div>
                  )}
@@ -195,12 +195,12 @@ export function RoastModal({ isOpen, onClose, onSave }: RoastModalProps) {
         </div>
 
         <div>
-          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Observações Adicionais</label>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-2 block">Observações Adicionais</label>
           <textarea 
             rows={3}
             value={formData.notes}
             onChange={e => setFormData({...formData, notes: e.target.value})}
-            className="w-full bg-white border border-[#a3a3a3]/20 rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-[#c9a263]/20 focus:border-[#c9a263]/50 transition-all outline-none resize-none placeholder:text-[#a3a3a3]/50"
+            className="w-full bg-[#111111] border border-[#a3a3a3]/10 rounded-xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-[#c9a263]/10 focus:border-[#c9a263]/50 transition-all outline-none resize-none placeholder:text-[#a3a3a3]/40"
             placeholder="Algum detalhe relevante sobre este lote de torra..."
           />
         </div>
@@ -209,7 +209,7 @@ export function RoastModal({ isOpen, onClose, onSave }: RoastModalProps) {
            <button 
              type="button" 
              onClick={onClose} 
-             className="px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-[#111111] hover:bg-black/5 transition-all"
+             className="px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] hover:text-white transition-all"
            >
              Descartar
            </button>
@@ -217,12 +217,12 @@ export function RoastModal({ isOpen, onClose, onSave }: RoastModalProps) {
               <button 
                 type="submit"
                 disabled={!canSave || loading}
-                className="bg-[#111111] border border-[#a3a3a3]/10 text-white px-10 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-black/5 hover:bg-black active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                className="bg-[#c9a263] text-black hover:bg-white px-10 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(201,162,99,0.2)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Processando...' : 'Finalizar Registro'}
               </button>
               {!canSave && (
-                 <div className="absolute bottom-full mb-2 right-0 w-max max-w-xs whitespace-normal bg-black text-white text-[10px] font-bold py-2 px-3 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                 <div className="absolute bottom-full mb-2 right-0 w-max max-w-xs whitespace-normal bg-[#111111] border border-[#a3a3a3]/10 text-white text-[10px] font-bold py-2 px-3 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                      Obrigatório: {missingFields.join(', ')}
                  </div>
               )}

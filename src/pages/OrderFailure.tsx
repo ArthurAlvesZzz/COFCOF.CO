@@ -33,7 +33,7 @@ export default function OrderFailure() {
             <RefreshCcw size={18} /> Tentar novamente
           </Link>
           <a 
-            href="https://wa.me/5531999999999" target="_blank" rel="noreferrer"
+            href="https://wa.me/5534998728882" target="_blank" rel="noreferrer"
             className="w-full block bg-transparent text-[#2A160E] py-4 rounded-xl font-medium text-sm hover:text-[#B06A32]"
           >
             Falar no WhatsApp

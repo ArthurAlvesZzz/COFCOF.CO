@@ -18,7 +18,7 @@ interface Partner {
 
 export function PartnersTab() {
   const [partners, setPartners] = useState<Partner[]>([
-    { id: '1', name: 'Café da Esquina', type: 'Cafeteria', city: 'São Paulo, SP', contact: '11999999999', address: 'Rua X, 123 - Centro', lat: -23.5505, lng: -46.6333, active: true },
+    { id: '1', name: 'Café da Esquina', type: 'Cafeteria', city: 'São Paulo, SP', contact: '34998728882', address: 'Rua X, 123 - Centro', lat: -23.5505, lng: -46.6333, active: true },
     { id: '2', name: 'Supermercado Vida', type: 'Mercado', city: 'Campinas, SP', contact: '19988888888', address: 'Av Y, 456 - Cambuí', lat: -22.9099, lng: -47.0626, active: true },
   ]);
   
