@@ -357,7 +357,6 @@ export default function MapPartners() {
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setHasUserClosedPreview(false);
               }}
               className="w-full bg-[#111111] border border-[#a3a3a3]/20 pl-12 pr-10 py-3.5 rounded-xl focus:outline-none focus:border-[#c9a263]/50 text-white placeholder:text-[#a3a3a3] text-sm font-medium transition-colors"
             />
@@ -380,7 +379,6 @@ export default function MapPartners() {
                   key={cat}
                   onClick={() => {
                     setActiveCategory(cat);
-                    setHasUserClosedPreview(false);
                   }}
                   className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-1.5 ${
                     activeCategory === cat
@@ -505,7 +503,6 @@ export default function MapPartners() {
                   onClick={() => {
                     setSearchTerm("");
                     setActiveCategory("Todos");
-                    setHasUserClosedPreview(false);
                   }}
                   className="text-[#a3a3a3] hover:text-white underline underline-offset-4 text-xs mt-2 transition-colors"
                 >
