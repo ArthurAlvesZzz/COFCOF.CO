@@ -6,23 +6,14 @@ import { mockProducts } from '../data/seed';
 import { useCartStore } from '../store/cartStore';
 import { usePublicContent } from '../hooks/usePublicContent';
 
-const ProofStrip = () => {
-  const claims = [
-    "86+ pts SCA",
-    "Cerrado Mineiro D.O.",
-    "Torra sob demanda",
-    "Rastreabilidade QR",
-    "Cup of Excellence",
-    "Lotes selecionados",
-    "A partir de R$ 1,87 por xícara"
-  ];
+const ProofMarquee = ({ items, className = "" }: { items: string[], className?: string }) => {
   return (
-    <div className="w-full bg-[#111111] border-y border-[#1a1a1a] py-5 overflow-hidden flex whitespace-nowrap relative z-20 shadow-[-10px_0_20px_rgba(0,0,0,0.5)] my-4 md:my-8 scale-100">
-       <div className="flex px-4 min-w-max items-center animate-marquee">
-         {[...claims, ...claims, ...claims, ...claims].map((claim, idx) => (
+    <div className={`w-full bg-[#0a0a0a] border-y border-[#1a1a1a] py-6 overflow-hidden flex whitespace-nowrap relative z-20 my-8 md:my-12 ${className}`}>
+       <div className="flex px-4 min-w-max items-center animate-[marquee_50s_linear_infinite] motion-reduce:animate-none hover:[animation-play-state:paused]">
+         {[...items, ...items, ...items, ...items, ...items, ...items].map((claim, idx) => (
            <div key={idx} className="flex items-center space-x-6 sm:space-x-12 mr-6 sm:mr-12">
-             <span className="text-[10px] md:text-[11px] font-bold text-[#F6F1EB] uppercase tracking-[0.2em]">{claim}</span>
-             <span className="text-[#c9a263] opacity-50">✦</span>
+             <span className="text-[11px] md:text-sm font-bold text-[#F6F1EB] uppercase tracking-[0.2em]">{claim}</span>
+             <span className="text-[#c9a263] opacity-60 font-serif text-2xl mb-1">·</span>
            </div>
          ))}
        </div>
@@ -38,7 +29,7 @@ const CertificationsSection = () => {
               Reconhecimentos que sustentam o que está na xícara.
             </h2>
             <p className="text-[#160F0A]/70 text-lg md:text-xl font-light mb-16 max-w-2xl">
-              Café especial precisa de origem, avaliação rigorosa e rastreabilidade, não apenas embalagem bonita.
+              Não chamamos de especial por marketing. Chamamos porque existe origem, avaliação e rastreabilidade.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -87,6 +78,12 @@ const CertificationsSection = () => {
                  </p>
                </div>
             </div>
+
+            <div className="mt-16 sm:mt-24 w-full flex justify-center">
+               <p className="text-2xl md:text-3xl font-serif text-[#160F0A]/80 italic font-light drop-shadow-sm max-w-2xl leading-relaxed">
+                  "Confiança não precisa ser gritada. Precisa poder ser verificada."
+               </p>
+            </div>
         </div>
     </section>
   );
@@ -107,7 +104,7 @@ export default function Home() {
   return (
     <div className="w-full pt-6 md:pt-8">
       {/* 1. HERO - Cinematic & Premium */}
-      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12 relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-[#a3a3a3]/10 my-4 md:my-8 shadow-2xl bg-[#111111] w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)]">
+      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-[#a3a3a3]/10 mt-12 md:mt-24 mb-12 shadow-2xl bg-[#111111] w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)]">
         {/* Hero Background Image overlay */}
         <div className="absolute inset-0 z-0 bg-[image:linear-gradient(to_bottom,rgba(10,10,10,0.9),rgba(10,10,10,0.4)),url('https://lh3.googleusercontent.com/aida-public/AB6AXuBw3hyn7icMTm2DG1DORz-6_pj34D9njJ497ojAHcLknfi71Ksz8kZA2wuQOA6Ryghm14jIX48Y4AAYa8O08yDT-HYCEF0_n6tRXj7x_sVgqhopl_6X1dR1c0lR98-zStNQhNLT-hkksF5YWlAQG_MdBK8D8Vb8whcKrUn0uIbIn2POypGgb_ZJOXHQ7V98ulnSHJlse_8cVyBIh5Ksxir9q3TkRPEmyAntU9Q9akBrJNkoO353SeQp1GbqPHs9yuh5EliG_y0Dwbt_')] bg-cover bg-center rounded-[2rem] md:rounded-[3rem] opacity-70 mix-blend-overlay pointer-events-none"></div>
         
@@ -123,8 +120,13 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Microcopy acima da barra técnica */}
+        <div className="relative z-10 text-center mb-4">
+          <p className="text-[#F6F1EB] text-xs uppercase tracking-widest font-bold">Rastreabilidade real, antes da primeira xícara.</p>
+        </div>
+
         {/* Top Stats Bar */}
-        <div className="relative z-10 bg-[#1a1a1a]/80 backdrop-blur-md border border-[#a3a3a3]/10 rounded-xl p-6 mb-12 mx-auto max-w-5xl flex flex-wrap justify-between items-center text-sm shadow-xl">
+        <div className="relative z-10 bg-[#1a1a1a]/80 backdrop-blur-md border border-[#a3a3a3]/10 rounded-xl p-6 mb-4 mx-auto max-w-5xl flex flex-wrap justify-between items-center text-sm shadow-xl">
           <div className="px-4 text-center sm:text-left mb-4 sm:mb-0 border-r border-[#a3a3a3]/10 last:border-0 flex-1 hidden sm:block group relative">
             <span className="block text-[#c9a263] mb-1 uppercase text-[10px] tracking-wider font-bold">Edição</span>
             <span className="block text-white font-medium">Nº 01 • 2026</span>
@@ -146,6 +148,10 @@ export default function Home() {
             <span className="block text-white font-medium text-lg">86 – 88.5</span>
           </div>
         </div>
+        
+        <div className="relative z-10 text-center mb-12">
+            <p className="text-[#a3a3a3] text-xs font-light tracking-wide italic">Cada lote informa origem, safra, altitude e pontuação antes de chegar à sua casa.</p>
+        </div>
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-4xl mb-16 md:mb-24 px-4 sm:px-8">
@@ -161,25 +167,30 @@ export default function Home() {
               {heroBlock?.subtitle || "Talvez o melhor café do Brasil ainda não esteja na sua xícara."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <button onClick={() => navigate(heroBlock?.ctas?.[0]?.url || '/cafes')} className="bg-[#c9a263] text-[#0a0a0a] px-8 py-5 rounded-xl font-bold text-center hover:bg-[#e0b875] transition-colors shadow-[0_10px_30px_rgba(201,162,99,0.3)] hover:scale-105 active:scale-95 uppercase text-sm">
+              <button onClick={() => navigate(heroBlock?.ctas?.[0]?.url || '/cafes')} className="bg-[#c9a263] text-[#0a0a0a] px-10 py-5 rounded-xl font-bold text-center hover:bg-[#e0b875] transition-colors shadow-[0_10px_30px_rgba(201,162,99,0.3)] hover:scale-105 active:scale-95 uppercase text-sm">
                 {heroBlock?.ctas?.[0]?.label || "Comprar cafés premiados"}
               </button>
-              <Link to={heroBlock?.ctas?.[1]?.url || "/assinatura"} className="border border-[#c9a263]/30 text-white px-8 py-5 rounded-xl font-bold text-center hover:bg-white/5 hover:border-[#c9a263]/50 transition-colors backdrop-blur-sm uppercase text-sm">
+              <Link to={heroBlock?.ctas?.[1]?.url || "/assinatura"} className="border border-[#c9a263]/30 text-white px-10 py-5 rounded-xl font-bold text-center hover:bg-white/5 hover:border-[#c9a263]/50 transition-colors backdrop-blur-sm uppercase text-sm">
                 {heroBlock?.ctas?.[1]?.label || "Entrar para o Clube"}
               </Link>
             </div>
             
             {/* Microprovas */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[10px] sm:text-xs font-bold text-[#a3a3a3] uppercase tracking-widest pt-2">
-              <span className="flex items-center gap-2"><Award size={14} className="text-[#c9a263]"/> 86–88.5 SCA</span>
-              <span className="flex items-center gap-2"><MapPin size={14} className="text-[#c9a263]"/> Cerrado Mineiro</span>
-              <span className="flex items-center gap-2"><Flame size={14} className="text-[#c9a263]"/> Torra sob demanda</span>
-              <span className="flex items-center gap-2"><Sprout size={14} className="text-[#c9a263]"/> Origem rastreada</span>
+            <div className="flex flex-col gap-4 items-start">
+              <span className="text-white text-xs uppercase tracking-widest font-bold">Torra sob demanda · Envio fresco · Origem rastreada</span>
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[10px] sm:text-xs font-bold text-[#a3a3a3] uppercase tracking-widest">
+                <span className="flex items-center gap-2"><Award size={14} className="text-[#c9a263]"/> 86–88.5 SCA</span>
+                <span className="flex items-center gap-2"><Star size={14} className="text-[#c9a263]"/> Cup of Excellence</span>
+                <span className="flex items-center gap-2"><MapPin size={14} className="text-[#c9a263]"/> Cerrado Mineiro D.O.</span>
+              </div>
             </div>
           </motion.div>
         </div>
 
         {/* Video Grid Section */}
+        <div className="relative z-10 text-center pt-8 pb-8">
+           <h3 className="text-white text-3xl font-serif">Antes de escolher seu café, entenda a diferença.</h3>
+        </div>
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 px-4 sm:px-8">
           {/* Card 1 */}
           <article className="bg-[#1a1a1a] border border-[#a3a3a3]/10 rounded-2xl overflow-hidden flex flex-col group cursor-default shadow-lg hover:-translate-y-1 hover:shadow-[#c9a263]/10 transition-all duration-300">
@@ -229,8 +240,19 @@ export default function Home() {
         </div>
       </div>
 
-      <ProofStrip />
+      <ProofMarquee items={[
+        "86+ pts SCA",
+        "Cerrado Mineiro D.O.",
+        "Torra sob demanda",
+        "Rastreabilidade QR",
+        "Cup of Excellence",
+        "Lotes selecionados"
+      ]} />
       <CertificationsSection />
+
+      <div className="max-w-4xl mx-auto text-center py-10 mt-8">
+        <p className="text-sm md:text-base text-[#a3a3a3] uppercase tracking-[0.2em] font-bold">Menos amargor · Mais doçura natural · Grão ou moído · Guia de preparo</p>
+      </div>
 
       {/* 2. KIT PRIMEIRA XÍCARA */}
       <section className="bg-[#1a1a1a] py-24 px-6 relative z-10 mx-4 md:mx-10 rounded-[3rem] shadow-2xl shadow-black/50 mt-12 md:mt-20 border border-[#a3a3a3]/10">
@@ -258,31 +280,37 @@ export default function Home() {
             </div>
             <div className="flex-1 order-1 md:order-2">
                 <div className="inline-flex items-center border border-[#c9a263]/30 text-[#c9a263] rounded-full px-4 py-1.5 mb-6 text-[10px] font-black tracking-widest uppercase bg-[#c9a263]/5">
-                  Descubra o café que você nunca tomou
+                  Comece por aqui
                 </div>
                 <h2 className="text-4xl lg:text-5xl font-serif text-white mb-6 leading-tight">
-                  Talvez você não precise gostar mais de café.
+                  Não sabe qual café escolher? Comece pelo Kit Primeira Xícara.
                 </h2>
-                <h3 className="text-2xl text-[#c9a263] font-serif italic mb-8">Talvez só precise provar um café melhor.</h3>
-                <p className="text-[#a3a3a3] text-lg mb-8 leading-relaxed">
-                  Quebre a barreira da primeira compra. Preparamos um kit especial com nosso melhor lote do Cerrado Mineiro, acompanhado de um card explicativo e um guia simples: <strong className="text-white">Como preparar para não estragar um café premiado</strong>.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center gap-4">
+                <h3 className="text-xl text-[#a3a3a3] font-light mb-8 max-w-lg leading-relaxed">
+                  Para quem quer sentir a diferença do café especial sem precisar entender SCA, variedade ou processo.
+                </h3>
+                
+                <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
                     <button 
                        onClick={() => { navigate('/cafes/kit-primeira-xicara'); }}
-                       className="w-full sm:w-auto bg-[#c9a263] text-[#0a0a0a] px-8 py-4.5 rounded-xl font-bold hover:bg-[#e0b875] transition-colors shadow-[0_10px_25px_rgba(201,162,99,0.3)] hover:scale-105 active:scale-95"
+                       className="w-full sm:w-auto bg-[#c9a263] text-[#0a0a0a] px-10 py-5 rounded-xl font-bold hover:bg-[#e0b875] transition-colors shadow-[0_10px_25px_rgba(201,162,99,0.3)] hover:scale-105 active:scale-95 uppercase tracking-wider text-sm"
                     >
                        Começar pelo Kit
                     </button>
-                    <span className="text-sm font-bold text-white">R$ {kitPrimeiraXicara.price.toFixed(2)}</span>
+                    <span className="text-sm font-bold text-white uppercase tracking-widest pl-2">R$ {kitPrimeiraXicara.price.toFixed(2)}</span>
                 </div>
-                <div className="mt-8 grid grid-cols-2 gap-4 text-xs font-bold text-[#a3a3a3] uppercase tracking-widest">
-                    <span className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#c9a263]"/> Compra Segura</span>
+                <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-[10px] sm:text-xs font-bold text-[#a3a3a3] uppercase tracking-widest">
+                    <span className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#c9a263]"/> Menos amargor</span>
                     <span className="flex items-center gap-2"><MapPin size={16} className="text-[#c9a263]"/> Origem Controlada</span>
+                    <span className="flex items-center gap-2"><Star size={16} className="text-[#c9a263]"/> Mais doçura natural</span>
+                    <span className="flex items-center gap-2"><Flame size={16} className="text-[#c9a263]"/> Torra Correta</span>
                 </div>
             </div>
         </div>
       </section>
+
+      <div className="max-w-4xl mx-auto text-center py-6">
+        <p className="text-xl md:text-2xl text-[#c9a263] font-serif italic mb-2">Agora que você entende seu perfil, escolha o lote.</p>
+      </div>
 
       {/* 3. CAFÉS EM DESTAQUE - VITRINE EDITORIAL */}
       <section className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-10 py-16 md:py-24 relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-[#a3a3a3]/10 my-12 md:my-20 shadow-2xl bg-[#111111] w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)]">
@@ -292,7 +320,7 @@ export default function Home() {
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 border-b border-[#a3a3a3]/10 pb-8">
           <div>
             <h2 className="text-4xl md:text-5xl font-serif font-medium text-white mb-4">Escolhas do Mestre</h2>
-            <p className="text-[#a3a3a3] text-lg max-w-xl">Lotes selecionados, torrados sob demanda e enviados no auge do frescor.</p>
+            <p className="text-[#a3a3a3] text-lg max-w-xl">Escolha pelo seu gosto: doce, intenso, floral ou equilibrado.</p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[10px] sm:text-xs font-bold text-[#a3a3a3] uppercase tracking-widest pt-6">
               <span className="flex items-center gap-2 px-3 py-1.5 border border-[#c9a263]/30 rounded-full text-[#c9a263] bg-[#c9a263]/5 hover:bg-[#c9a263]/20 cursor-pointer transition-colors">Mais premiados</span>
               <span className="flex items-center gap-2 px-3 py-1.5 border border-[#a3a3a3]/30 rounded-full hover:border-[#c9a263]/50 hover:text-white cursor-pointer transition-colors">Para espresso</span>
@@ -325,7 +353,10 @@ export default function Home() {
                 <div className="text-[10px] text-[#c9a263] font-bold uppercase tracking-widest mb-3 bg-[#111111] inline-block px-3 py-1 rounded w-fit border border-[#a3a3a3]/10 shadow-sm">{product.region}</div>
                 <h3 className="font-serif text-2xl font-medium mb-3 leading-tight group-hover:text-[#c9a263] text-white transition-colors">{product.name}</h3>
                 <p className="text-sm text-[#a3a3a3] mb-5 leading-relaxed">{product.sensoryNotes.join(' • ')}.</p>
-                <div className="text-xs text-[#a3a3a3]/80 mb-6 font-medium">{product.formats[0]} 250g</div>
+                <div className="text-xs text-[#a3a3a3]/80 mb-6 font-medium flex justify-between">
+                   <span>{product.formats[0]} 250g</span>
+                   <span className="text-[#c9a263]">Ideal para: Coado / Espresso</span>
+                </div>
                 
                 <div className="mt-auto flex flex-col gap-3">
                   <div className="flex items-center justify-between mb-2">
@@ -366,10 +397,10 @@ export default function Home() {
             <div className="p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-[#a3a3a3]/10 bg-[#111111] flex flex-col relative overflow-hidden">
               <h3 className="text-2xl font-serif text-[#a3a3a3] mb-8 border-b border-[#a3a3a3]/10 pb-6 relative z-10">Café comum</h3>
               <ul className="space-y-6 flex-1 text-[#a3a3a3] font-light relative z-10">
-                <li className="flex gap-4"><div className="w-1.5 h-1.5 mt-2 rounded-full bg-[#a3a3a3]/30 shrink-0"/><span>Origem genérica e não identificável</span></li>
-                <li className="flex gap-4"><div className="w-1.5 h-1.5 mt-2 rounded-full bg-[#a3a3a3]/30 shrink-0"/><span>Torra escura para mascarar defeitos</span></li>
-                <li className="flex gap-4"><div className="w-1.5 h-1.5 mt-2 rounded-full bg-[#a3a3a3]/30 shrink-0"/><span>Meses esquecido na prateleira</span></li>
-                <li className="flex gap-4"><div className="w-1.5 h-1.5 mt-2 rounded-full bg-[#a3a3a3]/30 shrink-0"/><span>Pouca ou nenhuma rastreabilidade</span></li>
+                <li className="flex gap-4"><div className="w-1.5 h-1.5 mt-2 rounded-full bg-[#a3a3a3]/30 shrink-0"/><span>Origem genérica</span></li>
+                <li className="flex gap-4"><div className="w-1.5 h-1.5 mt-2 rounded-full bg-[#a3a3a3]/30 shrink-0"/><span>Torra escura</span></li>
+                <li className="flex gap-4"><div className="w-1.5 h-1.5 mt-2 rounded-full bg-[#a3a3a3]/30 shrink-0"/><span>Sem rastreabilidade</span></li>
+                <li className="flex gap-4"><div className="w-1.5 h-1.5 mt-2 rounded-full bg-[#a3a3a3]/30 shrink-0"/><span>Perfil indefinido</span></li>
               </ul>
             </div>
             
@@ -380,22 +411,30 @@ export default function Home() {
                  COFCOF.CO
                </h3>
                <ul className="space-y-6 flex-1 text-white font-medium relative z-10">
-                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Origem 100% identificada e demarcada</span></li>
-                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Torra sob demanda antes do envio</span></li>
-                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Lote rastreável até a fazenda (QR Code)</span></li>
-                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Perfil sensorial real e pontuação SCA</span></li>
-                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Curadoria rigorosa de cafés especiais</span></li>
+                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Origem rastreada</span></li>
+                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Torra sob demanda</span></li>
+                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Pontuação SCA</span></li>
+                 <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Curadoria por lote</span></li>
                </ul>
             </div>
           </div>
           
           <div className="mt-16 text-center">
+             <p className="text-2xl font-serif text-white mb-10 leading-relaxed italic mx-auto max-w-2xl font-light">"A diferença não está só no sabor. Está no que você consegue provar antes de comprar."</p>
              <button onClick={() => navigate('/sobre')} className="bg-transparent border border-[#a3a3a3]/30 text-white px-10 py-5 rounded-xl font-bold tracking-wider uppercase text-sm hover:bg-white/5 transition-colors">
                Entender a diferença
              </button>
           </div>
         </div>
       </section>
+
+      <ProofMarquee items={[
+        "Menos amargor",
+        "Mais doçura natural",
+        "Aroma limpo",
+        "Final equilibrado",
+        "Café que não precisa de açúcar"
+      ]} />
 
       {/* 7. PROVAS / O QUE MUDA NA XÍCARA */}
       <section className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-10 py-16 md:py-24 relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-[#a3a3a3]/10 my-12 md:my-20 shadow-2xl bg-[#111111] w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)]">
@@ -407,28 +446,28 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-[#1a1a1a] border border-[#a3a3a3]/10 p-8 rounded-2xl flex flex-col items-start gap-4">
             <div className="flex text-[#c9a263] gap-1"><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/></div>
-            <p className="text-white text-lg font-medium italic leading-relaxed">"Foi o primeiro café que meus clientes perguntaram onde eu comprei."</p>
+            <p className="text-white text-lg font-medium italic leading-relaxed">"Foi o primeiro café que não precisei adoçar. O cuidado com a torra é perceptível em cada xícara. Mudou meu padrão."</p>
             <div className="mt-auto pt-6 w-full text-[#a3a3a3] text-sm flex items-center justify-between border-t border-[#a3a3a3]/10">
-              <span className="font-bold">Clínica parceira</span>
-              <span className="text-xs uppercase tracking-widest text-[#c9a263]">Uberlândia</span>
+              <span className="font-bold">Marcelo T.</span>
+              <span className="text-[10px] uppercase tracking-widest text-[#c9a263]">Uberlândia, MG · Cliente Clube</span>
             </div>
           </div>
           
           <div className="bg-[#1a1a1a] border border-[#a3a3a3]/10 p-8 rounded-2xl flex flex-col items-start gap-4">
             <div className="flex text-[#c9a263] gap-1"><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/></div>
-            <p className="text-white text-lg font-medium italic leading-relaxed">"Finalmente entendi o que é nota de chocolate e caramelo sem precisar adicionar açúcar."</p>
+            <p className="text-white text-lg font-medium italic leading-relaxed">"Sensacional a experiência de conhecer a fazenda e a história de quem produziu antes mesmo de abrir o pacote. Entrega super rápida."</p>
             <div className="mt-auto pt-6 w-full text-[#a3a3a3] text-sm flex items-center justify-between border-t border-[#a3a3a3]/10">
-              <span className="font-bold">Assinante do Clube</span>
-              <span className="text-xs uppercase tracking-widest text-[#c9a263]">Lote 01</span>
+              <span className="font-bold">Camila R.</span>
+              <span className="text-[10px] uppercase tracking-widest text-[#c9a263]">São Paulo, SP · Lote Paraíso</span>
             </div>
           </div>
           
           <div className="bg-[#1a1a1a] border border-[#a3a3a3]/10 p-8 rounded-2xl flex flex-col items-start gap-4">
             <div className="flex text-[#c9a263] gap-1"><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/></div>
-            <p className="text-white text-lg font-medium italic leading-relaxed">"O frescor da torra faz toda a diferença. O pacote chega perfumando a caixa do correio."</p>
+            <p className="text-white text-lg font-medium italic leading-relaxed">"Passamos a servir CofCof no nosso escritório de arquitetura e a diferença no impacto dos clientes foi imediata. Café premium de verdade."</p>
             <div className="mt-auto pt-6 w-full text-[#a3a3a3] text-sm flex items-center justify-between border-t border-[#a3a3a3]/10">
-              <span className="font-bold">Cliente e-commerce</span>
-              <span className="text-xs uppercase tracking-widest text-[#c9a263]">Torra sob demanda</span>
+              <span className="font-bold">Roberto & Assoc.</span>
+              <span className="text-[10px] uppercase tracking-widest text-[#c9a263]">Curitiba, PR · Cliente B2B</span>
             </div>
           </div>
         </div>
@@ -448,7 +487,7 @@ export default function Home() {
               Do Cerrado Mineiro para sua xícara.
             </h2>
             <p className="text-[#a3a3a3] text-xl font-light mb-12 max-w-xl leading-relaxed">
-              Descubra por que a altitude, o solo e o processo de secagem definem a doçura e a qualidade do que você bebe.
+              Altitude ideal, clima seco na colheita e produtores premiados criam cafés mais doces, limpos e totalmente rastreáveis.
             </p>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-12">
@@ -484,6 +523,14 @@ export default function Home() {
          </div>
       </section>
 
+      <ProofMarquee items={[
+        "Todo mês",
+        "Curadoria pronta",
+        "Grão ou moído",
+        "Pause quando quiser",
+        "Torra sob demanda"
+      ]} />
+
       {/* 5. CLUBE DOS CAFÉS PREMIADOS */}
       <section className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-10 py-16 md:py-24 relative overflow-hidden rounded-[2rem] md:rounded-[3rem] border border-[#a3a3a3]/10 my-12 md:my-20 shadow-2xl bg-[#111111] w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)]">
         <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
@@ -499,7 +546,7 @@ export default function Home() {
               Clube CofCof — cafés premiados antes de todo mundo.
             </h2>
             <p className="text-xl text-[#a3a3a3] mb-10 font-light max-w-xl">
-              Todo mês, um lote selecionado, torrado sob demanda e enviado para sua casa.
+              Para quem quer receber uma curadoria pronta, sem precisar escolher lote todo mês.
             </p>
             
             <div className="grid grid-cols-2 gap-6 mb-12">
@@ -521,12 +568,15 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex flex-col items-start gap-3">
-              <Link to="/assinatura" className="bg-[#c9a263] text-[#0a0a0a] px-8 py-5 rounded-xl font-bold uppercase text-sm tracking-wider shadow-[0_10px_30px_rgba(201,162,99,0.3)] hover:bg-[#e0b875] hover:scale-105 active:scale-95 transition-all">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <Link to="/assinatura" className="bg-[#c9a263] text-[#0a0a0a] px-8 py-5 rounded-xl font-bold uppercase text-sm tracking-wider shadow-[0_10px_30px_rgba(201,162,99,0.3)] hover:bg-[#e0b875] hover:scale-105 active:scale-95 transition-all text-center w-full sm:w-auto">
                 Ver planos do clube
               </Link>
-              <span className="text-xs text-[#a3a3a3]">Sem fidelidade. Você controla sua assinatura.</span>
+              <Link to="/assinatura" className="text-sm border-b border-[#a3a3a3]/30 text-[#a3a3a3] hover:text-white hover:border-white transition-colors py-1">
+                Como funciona a assinatura
+              </Link>
             </div>
+            <p className="text-xs text-[#a3a3a3] mt-4">Sem fidelidade. Você controla sua assinatura.</p>
           </div>
         </div>
       </section>
@@ -545,23 +595,13 @@ export default function Home() {
               Para clínicas, escritórios, hotéis, restaurantes e empresas que querem transformar café em experiência de marca.
             </p>
             
-            <div className="grid sm:grid-cols-2 gap-4 mb-12">
-               <div className="flex bg-[#111111] border border-[#c9a263]/20 p-5 rounded-xl items-center gap-4 hover:border-[#c9a263]/50 transition-colors">
-                 <Building2 className="text-[#c9a263] shrink-0" size={24} />
-                 <span className="font-medium text-white text-sm">Escritórios premium</span>
-               </div>
-               <div className="flex bg-[#111111] border border-[#c9a263]/20 p-5 rounded-xl items-center gap-4 hover:border-[#c9a263]/50 transition-colors">
-                 <Store className="text-[#c9a263] shrink-0" size={24} />
-                 <span className="font-medium text-white text-sm">Clínicas e recepções</span>
-               </div>
-               <div className="flex bg-[#111111] border border-[#c9a263]/20 p-5 rounded-xl items-center gap-4 hover:border-[#c9a263]/50 transition-colors">
-                 <Coffee className="text-[#c9a263] shrink-0" size={24} />
-                 <span className="font-medium text-white text-sm">Restaurantes e cafeterias</span>
-               </div>
-               <div className="flex bg-[#111111] border border-[#c9a263]/20 p-5 rounded-xl items-center gap-4 hover:border-[#c9a263]/50 transition-colors">
-                 <Gift className="text-[#c9a263] shrink-0" size={24} />
-                 <span className="font-medium text-white text-sm">Presentes corporativos</span>
-               </div>
+            <div className="flex flex-wrap gap-3 mb-12">
+               {["10kg+/mês", "Nota fiscal", "Atendimento dedicado", "Cafeterias", "Clínicas", "Escritórios", "Hotéis"].map((item, idx) => (
+                 <div key={idx} className="flex bg-[#111111] border border-[#c9a263]/20 px-4 py-2.5 rounded-full items-center gap-2 hover:border-[#c9a263]/50 transition-colors">
+                   <CheckCircle2 className="text-[#c9a263] shrink-0" size={14} />
+                   <span className="font-medium text-[#a3a3a3] hover:text-white text-[10px] md:text-xs uppercase tracking-widest transition-colors">{item}</span>
+                 </div>
+               ))}
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -595,17 +635,23 @@ export default function Home() {
           </p>
         </div>
         
-        <div className="relative z-10 max-w-4xl mx-auto bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 p-8 md:p-12 flex flex-col items-center justify-center text-center">
+        <div className="relative z-10 max-w-2xl mx-auto bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 p-8 md:p-12 flex flex-col items-center justify-center text-center">
             <div className="w-16 h-16 bg-[#c9a263]/10 rounded-full flex items-center justify-center text-[#c9a263] mb-6">
               <MapPin size={32} />
             </div>
-            <h3 className="text-2xl font-serif text-white mb-4">Localizador de parceiros em breve</h3>
-            <p className="text-[#a3a3a3] mb-8 max-w-md">Estamos mapeando os melhores pontos para você encontrar os cafés CofCof fisicamente mais perto de você.</p>
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link to="/parceiros" className="bg-[#111111] border border-[#c9a263]/30 text-[#c9a263] px-8 py-5 rounded-xl font-bold uppercase text-sm tracking-wider hover:bg-[#c9a263]/10 transition-colors">
-                Indicar um ponto
-              </Link>
-            </div>
+            <h3 className="text-2xl font-serif text-white mb-4">Localizador de parceiros</h3>
+            <p className="text-[#a3a3a3] mb-8 max-w-md">Estamos mapeando e selecionando os melhores pontos parceiros. Quer indicar um local?</p>
+            
+            <form className="w-full flex flex-col md:flex-row gap-3 mb-6" onSubmit={(e) => e.preventDefault()}>
+               <input type="text" placeholder="Digite seu CEP ou Cidade..." className="flex-1 bg-[#111111] border border-[#a3a3a3]/10 px-4 py-4 rounded-xl text-sm focus:outline-none focus:border-[#c9a263]/50 text-white" />
+               <button type="submit" className="bg-[#111111] border border-[#c9a263]/30 text-[#c9a263] px-8 py-4 rounded-xl font-bold uppercase text-sm tracking-wider hover:bg-[#c9a263]/10 transition-colors whitespace-nowrap">
+                  Buscar
+               </button>
+            </form>
+
+            <Link to="/parceiros" className="text-[#a3a3a3] hover:text-white uppercase tracking-widest text-[10px] font-bold border-b border-transparent hover:border-[#a3a3a3]/30 transition-colors pb-1">
+              Sou lojista e quero revender
+            </Link>
         </div>
       </section>
 
@@ -622,40 +668,20 @@ export default function Home() {
                  <p className="text-[#a3a3a3] font-light text-sm">Oferecemos ambas as opções. Você pode escolher "Em Grãos" se tiver moedor, ou "Moído" com a granulometria ideal para preparos caseiros como coador, melitta ou V60.</p>
               </div>
               <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Quando ele é torrado?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Apenas após a confirmação do seu pedido. Nossa torra é sob demanda. Assim, o café chega na sua casa exatamente no auge do frescor (após o período mínimo de descanso).</p>
-              </div>
-              <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Quanto tempo demora para chegar?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Despachamos em até 48 horas úteis após a torra. O tempo de trânsito depende do seu CEP, mas sempre calculamos a melhor rota logística para garantir a entrega rápida.</p>
-              </div>
-              <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Qual café escolher para primeira compra?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Recomendamos nosso "Kit Primeira Xícara", projetado exatamente para guiar quem está entrando no mundo dos cafés especiais, com notas equilibradas e fáceis de extrair.</p>
+                 <h3 className="font-serif text-lg text-white mb-2">Como funciona a torra sob demanda?</h3>
+                 <p className="text-[#a3a3a3] font-light text-sm">Apenas torramos o lote após a confirmação do seu pedido. Em seguida, respeitamos o período mínimo de maturação para que ele chegue na sua casa no auge do frescor e sabor.</p>
               </div>
               <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
                  <h3 className="font-serif text-lg text-white mb-2">É muito amargo?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Não! O amargor forte no café comum vem da torra carbonizada. Nossos lotes possuem doçura natural e não recebem torra escura, dispensando até o uso de açúcar.</p>
+                 <p className="text-[#a3a3a3] font-light text-sm">Não! O amargor forte no café comum vem da torra excessivamente carbonizada (para esconder defeitos). Nossos lotes possuem doçura natural e torra moderada, dispensando até o uso de açúcar.</p>
               </div>
               <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Posso comprar para presente?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Sim. Durante o checkout, fornecemos opções para adicionar kits de presente e instruções especiais, ideal para surpreender alguém querido.</p>
+                 <h3 className="font-serif text-lg text-white mb-2">Como funciona o Clube CofCof?</h3>
+                 <p className="text-[#a3a3a3] font-light text-sm">Todo mês enviamos um microlote exclusivo e recém-torrado, acompanhado de materiais de rastreabilidade. Tudo automatizado. E o melhor: você pode pular o mês ou cancelar a qualquer momento no seu painel, sem taxas escondidas.</p>
               </div>
               <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Como funciona a assinatura?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Todo mês, você recebe um microlote surpresa recém-torrado, acompanhado da história da fazenda e notas sensoriais, diretamente na sua porta, em grão ou moído.</p>
-              </div>
-              <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Posso pausar o Clube?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Absolutamente. O Clube CofCof não tem fidelidade. Você entra no seu painel e pode pausar ou pular o mês com um único clique.</p>
-              </div>
-              <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">Vocês vendem para empresas?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">Sim. Temos uma operação B2B com pacotes maiores e torra programada para escritórios, clínicas e cafeterias. Acesse a aba "Empresas" para cotar conosco.</p>
-              </div>
-              <div className="bg-[#1a1a1a] rounded-2xl border border-[#a3a3a3]/10 overflow-hidden shadow-sm p-6">
-                 <h3 className="font-serif text-lg text-white mb-2">O que significa pontuação SCA?</h3>
-                 <p className="text-[#a3a3a3] font-light text-sm">A Specialty Coffee Association avalia os cafés de 0 a 100. Acima de 80, ele é considerado "Especial", atestando ausência de defeitos primários e alta complexidade sensorial.</p>
+                 <h3 className="font-serif text-lg text-white mb-2">Qual café escolher primeiro?</h3>
+                 <p className="text-[#a3a3a3] font-light text-sm">Recomendamos nosso "Kit Primeira Xícara". Ele traz notas doces clássicas (chocolate, nozes, caramelo), fáceis de reconhecer por quem está substituindo o café tradicional pelo especial.</p>
               </div>
           </div>
         </div>

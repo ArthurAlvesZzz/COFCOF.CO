@@ -8,6 +8,7 @@ import B2B from './pages/B2B';
 import Wholesale from './pages/Wholesale';
 import Origin from './pages/Origin';
 import MapPartners from './pages/MapPartners';
+import PartnerProfile from './pages/PartnerProfile';
 import Subscription from './pages/Subscription';
 import About from './pages/About';
 import Login from './pages/Login';
@@ -33,6 +34,9 @@ export default function App() {
           <Route path="atacado" element={<Wholesale />} />
           <Route path="origem" element={<Origin />} />
           <Route path="parceiros" element={<MapPartners />} />
+          <Route path="parceiros/:slug" element={<PartnerProfile />} />
+          <Route path="onde-encontrar" element={<MapPartners />} />
+          <Route path="onde-encontrar/:slug" element={<PartnerProfile />} />
           <Route path="assinatura" element={<Subscription />} />
           <Route path="sobre" element={<About />} />
           <Route path="login" element={<Login />} />
