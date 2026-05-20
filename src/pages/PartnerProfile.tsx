@@ -44,10 +44,13 @@ export default function PartnerProfile() {
   };
 
   const handleOpenGoogleMaps = () => {
-    if (partner.googleMapsUrl) {
+    if (partner.googleMapsUrl && partner.locationStatus === 'confirmed') {
        window.open(partner.googleMapsUrl, '_blank');
+    } else if (partner.lat && partner.lng && (partner.coordinatesConfirmed || partner.locationStatus === 'confirmed')) {
+       window.open(`https://www.google.com/maps/dir/?api=1&destination=${partner.lat},${partner.lng}`, '_blank');
     } else {
-       const q = `${partner.publicName}, ${partner.address}, ${partner.city}`.replace(/\s/g, '+');
+       const addressToUse = partner.fullAddress || `${partner.publicName}, ${partner.address}, ${partner.city}`;
+       const q = addressToUse.replace(/\s/g, '+');
        window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank');
     }
   };
@@ -89,7 +92,13 @@ export default function PartnerProfile() {
                   <span className="text-[10px] text-[#a3a3a3] uppercase font-bold tracking-widest px-2.5 py-1 rounded border border-[#a3a3a3]/30 bg-[#111111]/50 backdrop-blur">{partner.category}</span>
                </div>
                <h1 className="text-4xl md:text-6xl font-serif text-white mb-2 leading-tight">{partner.publicName}</h1>
-               <p className="text-[#a3a3a3] text-sm md:text-lg max-w-2xl font-light">{partner.neighborhood} · {partner.city}, {partner.state}</p>
+               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
+                 <p className="text-[#a3a3a3] text-sm md:text-lg font-light">{partner.neighborhood} · {partner.city}, {partner.state}</p>
+                 <div className="flex items-center gap-2 text-xs text-[#a3a3a3]">
+                    {partner.rating && <span className="flex items-center gap-1 text-white"><Store size={12} className="text-[#c9a263]"/> {partner.rating}</span>}
+                    {partner.priceRange && <span className="border-l border-white/20 pl-2">{partner.priceRange}</span>}
+                 </div>
+               </div>
             </motion.div>
           </div>
         </div>
@@ -180,14 +189,19 @@ export default function PartnerProfile() {
                         </MapContainer>
                      </div>
                      <div className="p-6">
-                        <div className="flex items-start gap-3 mb-6">
+                        <div className="flex items-start gap-3 mb-4">
                            <MapPin size={20} className="text-[#c9a263] shrink-0" />
                            <div>
-                             <h4 className="text-white text-sm leading-relaxed mb-1">{partner.address}</h4>
+                             <h4 className="text-white text-sm leading-relaxed mb-1">{partner.fullAddress || partner.address}</h4>
                              <p className="text-xs text-[#a3a3a3]">{partner.neighborhood} · {partner.city}/{partner.state}</p>
                            </div>
                         </div>
-                        <button onClick={handleOpenGoogleMaps} className="premium-cta w-full justify-center bg-[#c9a263] text-black border-none py-3 text-xs">
+                        {partner.locationStatus && partner.locationStatus !== 'confirmed' && !partner.coordinatesConfirmed && (
+                           <div className="mb-4 text-[10px] text-yellow-500 bg-yellow-500/10 p-2 rounded flex items-center gap-1.5 border border-yellow-500/20">
+                             Endereço pendente de validação. A localização pode ser aproximada.
+                           </div>
+                        )}
+                        <button onClick={handleOpenGoogleMaps} className="premium-cta w-full justify-center bg-[#c9a263] text-black border-none py-3 text-xs" disabled={partner.locationStatus === 'invalid'}>
                           Como chegar
                         </button>
                      </div>

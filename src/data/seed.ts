@@ -326,7 +326,7 @@ export const mockProducts: Product[] = [
   }
 ];
 
-export const mockPartners: Partner[] = [
+const rawPartners: Partner[] = [
   {
     id: "1",
     publicName: "Kantine Gastronomia",
@@ -756,3 +756,23 @@ export const mockPartners: Partner[] = [
     status: "published"
   }
 ];
+
+export const mockPartners: Partner[] = rawPartners.map(p => {
+  let aliases: string[] = [];
+  const lowerName = p.publicName?.toLowerCase() || '';
+  if (lowerName.includes("kantine")) aliases = ["Kantine", "Gastronomia Kantine"];
+  else if (lowerName.includes("club")) aliases = ["Club Cafe", "Clube Cafe", "Clube do Café", "Club de Café"];
+  else if (lowerName.includes("gatô")) aliases = ["Bistro Gato", "Bistrot Gato", "Bistrô Gato"];
+  else if (lowerName.includes("obaianeiro")) aliases = ["O Baianeiro", "Baianeiro", "Obaineiro"];
+  
+  if (lowerName.includes("santa mônica")) aliases.push("banca do dinei", "dinei", "santa monica");
+  if (lowerName.includes("aparecida")) aliases.push("banca do dinei", "dinei", "nossa sra");
+
+  return {
+    ...p,
+    fullAddress: p.address,
+    locationStatus: p.isPendingValidation ? "suggested" : "confirmed",
+    coordinatesConfirmed: !p.isPendingValidation,
+    aliases
+  };
+});

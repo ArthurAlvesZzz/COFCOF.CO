@@ -42,19 +42,27 @@ export default function MapPartners() {
   };
 
   const filteredData = useMemo(() => {
+    const normalizeText = (text: string) => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    const term = normalizeText(searchTerm);
+
     return mockPartners.filter(p => {
       // Exclude pending/inactive
       if (!p.active || p.status === 'pending') return false;
 
-      const term = searchTerm.toLowerCase();
-      const matchName = (p.publicName || '').toLowerCase().includes(term);
-      const matchCity = (p.city || '').toLowerCase().includes(term);
-      const matchNeighborhood = (p.neighborhood || '').toLowerCase().includes(term);
-      const matchType = (p.type || '').toLowerCase().includes(term);
-      const matchTags = p.tags?.some(tag => tag.toLowerCase().includes(term));
-      const matchProducts = p.availableProducts?.some(prod => prod.toLowerCase().includes(term));
+      const nName = normalizeText(p.publicName || '');
+      const nCity = normalizeText(p.city || '');
+      const nNeighborhood = normalizeText(p.neighborhood || '');
+      const nType = normalizeText(p.type || '');
+      const nAddress = normalizeText(p.fullAddress || p.address || '');
+      const matchTags = p.tags?.some(tag => normalizeText(tag).includes(term));
+      const matchProducts = p.availableProducts?.some(prod => normalizeText(prod).includes(term));
+      const matchAliases = p.aliases?.some(alias => normalizeText(alias).includes(term));
       
-      const isSearchMatch = !term || matchName || matchCity || matchNeighborhood || matchType || matchTags || matchProducts;
+      const isRoute = term.includes("rota") && p.isRoutePartner;
+      const is24h = term.includes("24") && p.isOpen24h;
+      const isPosto = term.includes("posto") && (normalizeText(p.category || '').includes("posto") || p.isRoutePartner);
+      
+      const isSearchMatch = !term || nName.includes(term) || nCity.includes(term) || nNeighborhood.includes(term) || nType.includes(term) || nAddress.includes(term) || matchTags || matchProducts || matchAliases || isRoute || is24h || isPosto;
       
       let isCategoryMatch = true;
       if (activeCategory !== 'Todos') {
@@ -75,6 +83,16 @@ export default function MapPartners() {
     });
   }, [searchTerm, activeCategory]);
 
+  const selectPartner = (partner: Partner) => {
+    setActivePartner(partner);
+  };
+
+  useEffect(() => {
+    if (filteredData.length > 0 && !activePartner && window.innerWidth >= 768) {
+      selectPartner(filteredData[0]);
+    }
+  }, [filteredData]);
+
   const getCategoryCount = (catName: string) => {
     if (catName === 'Todos') return mockPartners.filter(p => p.active && p.status !== 'pending').length;
     return mockPartners.filter(p => {
@@ -93,11 +111,15 @@ export default function MapPartners() {
     }).length;
   };
 
-  const handleOpenGoogleMaps = (partner: Partner) => {
-    if (partner.googleMapsUrl) {
+  const handleOpenGoogleMaps = (partner: Partner, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (partner.googleMapsUrl && partner.locationStatus === 'confirmed') {
        window.open(partner.googleMapsUrl, '_blank');
+    } else if (partner.lat && partner.lng && (partner.coordinatesConfirmed || partner.locationStatus === 'confirmed')) {
+       window.open(`https://www.google.com/maps/dir/?api=1&destination=${partner.lat},${partner.lng}`, '_blank');
     } else {
-       const q = `${partner.publicName}, ${partner.address}, ${partner.city}`.replace(/\s/g, '+');
+       const addressToUse = partner.fullAddress || `${partner.publicName}, ${partner.address}, ${partner.city}`;
+       const q = addressToUse.replace(/\s/g, '+');
        window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank');
     }
   };
@@ -223,14 +245,14 @@ export default function MapPartners() {
          {/* Results List */}
          <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 no-scrollbar pb-32 md:pb-8 pt-0">
             {filteredData.map(partner => (
-              <button 
+              <div 
                 key={partner.id} 
-                onClick={() => {
-                   setActivePartner(partner);
-                }}
-                className={`w-full text-left bg-[#111111] border ${activePartner?.id === partner.id ? 'border-[#c9a263] bg-[#1a1a1a]' : 'border-[#a3a3a3]/10'} rounded-2xl overflow-hidden hover:border-[#c9a263]/50 transition-all flex flex-col group`}
+                onClick={() => selectPartner(partner)}
+                role="button"
+                tabIndex={0}
+                className={`w-full text-left bg-[#111111] border ${activePartner?.id === partner.id ? 'border-[#c9a263] bg-[#1a1a1a]' : 'border-[#a3a3a3]/10'} rounded-2xl overflow-hidden hover:border-[#c9a263]/50 transition-all flex flex-col group cursor-pointer`}
               >
-                 <div className="flex items-stretch h-[110px]">
+                 <div className="flex items-stretch min-h-[110px]">
                     <div className="w-[100px] shrink-0 relative">
                        <img src={partner.coverImage} alt={partner.publicName} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                        {partner.featured && <span className="absolute top-2 left-2 bg-[#c9a263] text-black text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded">Destaque</span>}
@@ -247,21 +269,23 @@ export default function MapPartners() {
                        </div>
                     </div>
                  </div>
-                 <div className="px-4 py-3 border-t border-[#a3a3a3]/10 bg-[#1a1a1a] flex justify-between items-center group-hover:bg-[#c9a263]/5 transition-colors">
+                 <div className="px-4 py-3 border-t border-[#a3a3a3]/10 bg-[#1a1a1a] flex justify-between items-center group-hover:bg-[#c9a263]/5 transition-colors gap-2">
                     <span className="text-[10px] text-[#a3a3a3] font-medium truncate flex-1 flex items-center gap-1.5"><CheckCircle2 size={12} className="text-[#c9a263]"/> Parceiro CofCof</span>
-                    <span className="text-[10px] text-[#c9a263] font-bold uppercase tracking-widest ml-2 whitespace-nowrap group-hover:underline">Ver no mapa</span>
+                    <button onClick={(e) => handleOpenGoogleMaps(partner, e)} className="text-[10px] text-[#a3a3a3] hover:text-[#c9a263] font-bold uppercase tracking-widest whitespace-nowrap bg-transparent border border-[#a3a3a3]/20 px-3 py-1.5 rounded-full hover:border-[#c9a263] transition-colors relative z-10">Como chegar</button>
+                    <span className="text-[10px] text-[#c9a263] font-bold uppercase tracking-widest whitespace-nowrap group-hover:underline">Detalhes</span>
                  </div>
-              </button>
+              </div>
             ))}
 
             {filteredData.length === 0 && (
                <div className="text-center py-10 px-4 bg-[#111111] rounded-2xl border border-[#a3a3a3]/10">
                  <MapPin className="mx-auto text-[#c9a263] mb-4" size={32} />
-                 <h3 className="font-serif text-xl text-white mb-2">Nenhum parceiro encontrado com esse termo.</h3>
-                 <p className="text-[#a3a3a3] text-sm mb-6">Você pode buscar por cidade, bairro ou tipo de local.</p>
+                 <h3 className="font-serif text-xl text-white mb-2">Nenhum parceiro encontrado nessa busca.</h3>
+                 <p className="text-[#a3a3a3] text-sm mb-6">Você pode comprar online ou indicar um ponto que deveria servir CofCof.</p>
                  <div className="flex flex-col gap-3">
-                   <button onClick={() => { setSearchTerm(''); setActiveCategory('Todos'); }} className="premium-cta-ghost w-full py-3 text-xs justify-center text-center">Limpar busca</button>
                    <Link to="/cafes" className="premium-cta w-full flex justify-center py-3 text-xs">Comprar online</Link>
+                   <Link to="/empresas" className="premium-cta-ghost w-full py-3 text-xs flex justify-center">Quero revender CofCof</Link>
+                   <button onClick={() => { setSearchTerm(''); setActiveCategory('Todos'); }} className="text-[#a3a3a3] hover:text-white underline underline-offset-4 text-xs mt-2 transition-colors">Limpar filtros</button>
                  </div>
                </div>
             )}
@@ -298,7 +322,7 @@ export default function MapPartners() {
               position={[partner.lat, partner.lng]}
               icon={createCustomIcon(partner, activePartner?.id === partner.id)}
               zIndexOffset={activePartner?.id === partner.id ? 1000 : 0}
-              eventHandlers={{ click: () => setActivePartner(partner) }}
+              eventHandlers={{ click: () => selectPartner(partner) }}
             />
           ))}
         </MapContainer>
@@ -340,13 +364,19 @@ export default function MapPartners() {
 
                {/* Body Content */}
                <div className="p-6 pt-5 bg-[#111111] overflow-y-auto no-scrollbar min-h-[150px]">
-                 <p className="text-sm text-[#a3a3a3] mb-5 leading-relaxed">{activePartner.shortDescription}</p>
+                 <div className="flex items-center gap-2 mb-4">
+                    {activePartner.rating && <span className="flex items-center gap-1 text-[11px] text-white"><Store size={12} className="text-[#c9a263]"/> {activePartner.rating}</span>}
+                    {activePartner.priceRange && <span className="text-[11px] text-[#a3a3a3] border-l border-white/10 pl-2">{activePartner.priceRange}</span>}
+                 </div>
+
+                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-white mb-2">Por que visitar?</h3>
+                 <p className="text-xs text-[#a3a3a3] mb-5 leading-relaxed">{activePartner.shortDescription}</p>
                  
                  <div className="space-y-4 mb-6 pt-5 border-t border-[#a3a3a3]/10">
                     <div className="flex items-start gap-4">
                       <MapPin size={18} className="text-[#c9a263] shrink-0 mt-0.5" />
                       <div>
-                         <p className="text-xs text-white leading-snug">{activePartner.address}</p>
+                         <p className="text-xs text-white leading-snug">{activePartner.fullAddress || activePartner.address}</p>
                          <p className="text-[10px] text-[#a3a3a3] mt-0.5">{activePartner.neighborhood} · {activePartner.city}/{activePartner.state}</p>
                       </div>
                     </div>
@@ -358,41 +388,44 @@ export default function MapPartners() {
                     </div>
                  </div>
 
-                 {activePartner.availableProducts && activePartner.availableProducts.length > 0 && (
-                   <div className="mb-2">
-                     <div className="text-[10px] font-bold uppercase tracking-widest text-[#a3a3a3] mb-3">Opções CofCof:</div>
+                 {(activePartner.availableProducts?.length || activePartner.consumptionMethods?.length) ? (
+                   <div className="mb-2 pt-5 border-t border-[#a3a3a3]/10">
+                     <div className="text-[10px] font-bold uppercase tracking-widest text-white mb-3">CofCof no local</div>
                      <div className="flex flex-wrap gap-1.5">
-                       {activePartner.availableProducts.map((prod, i) => (
-                         <span key={i} className="text-[9px] font-bold uppercase tracking-widest bg-[#1a1a1a] text-[#c9a263] px-2 py-1 rounded border border-[#c9a263]/20">{prod}</span>
+                       {activePartner.consumptionMethods?.map((method, i) => (
+                         <span key={'m'+i} className="text-[9px] font-bold uppercase tracking-widest bg-[#1a1a1a] text-[#a3a3a3] px-2 py-1 rounded border border-white/5">{method}</span>
+                       ))}
+                       {activePartner.availableProducts?.map((prod, i) => (
+                         <span key={'p'+i} className="text-[9px] font-bold uppercase tracking-widest bg-[#c9a263]/10 text-[#c9a263] px-2 py-1 rounded border border-[#c9a263]/20">{prod}</span>
                        ))}
                      </div>
                    </div>
-                 )}
+                 ) : null}
                </div>
 
                {/* Sticky Footer CTAs */}
                <div className="p-4 bg-[#111111] border-t border-[#a3a3a3]/10 shrink-0">
                   <div className="flex gap-2 mb-3">
-                    <button onClick={() => handleOpenGoogleMaps(activePartner)} className="premium-cta w-full justify-center text-xs py-3.5 bg-[#c9a263] text-black border-transparent hover:bg-white hover:text-black">
+                    <button onClick={(e) => handleOpenGoogleMaps(activePartner, e)} className="premium-cta w-full justify-center text-xs py-3.5 bg-[#c9a263] text-black border-transparent hover:bg-white hover:text-black">
                        Como chegar
                     </button>
                   </div>
                   <div className="flex justify-between items-center px-1">
-                     <Link to={`/parceiros/${activePartner.slug}`} className="text-[#a3a3a3] hover:text-white text-[11px] font-medium underline underline-offset-4 transition-colors">
-                       Ver perfil do parceiro
+                     <Link to={`/onde-encontrar/${activePartner.slug}`} className="text-[#a3a3a3] hover:text-[#c9a263] text-[11px] font-medium underline underline-offset-4 transition-colors">
+                       Ver perfil completo
                      </Link>
                      <div className="flex items-center gap-3">
                        {activePartner.instagram && (
-                         <a href={`https://instagram.com/${activePartner.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" className="text-[#a3a3a3] hover:text-white transition-colors">
+                         <a href={`https://instagram.com/${activePartner.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" className="text-[#a3a3a3] hover:text-white transition-colors" title="Instagram">
                            <ExternalLink size={16} />
                          </a>
                        )}
                        {activePartner.whatsapp && (
-                         <a href={`https://wa.me/${activePartner.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="text-[#a3a3a3] hover:text-white transition-colors">
+                         <a href={`https://wa.me/${activePartner.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="text-[#a3a3a3] hover:text-white transition-colors" title="WhatsApp">
                            <MessageCircle size={16} />
                          </a>
                        )}
-                       <button onClick={() => handleShare(activePartner)} className="text-[#a3a3a3] hover:text-[#c9a263] transition-colors ml-1">
+                       <button onClick={() => handleShare(activePartner)} className="text-[#a3a3a3] hover:text-[#c9a263] transition-colors ml-1" title="Compartilhar">
                          <Share2 size={16} />
                        </button>
                      </div>

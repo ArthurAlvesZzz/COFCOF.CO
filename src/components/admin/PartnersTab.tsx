@@ -229,11 +229,18 @@ export function PartnersTab() {
                  </div>
                  <div>
                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Latitude</label>
-                   <input type="number" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.lat || 0} onChange={e => setEditingPartner({...editingPartner, lat: parseFloat(e.target.value) || 0})} />
+                   <input type="number" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.lat || 0} onChange={e => setEditingPartner({...editingPartner, lat: parseFloat(e.target.value) || 0, coordinatesConfirmed: false, locationStatus: 'suggested'})} />
                  </div>
                  <div>
                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Longitude</label>
-                   <input type="number" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.lng || 0} onChange={e => setEditingPartner({...editingPartner, lng: parseFloat(e.target.value) || 0})} />
+                   <input type="number" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.lng || 0} onChange={e => setEditingPartner({...editingPartner, lng: parseFloat(e.target.value) || 0, coordinatesConfirmed: false, locationStatus: 'suggested'})} />
+                 </div>
+                 <div className="col-span-2 bg-gray-50 p-4 rounded-xl border border-gray-200 mt-2">
+                   <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                     <input type="checkbox" checked={editingPartner?.coordinatesConfirmed || false} onChange={e => setEditingPartner({...editingPartner, coordinatesConfirmed: e.target.checked, locationStatus: e.target.checked ? 'confirmed' : 'suggested'})} className="w-4 h-4 accent-[#c9a263]" />
+                     <span className="font-bold">Coordenadas Confirmadas</span>
+                   </label>
+                   <p className="text-[10px] text-gray-500 mt-1 ml-7">Sempre verifique se as coordenadas apontam para a entrada correta no Google Maps.</p>
                  </div>
               </div>
            </div>

@@ -11,7 +11,7 @@ export default function MainLayout() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  const isMapRoute = pathname === '/parceiros';
+  const isMapRoute = pathname === '/parceiros' || pathname === '/onde-encontrar';
 
   return (
     <div className={isMapRoute ? "h-dvh flex flex-col font-sans bg-[#F6F1EB] text-cof-black overflow-hidden w-full relative" : "min-h-screen flex flex-col font-sans bg-cof-cream text-cof-black overflow-x-hidden w-full"}>

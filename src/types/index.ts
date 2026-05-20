@@ -102,6 +102,16 @@ export interface Partner {
   showOnHome?: boolean;
   showOnPartnersPage?: boolean;
   
+  // Location validation & search
+  fullAddress?: string;
+  locationStatus?: "draft" | "missing_coordinates" | "suggested" | "confirmed" | "invalid";
+  locationValidatedAt?: string;
+  locationSource?: "manual" | "google_maps" | "admin" | "imported" | "unknown";
+  locationNotes?: string;
+  cep?: string;
+  coordinatesConfirmed?: boolean;
+  aliases?: string[];
+  
   // Legacy / fallback fields
   name?: string;
   partnerBadge?: string;
