@@ -546,6 +546,8 @@ const rawPartners: Partner[] = [
     featured: false,
     active: false,
     isPendingValidation: true,
+    locationStatus: "suggested",
+    coordinatesConfirmed: false,
     internalNotes: "Confirmar nome comercial, endereço, categoria e horário antes de publicar.",
     status: "pending"
   },
@@ -768,11 +770,16 @@ export const mockPartners: Partner[] = rawPartners.map(p => {
   if (lowerName.includes("santa mônica")) aliases.push("banca do dinei", "dinei", "santa monica");
   if (lowerName.includes("aparecida")) aliases.push("banca do dinei", "dinei", "nossa sra");
 
+  const isDoubtful = p.isPendingValidation || !p.active;
+
   return {
     ...p,
-    fullAddress: p.address,
-    locationStatus: p.isPendingValidation ? "suggested" : "confirmed",
-    coordinatesConfirmed: !p.isPendingValidation,
+    fullAddress: p.fullAddress || p.address,
+    googleMapsUrl: p.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`,
+    locationStatus: p.locationStatus || (isDoubtful ? "suggested" : "confirmed"),
+    coordinatesConfirmed: p.coordinatesConfirmed !== undefined ? p.coordinatesConfirmed : !isDoubtful,
+    locationSource: p.locationSource || "google_maps",
+    locationNotes: p.locationNotes || "",
     aliases
   };
 });

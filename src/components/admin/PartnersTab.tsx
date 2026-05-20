@@ -31,9 +31,37 @@ export function PartnersTab() {
   };
 
   const handleSave = () => {
-    if(!editingPartner?.publicName && !editingPartner?.name) {
+    if (!editingPartner?.publicName && !editingPartner?.name) {
       toast.error('Nome é obrigatório');
       return;
+    }
+
+    if (editingPartner.active) {
+      if (!editingPartner.category) {
+        toast.error('Categoria é obrigatória para publicar');
+        return;
+      }
+      if (!editingPartner.address) {
+        toast.error('Endereço completo é obrigatório para publicar');
+        return;
+      }
+      if (!editingPartner.city) {
+        toast.error('Cidade/estado é obrigatório para publicar');
+        return;
+      }
+      if (!editingPartner.lat || !editingPartner.lng) {
+        toast.error('Latitude e longitude são obrigatórias para publicar');
+        return;
+      }
+      if (!editingPartner.coordinatesConfirmed || editingPartner.locationStatus !== 'confirmed') {
+        toast.error('Coordenadas confirmadas são obrigatórias para publicar');
+        return;
+      }
+      if (!editingPartner.shortDescription) {
+        toast.error('Descrição curta é obrigatória para publicar');
+        return;
+      }
+      // Assuming a default fallback image is allowed if currently empty, but strict rule says "foto ou fallback". Let's assume coverImage should be populated or standard.
     }
 
     if (editingPartner.id) {
@@ -49,8 +77,24 @@ export function PartnersTab() {
   };
 
   const toggleActive = (id: string, currentActive: boolean) => {
+    const partner = partners.find(p => p.id === id);
+    if (!currentActive && partner) {
+      if (!partner.category || !partner.address || !partner.city || !partner.lat || !partner.lng || !partner.coordinatesConfirmed || partner.locationStatus !== 'confirmed' || !partner.shortDescription) {
+        toast.error('Parceiro incompleto. Edite e confirme os dados de localização antes de ativar.');
+        return;
+      }
+    }
     setPartners(partners.map(p => p.id === id ? { ...p, active: !currentActive, status: !currentActive ? 'published' : 'inactive' } : p));
     toast.success(!currentActive ? 'Parceiro reativado.' : 'Parceiro desativado.');
+  };
+
+  const handleAddressChange = (newAddress: string) => {
+    setEditingPartner({
+      ...editingPartner, 
+      address: newAddress, 
+      coordinatesConfirmed: false, 
+      locationStatus: 'suggested' 
+    });
   };
 
   return (
@@ -217,7 +261,7 @@ export function PartnersTab() {
               <div className="grid grid-cols-2 gap-4">
                  <div className="col-span-2">
                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Endereço Completo</label>
-                   <input className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.address || ''} onChange={e => setEditingPartner({...editingPartner, address: e.target.value})} />
+                   <input className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.address || ''} onChange={e => handleAddressChange(e.target.value)} />
                  </div>
                  <div>
                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Cidade</label>
