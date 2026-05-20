@@ -6,7 +6,7 @@ import {
   useMap,
   ZoomControl,
 } from "react-leaflet";
-import { mockPartners } from "../data/seed";
+import { mockPartners, getPublicPartners, getPartnerRouteUrl, hasConfirmedLocation } from "../data/seed";
 import L from "leaflet";
 import {
   Search,
@@ -29,6 +29,7 @@ import { Partner } from "../types";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { SafePartnerImage } from "../components/SafePartnerImage";
 
 function ChangeView({
   center,
@@ -87,17 +88,19 @@ export default function MapPartners() {
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
+
     const term = normalizeText(searchTerm);
 
-    return mockPartners.filter((p) => {
-      // Exclude pending/inactive
-      if (!p.active || p.status === "pending") return false;
-
-      const nName = normalizeText(p.publicName || "");
+    return getPublicPartners().filter((p) => {
+      const nName = normalizeText(p.publicName || p.name || "");
       const nCity = normalizeText(p.city || "");
+      const nState = normalizeText(p.state || "");
       const nNeighborhood = normalizeText(p.neighborhood || "");
       const nType = normalizeText(p.type || "");
+      const nCategory = normalizeText(p.category || "");
       const nAddress = normalizeText(p.fullAddress || p.address || "");
       const matchTags = p.tags?.some((tag) =>
         normalizeText(tag).includes(term),
@@ -119,8 +122,10 @@ export default function MapPartners() {
         !term ||
         nName.includes(term) ||
         nCity.includes(term) ||
+        nState.includes(term) ||
         nNeighborhood.includes(term) ||
         nType.includes(term) ||
+        nCategory.includes(term) ||
         nAddress.includes(term) ||
         matchTags ||
         matchProducts ||
@@ -139,7 +144,7 @@ export default function MapPartners() {
           isCategoryMatch = pCat === "restaurante";
         else if (cat === "padarias") isCategoryMatch = pCat === "padaria";
         else if (cat === "hotéis") isCategoryMatch = pCat === "hotel";
-        else if (cat === "postos") isCategoryMatch = pCat === "posto";
+        else if (cat === "postos" || cat === "rota cofcof") isCategoryMatch = pCat === "posto" || p.isRoutePartner;
         else if (cat === "conveniência")
           isCategoryMatch = pCat === "conveniência";
         else if (cat === "revendas") isCategoryMatch = pCat === "revenda";
@@ -153,7 +158,7 @@ export default function MapPartners() {
   const selectPartner = (partnerId: string) => {
     const partner =
       filteredData.find((p) => p.id === partnerId) ||
-      mockPartners.find((p) => p.id === partnerId);
+      getPublicPartners(mockPartners).find((p) => p.id === partnerId);
     if (!partner) return;
     setHasUserClosedPreview(false);
     setActivePartner(partner);
@@ -200,11 +205,10 @@ export default function MapPartners() {
   }, [filteredData, activePartner?.id, hasUserClosedPreview]);
 
   const getCategoryCount = (catName: string) => {
-    if (catName === "Todos")
-      return mockPartners.filter((p) => p.active && p.status !== "pending")
-        .length;
-    return mockPartners.filter((p) => {
-      if (!p.active || p.status === "pending") return false;
+    const publicPartners = getPublicPartners(mockPartners);
+    if (catName === "Todos") return publicPartners.length;
+    
+    return publicPartners.filter((p) => {
       const cat = catName.toLowerCase();
       const pCat = getPartnerCategory(p).toLowerCase();
       if (cat === "cafeterias") return pCat === "cafeteria";
@@ -212,7 +216,7 @@ export default function MapPartners() {
       if (cat === "restaurantes") return pCat === "restaurante";
       if (cat === "padarias") return pCat === "padaria";
       if (cat === "hotéis") return pCat === "hotel";
-      if (cat === "postos") return pCat === "posto";
+      if (cat === "postos" || cat === "rota cofcof") return pCat === "posto" || p.isRoutePartner;
       if (cat === "conveniência") return pCat === "conveniência";
       if (cat === "revendas") return pCat === "revenda";
       return false;
@@ -221,33 +225,8 @@ export default function MapPartners() {
 
   const handleOpenGoogleMaps = (partner: Partner, e?: React.MouseEvent) => {
     e?.stopPropagation();
-
-    if (
-      partner.lat &&
-      partner.lng &&
-      (partner.coordinatesConfirmed || partner.locationStatus === "confirmed")
-    ) {
-      window.open(
-        `https://www.google.com/maps/dir/?api=1&destination=${partner.lat},${partner.lng}`,
-        "_blank",
-      );
-      return;
-    }
-
-    if (partner.googleMapsUrl) {
-      window.open(partner.googleMapsUrl, "_blank");
-      return;
-    }
-
-    const addressToUse =
-      partner.fullAddress ||
-      `${partner.publicName}, ${partner.address}, ${partner.city}`;
-
-    const q = addressToUse.replace(/\s/g, "+");
-    window.open(
-      `https://www.google.com/maps/search/?api=1&query=${q}`,
-      "_blank",
-    );
+    const url = getPartnerRouteUrl(partner);
+    window.open(url, "_blank");
   };
 
   const handleShare = async (partner: Partner) => {
@@ -420,9 +399,8 @@ export default function MapPartners() {
             >
               <div className="flex items-stretch min-h-[130px]">
                 <div className="w-[120px] shrink-0 relative">
-                  <img
-                    src={partner.coverImage}
-                    alt={partner.publicName}
+                  <SafePartnerImage
+                    partner={partner}
                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                   />
                   {partner.featured && (
@@ -576,9 +554,8 @@ export default function MapPartners() {
           >
             {/* Cover Image Header */}
             <div className="h-52 bg-[#0a0a0a] relative w-full overflow-hidden shrink-0 group">
-              <img
-                src={activePartner.coverImage}
-                alt={activePartner.publicName}
+              <SafePartnerImage
+                partner={activePartner}
                 className="w-full h-full object-cover mix-blend-lighten opacity-90 group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-[#111111] via-[#111111]/70 to-transparent" />
@@ -708,6 +685,11 @@ export default function MapPartners() {
 
             {/* Sticky Footer CTAs */}
             <div className="p-4 bg-[#111111] border-t border-[#a3a3a3]/10 shrink-0">
+              {(activePartner.coordinatesConfirmed || activePartner.locationStatus === 'confirmed') && (
+                <div className="text-[10px] text-center text-[#a3a3a3] mb-2 font-medium">
+                  Rota baseada na localização confirmada do parceiro.
+                </div>
+              )}
               <div className="flex gap-2 mb-4">
                 <button
                   onClick={(e) => handleOpenGoogleMaps(activePartner, e)}

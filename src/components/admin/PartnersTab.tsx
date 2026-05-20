@@ -265,11 +265,11 @@ export function PartnersTab() {
                  </div>
                  <div>
                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Cidade</label>
-                   <input className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.city || ''} onChange={e => setEditingPartner({...editingPartner, city: e.target.value})} />
+                   <input className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.city || ''} onChange={e => setEditingPartner({ ...editingPartner, city: e.target.value, coordinatesConfirmed: false, locationStatus: 'suggested' })} />
                  </div>
                  <div>
                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Bairro</label>
-                   <input className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.neighborhood || ''} onChange={e => setEditingPartner({...editingPartner, neighborhood: e.target.value})} />
+                   <input className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.neighborhood || ''} onChange={e => setEditingPartner({ ...editingPartner, neighborhood: e.target.value, coordinatesConfirmed: false, locationStatus: 'suggested' })} />
                  </div>
                  <div>
                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Latitude</label>
@@ -279,12 +279,41 @@ export function PartnersTab() {
                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Longitude</label>
                    <input type="number" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.lng || 0} onChange={e => setEditingPartner({...editingPartner, lng: parseFloat(e.target.value) || 0, coordinatesConfirmed: false, locationStatus: 'suggested'})} />
                  </div>
-                 <div className="col-span-2 bg-gray-50 p-4 rounded-xl border border-gray-200 mt-2">
-                   <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
-                     <input type="checkbox" checked={editingPartner?.coordinatesConfirmed || false} onChange={e => setEditingPartner({...editingPartner, coordinatesConfirmed: e.target.checked, locationStatus: e.target.checked ? 'confirmed' : 'suggested'})} className="w-4 h-4 accent-[#c9a263]" />
-                     <span className="font-bold">Coordenadas Confirmadas</span>
-                   </label>
-                   <p className="text-[10px] text-gray-500 mt-1 ml-7">Sempre verifique se as coordenadas apontam para a entrada correta no Google Maps.</p>
+                 <div className="col-span-2">
+                   <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Google Maps URL</label>
+                   <input className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#c9a263] outline-none transition-colors text-black" value={editingPartner?.googleMapsUrl || ''} onChange={e => setEditingPartner({...editingPartner, googleMapsUrl: e.target.value, coordinatesConfirmed: false, locationStatus: 'suggested'})} />
+                 </div>
+                 <div className="col-span-2 bg-gray-50 p-6 rounded-xl border border-gray-200 mt-2 space-y-4">
+                   <div className="flex flex-col gap-2">
+                      <span className="font-bold text-sm text-[#0a0a0a]">Validação da Localização</span>
+                      <p className="text-xs text-gray-500">O parceiro só pode ser publicado quando a localização for validada manualmente. Confirme se o PIN aponta exatamente para a entrada no mapa antes de confirmar.</p>
+                      
+                      <div className="flex gap-2 mt-2">
+                         <a href={`https://www.google.com/maps/search/?api=1&query=${editingPartner?.lat},${editingPartner?.lng}`} target="_blank" rel="noreferrer" className="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs px-4 py-2 flex items-center gap-1.5 rounded-lg transition-colors font-medium cursor-pointer">
+                           🗺️ Verificar Coordenada no Google
+                         </a>
+                         <button 
+                            type="button" 
+                            onClick={() => {
+                              if (editingPartner?.lat && editingPartner?.lng) {
+                                setEditingPartner({...editingPartner, coordinatesConfirmed: true, locationStatus: 'confirmed'});
+                                toast.success("Localização confirmada!");
+                              } else {
+                                toast.error("Preencha LAT e LNG primeiro");
+                              }
+                            }}
+                            className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${editingPartner?.coordinatesConfirmed ? 'bg-green-100 text-green-700 pointer-events-none' : 'bg-[#c9a263] text-black hover:bg-[#b58f55]'}`}
+                         >
+                           {editingPartner?.coordinatesConfirmed ? '✅ Localização Confirmada' : 'Confirmar Localização'}
+                         </button>
+                      </div>
+                   </div>
+                   
+                   {!editingPartner?.coordinatesConfirmed && (
+                     <div className="bg-yellow-100 text-yellow-800 text-xs p-3 rounded-lg border border-yellow-200">
+                       ⚠️ Status atual: Pendente de validação. Parceiro não aparecerá no mapa com essa configuração.
+                     </div>
+                   )}
                  </div>
               </div>
            </div>

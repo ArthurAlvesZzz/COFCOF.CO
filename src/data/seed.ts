@@ -764,22 +764,48 @@ export const mockPartners: Partner[] = rawPartners.map(p => {
   const lowerName = p.publicName?.toLowerCase() || '';
   if (lowerName.includes("kantine")) aliases = ["Kantine", "Gastronomia Kantine"];
   else if (lowerName.includes("club")) aliases = ["Club Cafe", "Clube Cafe", "Clube do Café", "Club de Café"];
-  else if (lowerName.includes("gatô")) aliases = ["Bistro Gato", "Bistrot Gato", "Bistrô Gato"];
+  else if (lowerName.includes("gatô") || lowerName.includes("gato")) aliases = ["Bistro Gato", "Bistrot Gato", "Bistrô Gato"];
   else if (lowerName.includes("obaianeiro")) aliases = ["O Baianeiro", "Baianeiro", "Obaineiro"];
   
   if (lowerName.includes("santa mônica")) aliases.push("banca do dinei", "dinei", "santa monica");
-  if (lowerName.includes("aparecida")) aliases.push("banca do dinei", "dinei", "nossa sra");
+  if (lowerName.includes("aparecida")) aliases.push("banca do dinei", "dinei", "nossa senhora aparecida");
+  if (lowerName.includes("são roque") || lowerName.includes("sao roque")) aliases.push("sao roque", "posto sao", "posto sao roque");
 
-  const isDoubtful = p.isPendingValidation || !p.active;
-
+  const isConfirmedExplicitly = p.coordinatesConfirmed === true;
+  
   return {
     ...p,
     fullAddress: p.fullAddress || p.address,
     googleMapsUrl: p.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`,
-    locationStatus: p.locationStatus || (isDoubtful ? "suggested" : "confirmed"),
-    coordinatesConfirmed: p.coordinatesConfirmed !== undefined ? p.coordinatesConfirmed : !isDoubtful,
-    locationSource: p.locationSource || "google_maps",
+    locationStatus: p.locationStatus || (isConfirmedExplicitly ? "confirmed" : "suggested"),
+    coordinatesConfirmed: p.coordinatesConfirmed !== undefined ? p.coordinatesConfirmed : false,
+    locationSource: p.locationSource || (isConfirmedExplicitly ? "google_maps" : "manual"),
     locationNotes: p.locationNotes || "",
+    active: isConfirmedExplicitly ? p.active : false,
+    status: isConfirmedExplicitly ? p.status : "draft",
     aliases
   };
 });
+
+export const hasValidCoordinates = (partner: Partner): boolean => {
+  return typeof partner.lat === 'number' && typeof partner.lng === 'number' && !isNaN(partner.lat) && !isNaN(partner.lng);
+};
+
+export const hasConfirmedLocation = (partner: Partner): boolean => {
+  return partner.coordinatesConfirmed === true && partner.locationStatus === 'confirmed' && hasValidCoordinates(partner);
+};
+
+export const getPublicPartners = (partners: Partner[] = mockPartners): Partner[] => {
+  return partners.filter((p) => p.active && p.status === 'published' && hasConfirmedLocation(p));
+};
+
+export const getPartnerRouteUrl = (partner: Partner): string => {
+  if (hasConfirmedLocation(partner)) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${partner.lat},${partner.lng}`;
+  }
+  if (partner.googleMapsUrl) {
+    return partner.googleMapsUrl;
+  }
+  const query = (partner.fullAddress || partner.address || '').replace(/\s/g, '+');
+  return `https://www.google.com/maps/search/?api=1&query=${query}`;
+};

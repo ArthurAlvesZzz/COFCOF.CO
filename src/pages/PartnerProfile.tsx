@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { mockPartners } from "../data/seed";
+import { mockPartners, getPublicPartners, getPartnerRouteUrl, hasConfirmedLocation } from "../data/seed";
 import { MapContainer, TileLayer, Marker, ZoomControl } from "react-leaflet";
 import L from "leaflet";
 import {
@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import toast from "react-hot-toast";
+import { SafePartnerImage } from "../components/SafePartnerImage";
 
 export default function PartnerProfile() {
   const { slug } = useParams();
@@ -64,24 +65,9 @@ export default function PartnerProfile() {
   };
 
   const handleOpenGoogleMaps = () => {
-    if (
-      partner.lat &&
-      partner.lng &&
-      (partner.coordinatesConfirmed || partner.locationStatus === "confirmed")
-    ) {
-      window.open(
-        `https://www.google.com/maps/dir/?api=1&destination=${partner.lat},${partner.lng}`,
-        "_blank",
-      );
-    } else if (partner.fullAddress) {
-      const q = partner.fullAddress.replace(/\s/g, "+");
-      window.open(
-        `https://www.google.com/maps/search/?api=1&query=${q}`,
-        "_blank",
-      );
-    } else {
-      toast.error("Endereço pendente de validação");
-    }
+    if (!partner) return;
+    const url = getPartnerRouteUrl(partner);
+    window.open(url, "_blank");
   };
 
   const customIcon = L.divIcon({
@@ -104,9 +90,8 @@ export default function PartnerProfile() {
     <div className="min-h-screen bg-[#0a0a0a] pb-24">
       {/* Hero Section */}
       <div className="relative h-[50vh] min-h-[400px] w-full bg-[#111111] overflow-hidden">
-        <img
-          src={partner.coverImage}
-          alt={partner.publicName}
+        <SafePartnerImage
+          partner={partner}
           className="w-full h-full object-cover opacity-60 mix-blend-lighten"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
@@ -271,8 +256,9 @@ export default function PartnerProfile() {
                       key={i}
                       className="aspect-square bg-[#111111] rounded-2xl overflow-hidden border border-white/5"
                     >
-                      <img
-                        src={img}
+                      <SafePartnerImage
+                        partner={partner}
+                        imageUrl={img}
                         alt="Galeria"
                         className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity"
                       />
@@ -288,22 +274,24 @@ export default function PartnerProfile() {
             <div className="sticky top-24">
               {/* Address Card */}
               <div className="bg-[#111111] border border-[#a3a3a3]/10 rounded-3xl overflow-hidden mb-6">
-                <div className="h-[200px] w-full bg-[#1a1a1a]">
-                  <style>{` .leaflet-container { background: #0a0a0a; font-family: inherit; } `}</style>
-                  <MapContainer
-                    center={[partner.lat, partner.lng]}
-                    zoom={16}
-                    scrollWheelZoom={false}
-                    className="w-full h-full"
-                    zoomControl={false}
-                  >
-                    <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png" />
-                    <Marker
-                      position={[partner.lat, partner.lng]}
-                      icon={customIcon}
-                    />
-                  </MapContainer>
-                </div>
+                {hasConfirmedLocation(partner) && (
+                  <div className="h-[200px] w-full bg-[#1a1a1a]">
+                    <style>{` .leaflet-container { background: #0a0a0a; font-family: inherit; } `}</style>
+                    <MapContainer
+                      center={[partner.lat, partner.lng]}
+                      zoom={16}
+                      scrollWheelZoom={false}
+                      className="w-full h-full"
+                      zoomControl={false}
+                    >
+                      <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png" />
+                      <Marker
+                        position={[partner.lat, partner.lng]}
+                        icon={customIcon}
+                      />
+                    </MapContainer>
+                  </div>
+                )}
                 <div className="p-6">
                   <div className="flex items-start gap-3 mb-4">
                     <MapPin size={20} className="text-[#c9a263] shrink-0" />
