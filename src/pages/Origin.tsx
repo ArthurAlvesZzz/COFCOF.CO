@@ -69,6 +69,79 @@ export default function Origin() {
   const [activeFarm, setActiveFarm] = useState<OriginFarm | null>(null);
   const [mapFilter, setMapFilter] = useState('Todos');
 
+  const filterOptions = [
+    { id: 'Todos', label: 'Todos', test: (f: OriginFarm) => true },
+    { id: '86+ SCA', label: '86+ SCA', test: (f: OriginFarm) => (f.scaScore || 0) >= 86 },
+    { id: 'Natural', label: 'Natural', test: (f: OriginFarm) => f.process.toLowerCase().includes('natural') },
+    { id: 'Fermentado', label: 'Fermentado', test: (f: OriginFarm) => f.process.toLowerCase().includes('fermentado') },
+    { id: 'Disponível agora', label: 'Disponível agora', test: (f: OriginFarm) => f.active && !!f.linkedProductSlug }
+  ];
+
+  const filteredFarms = mockOriginFarms.filter(farm => {
+    const opt = filterOptions.find(o => o.id === mapFilter);
+    return opt ? opt.test(farm) : true;
+  });
+
+  // Set default farm and handle filter active sync
+  useEffect(() => {
+    if (filteredFarms.length === 1) {
+      if (activeFarm?.id !== filteredFarms[0].id) {
+        setActiveFarm(filteredFarms[0]);
+      }
+    } else if (filteredFarms.length > 0 && (!activeFarm || !filteredFarms.find(f => f.id === activeFarm.id))) {
+      // Find featured or available or first
+      const defaultFarm = filteredFarms.find(f => f.featured) || filteredFarms.find(f => f.active) || filteredFarms[0];
+      setActiveFarm(defaultFarm);
+    } else if (filteredFarms.length === 0) {
+      setActiveFarm(null);
+    }
+  }, [mapFilter]); // Deliberately only on mapFilter change to not override user clicks unless filtered out
+
+  // Initial load default
+  useEffect(() => {
+    if (!activeFarm && filteredFarms.length > 0) {
+      const defaultFarm = filteredFarms.find(f => f.featured) || filteredFarms.find(f => f.active) || filteredFarms[0];
+      setActiveFarm(defaultFarm);
+    }
+  }, []);
+
+  const getPinProps = (farm: OriginFarm) => {
+    if (farm.featured) return { fill: '#c9a263', stroke: '#0a0a0a', hasLot: true };
+    if (farm.active && farm.linkedProductSlug) return { fill: '#c9a263', stroke: '#0a0a0a', hasLot: true };
+    return { fill: 'transparent', stroke: '#c9a263', hasLot: false };
+  };
+
+  const createFarmIcon = (farm: OriginFarm, isActive: boolean) => {
+    const props = getPinProps(farm);
+    return L.divIcon({
+      className: 'bg-transparent border-0',
+      html: `
+        <div class="custom-pin-marker group relative" style="
+          background-color: ${props.fill};
+          width: ${isActive ? '40px' : '32px'};
+          height: ${isActive ? '40px' : '32px'};
+          border-radius: 50%;
+          border: 2px solid ${isActive ? '#fff' : props.stroke};
+          box-shadow: ${isActive ? '0 0 0 4px rgba(201,162,99,0.3), 0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 12px rgba(0, 0, 0, 0.5)'};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${props.hasLot ? '#0a0a0a' : props.stroke};
+          transition: all 0.3s ease;
+          transform: ${isActive ? 'scale(1.1) translateY(-4px)' : 'scale(1)'};
+        ">
+          ${farm.featured 
+            ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>'
+            : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
+          }
+          <div class="absolute opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-[#111111] text-white text-[10px] px-2 py-1 rounded border border-white/10 -top-8 left-1/2 -translate-x-1/2 pointer-events-none z-50">Localização aproximada da região produtora</div>
+        </div>
+      `,
+      iconSize: isActive ? [40, 40] : [32, 32],
+      iconAnchor: isActive ? [20, 20] : [16, 16],
+    });
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = "Origem | CofCof.co";
@@ -89,14 +162,7 @@ export default function Origin() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const filteredFarms = mockOriginFarms.filter(farm => {
-    if (mapFilter === 'Todos') return true;
-    if (mapFilter === '86+ SCA') return (farm.scaScore || 0) >= 86;
-    if (mapFilter === 'Disponível agora') return farm.active;
-    if (farm.process.toLowerCase().includes(mapFilter.toLowerCase())) return true;
-    if (farm.varieties.some(v => v.toLowerCase().includes(mapFilter.toLowerCase()))) return true;
-    return false;
-  });
+
 
   return (
     <div className="w-full bg-[#0a0a0a] min-h-screen pt-24 pb-20">
@@ -125,96 +191,80 @@ export default function Origin() {
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif text-white mb-6 leading-tight max-w-4xl mx-auto">
               A origem que assina <span className="text-[#c9a263] italic">cada café</span> CofCof.
             </h1>
-            <p className="text-lg md:text-xl text-[#a3a3a3] max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+            <p className="text-lg md:text-xl text-[#a3a3a3] max-w-2xl mx-auto leading-relaxed font-light mb-8">
               Do Cerrado Mineiro à sua xícara, cada lote carrega produtor, fazenda, altitude, safra, processo, pontuação sensorial e rastreabilidade.
             </p>
+
+            <div className="flex flex-wrap justify-center gap-4 text-[10px] sm:text-xs font-bold text-[#c9a263] uppercase tracking-widest mb-10 max-w-3xl mx-auto">
+               <span className="flex items-center gap-1.5"><MapPin size={12} /> Cerrado Mineiro D.O.</span>
+               <span className="flex items-center gap-1.5"><Award size={12} /> 86+ SCA</span>
+               <span className="flex items-center gap-1.5"><Mountain size={12} /> Cup of Excellence</span>
+               <span className="flex items-center gap-1.5"><QrCode size={12} /> QR por lote</span>
+               <span className="flex items-center gap-1.5"><Flame size={12} /> Torra sob demanda</span>
+            </div>
             
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <button 
                 onClick={() => scrollToSection('fazendas')}
-                className="premium-cta w-full sm:w-auto"
+                className="premium-cta w-full sm:w-auto border-transparent bg-[#1a1a1a] text-[#a3a3a3] hover:text-white"
               >
-                Ver fazendas e produtores
+                Explorar mapa da origem
               </button>
               <Link 
                 to="/cafes"
-                className="premium-cta-ghost w-full sm:w-auto"
+                className="premium-cta w-full sm:w-auto border-transparent bg-[#c9a263] text-black"
                >
-                Comprar cafés dessa origem
+                Comprar cafés do Cerrado
               </Link>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* 2. FAIXA DE PROVA */}
-      <section className="bg-[#111111] border-y border-[#a3a3a3]/10 py-6 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-wrap justify-center gap-x-6 sm:gap-x-12 gap-y-4 text-[10px] sm:text-xs font-bold text-[#a3a3a3] uppercase tracking-widest text-center">
-            <span className="flex items-center gap-2"><MapPin size={14} className="text-[#c9a263]" /> Cerrado Mineiro D.O.</span>
-            <span className="flex items-center gap-2"><Mountain size={14} className="text-[#c9a263]" /> 800–1.300m</span>
-            <span className="flex items-center gap-2"><Award size={14} className="text-[#c9a263]" /> 86+ SCA</span>
-            <span className="flex items-center gap-2"><Flame size={14} className="text-[#c9a263]" /> Cup of Excellence</span>
-            <span className="flex items-center gap-2"><QrCode size={14} className="text-[#c9a263]" /> QR por lote</span>
-          </div>
-        </div>
-      </section>
+      {/* 2. ESPAÇAMENTO */}
 
-      {/* 3. DOSSIÊ VISUAL */}
+      {/* 3. DOSSIÊ VISUAL & SENSORIAL */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">Cerrado Mineiro: terroir que se prova na xícara.</h2>
-          <p className="text-[#a3a3a3] text-lg max-w-2xl mx-auto font-light">Não é só uma região. É uma assinatura sensorial: altitude, clima definido, solo e produtores que entregam cafés mais doces, limpos e complexos.</p>
+           <div className="premium-badge mb-6 mx-auto inline-flex">Por que o Cerrado?</div>
+           <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">O que a origem muda no sabor?</h2>
+           <p className="text-[#a3a3a3] text-lg max-w-2xl mx-auto font-light">Origem não é decoração. É o que explica o sabor, a rastreabilidade e o valor de cada lote. Entenda como o terroir se prova na xícara.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-           <div className="premium-card bg-[#111111] p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+           <div className="premium-card bg-[#111111] p-8 aspect-square flex flex-col justify-center">
              <Mountain size={24} className="text-[#c9a263] mb-4" />
-             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-1">Altitude</div>
-             <h4 className="font-serif text-2xl text-white mb-3">800–1.300m</h4>
-             <p className="text-sm text-[#a3a3a3] leading-relaxed">Garante noites mais frias e maturação lenta dos grãos, resultando em mais densidade, doçura e complexidade celular.</p>
+             <h4 className="font-serif text-2xl text-white mb-3">Altitude</h4>
+             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-4 pb-4 border-b border-white/10">800–1.300m</div>
+             <p className="text-sm text-[#a3a3a3] leading-relaxed">Ajuda na maturação lenta e resulta em maior complexidade e doçura celular.</p>
            </div>
            
-           <div className="premium-card bg-[#111111] p-8">
-             <Sprout size={24} className="text-[#c9a263] mb-4" />
-             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-1">Solo</div>
-             <h4 className="font-serif text-2xl text-white mb-3">Basalto</h4>
-             <p className="text-sm text-[#a3a3a3] leading-relaxed">Solo rico em nutrientes que, aliado ao manejo cuidadoso, favorece o acúmulo de açúcares no fruto.</p>
-           </div>
-           
-           <div className="premium-card bg-[#111111] p-8">
+           <div className="premium-card bg-[#111111] p-8 aspect-square flex flex-col justify-center">
              <Sun size={24} className="text-[#c9a263] mb-4" />
-             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-1">Clima</div>
-             <h4 className="font-serif text-2xl text-white mb-3">Estações Definidas</h4>
-             <p className="text-sm text-[#a3a3a3] leading-relaxed">Verão chuvoso para o crescimento. Inverno seco perfeito para uma colheita sem fungos e secagem homogênea.</p>
+             <h4 className="font-serif text-2xl text-white mb-3">Estações</h4>
+             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-4 pb-4 border-b border-white/10">Inverno seco</div>
+             <p className="text-sm text-[#a3a3a3] leading-relaxed">Favorece uma secagem homogênea, sem fungos, garantindo uma xícara puríssima e limpa.</p>
            </div>
            
-           <div className="premium-card bg-[#111111] p-8">
+           <div className="premium-card bg-[#111111] p-8 aspect-square flex flex-col justify-center">
+             <Sprout size={24} className="text-[#c9a263] mb-4" />
+             <h4 className="font-serif text-2xl text-white mb-3">Solo</h4>
+             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-4 pb-4 border-b border-white/10">Basalto nutritivo</div>
+             <p className="text-sm text-[#a3a3a3] leading-relaxed">Contribui para doçura alta, estrutura encorpada e notas de caramelo e chocolate inerentes ao bioma.</p>
+           </div>
+           
+           <div className="premium-card bg-[#111111] p-8 aspect-square flex flex-col justify-center">
              <Coffee size={24} className="text-[#c9a263] mb-4" />
-             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-1">Variedades Elevadas</div>
-             <h4 className="font-serif text-xl tracking-wide text-white mb-3">Paraíso · Topázio · Arara</h4>
-             <p className="text-sm text-[#a3a3a3] leading-relaxed">Cultivares que encontraram no Cerrado o ambiente perfeito para expressar notas florais e frutadas intensas.</p>
-           </div>
-           
-           <div className="premium-card bg-[#111111] p-8">
-             <Award size={24} className="text-[#c9a263] mb-4" />
-             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-1">Certificação</div>
-             <h4 className="font-serif text-2xl text-white mb-3">Denominação D.O.</h4>
-             <p className="text-sm text-[#a3a3a3] leading-relaxed">A primeira região do Brasil com selo de Denominação de Origem. Onde a origem não é só uma promessa, é rastreável.</p>
-           </div>
-           
-           <div className="premium-card bg-[#111111] p-8">
-             <Flame size={24} className="text-[#c9a263] mb-4" />
-             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-1">Perfil Sensorial Clássico</div>
-             <h4 className="font-serif text-2xl text-white mb-3">Doçura Extrema</h4>
-             <p className="text-sm text-[#a3a3a3] leading-relaxed">Doçura natural alta, corpo aveludado e finalização achocolatada, com microlotes que chegam a jasmim e melaço.</p>
+             <h4 className="font-serif text-2xl text-white mb-3">Processos</h4>
+             <div className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3] mb-4 pb-4 border-b border-white/10">Naturais & Fermentados</div>
+             <p className="text-sm text-[#a3a3a3] leading-relaxed">Intensifica frutas, corpo aveludado e a doçura extrema que define os melhores lotes da região.</p>
            </div>
         </div>
         
         <div className="text-center">
-          <Link to="/cafes" className="premium-cta gap-2 inline-flex">
-            Ver cafés do Cerrado Mineiro <ChevronRight size={18} />
-          </Link>
+          <button onClick={() => scrollToSection('fazendas')} className="premium-cta gap-2 inline-flex">
+            Explorar origens no mapa <ChevronRight size={18} />
+          </button>
         </div>
       </section>
 
@@ -228,29 +278,36 @@ export default function Origin() {
               <p className="text-[#a3a3a3] text-base mb-8 leading-relaxed font-light">
                 Explore as fazendas por trás dos nossos lotes. Cada ponto representa uma origem selecionada: produtores, microlotes e cafés rastreáveis que compõem a curadoria CofCof.
               </p>
+              <p className="text-white text-xs lg:text-sm font-medium mb-6">Clique em uma fazenda no mapa para ver produtor, lote, pontuação e café disponível.</p>
               
               <div className="flex flex-wrap gap-2 mb-8">
-                {['Todos', '86+ SCA', 'Natural', 'Fermentado', 'Paraíso', 'Disponível agora'].map(filter => (
-                  <button 
-                    key={filter}
-                    onClick={() => {
-                        setMapFilter(filter);
-                        setActiveFarm(null);
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                      mapFilter === filter 
-                        ? 'bg-[#c9a263] text-[#0a0a0a]' 
-                        : 'bg-[#111111] text-[#a3a3a3] border border-[#a3a3a3]/20 hover:border-[#c9a263]/50 hover:text-white'
-                    }`}
-                  >
-                    {filter}
-                  </button>
-                ))}
+                {filterOptions.map(option => {
+                   const count = mockOriginFarms.filter(option.test).length;
+                   return (
+                     <button 
+                       key={option.id}
+                       onClick={() => setMapFilter(option.id)}
+                       className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center gap-1.5 ${
+                         mapFilter === option.id 
+                           ? 'bg-[#c9a263] text-[#0a0a0a]' 
+                           : 'bg-[#111111] text-[#a3a3a3] border border-[#a3a3a3]/20 hover:border-[#c9a263]/50 hover:text-white'
+                       }`}
+                     >
+                       {option.label}
+                       <span className={`px-1.5 py-0.5 rounded text-[8px] bg-black/20 ${mapFilter === option.id ? 'text-black' : 'text-[#a3a3a3]'}`}>{count}</span>
+                     </button>
+                   );
+                })}
               </div>
               
-              <div className="text-[10px] uppercase font-bold text-[#c9a263] tracking-widest mb-4">
-                 {filteredFarms.length} origens encontradas
-              </div>
+              {mapFilter !== 'Todos' && (
+                 <div className="flex justify-between items-center mb-4">
+                    <div className="text-[10px] uppercase font-bold text-[#c9a263] tracking-widest">
+                       {filteredFarms.length} origens com o filtro "{filterOptions.find(o => o.id === mapFilter)?.label}"
+                    </div>
+                    <button onClick={() => setMapFilter('Todos')} className="text-[10px] uppercase text-[#a3a3a3] hover:text-white font-bold tracking-widest underline decoration-[#a3a3a3]/50">Limpar filtros</button>
+                 </div>
+              )}
 
               {/* Mobile Selected Card ou Lista */}
               <div className="lg:hidden">
@@ -318,45 +375,34 @@ export default function Origin() {
                           className="absolute inset-0 bg-[#111111] border border-[#a3a3a3]/10 rounded-[2rem] p-8 shadow-xl flex flex-col justify-between"
                        >
                           <div>
-                             {activeFarm.approximateLocation && (
-                                <span className="inline-block px-2 py-1 mb-4 rounded border border-blue-500/30 text-[9px] font-bold uppercase tracking-widest text-blue-400 bg-blue-500/5">
-                                   Localização aproximada
+                             <div className="flex items-center gap-2 mb-4">
+                               <span className="premium-badge text-[10px]">Origem CofCof</span>
+                               {activeFarm.scaScore && activeFarm.scaScore >= 86 && <span className="premium-badge text-[10px] bg-[#c9a263]/10 text-[#c9a263] border-[#c9a263]/30">{activeFarm.scaScore}+ SCA</span>}
+                               {activeFarm.approximateLocation && (
+                                <span className="inline-block px-2 py-0.5 rounded border border-blue-500/30 text-[9px] font-bold uppercase tracking-widest text-blue-400 bg-blue-500/5">
+                                   Aproximada
                                 </span>
-                             )}
-                             <h3 className="font-serif text-3xl text-white mb-1">{activeFarm.farmName}</h3>
-                             <p className="text-sm text-[#a3a3a3] mb-6">Produtor: {activeFarm.producer} · {activeFarm.city}, {activeFarm.state}</p>
-                             
-                             <div className="grid grid-cols-2 gap-4 text-xs">
-                                <div>
-                                   <span className="block text-[10px] uppercase text-[#a3a3a3] font-bold mb-1">Processo</span>
-                                   <span className="text-white">{activeFarm.process}</span>
-                                </div>
-                                <div>
-                                   <span className="block text-[10px] uppercase text-[#a3a3a3] font-bold mb-1">Altitude</span>
-                                   <span className="text-white">{activeFarm.altitude}</span>
-                                </div>
-                                <div>
-                                   <span className="block text-[10px] uppercase text-[#a3a3a3] font-bold mb-1">Safra</span>
-                                   <span className="text-white">{activeFarm.harvest}</span>
-                                </div>
-                                <div>
-                                   <span className="block text-[10px] uppercase text-[#a3a3a3] font-bold mb-1">Lote CofCof</span>
-                                   <span className="text-[#c9a263] border border-[#c9a263]/30 px-1 py-0.5 rounded bg-[#c9a263]/5 inline-block truncate max-w-full">{activeFarm.lotName}</span>
-                                </div>
+                               )}
                              </div>
                              
-                             <div className="mt-6 bg-[#1a1a1a] p-4 rounded-xl border border-white/5">
-                                <div className="flex justify-between items-center mb-2">
-                                   <span className="text-[10px] uppercase font-bold tracking-widest text-[#a3a3a3]">Notas Sensoriais</span>
-                                   <span className="text-sm font-serif text-[#c9a263]">{activeFarm.scaScore} SCA</span>
-                                </div>
-                                <p className="text-white text-xs">{activeFarm.sensoryNotes}</p>
+                             <h3 className="font-serif text-3xl text-white mb-1">{activeFarm.farmName}</h3>
+                             <p className="text-sm text-[#a3a3a3] mb-4 text-white">Produtor: {activeFarm.producer}</p>
+                             
+                             <p className="text-xs text-[#a3a3a3] mb-6">Cerrado Mineiro · {activeFarm.altitude} · {activeFarm.process}</p>
+
+                             <div className="mb-6">
+                               <p className="text-white text-sm font-light italic border-l-2 border-[#c9a263] pl-4 py-1 leading-relaxed">
+                                  {activeFarm.traceabilitySummary || activeFarm.description || `Um lote rastreável e doce, para quem quer entender o caminho do café antes da primeira xícara. Notas sensoriais de ${activeFarm.sensoryNotes}.`}
+                               </p>
                              </div>
                           </div>
                           
-                          <div className="flex gap-3 mt-6">
-                             <Link to={activeFarm.linkedProductSlug ? `/cafes/${activeFarm.linkedProductSlug}` : '/cafes'} className="premium-cta flex-1 justify-center py-3 text-xs">Ver Café</Link>
-                             <button onClick={() => setActiveFarm(null)} className="premium-cta-ghost border-transparent px-4">Fechar</button>
+                          <div className="flex flex-col gap-3 mt-auto">
+                             <Link to={activeFarm.linkedProductSlug ? `/cafes/${activeFarm.linkedProductSlug}` : '/cafes'} className="premium-cta w-full justify-center py-4 bg-[#c9a263] text-black">Ver café deste lote</Link>
+                             <div className="flex gap-3">
+                                <button onClick={() => scrollToSection('produtores')} className="premium-cta-ghost flex-1 justify-center border-transparent bg-[#1a1a1a] text-[#a3a3a3] hover:text-white py-3 text-xs">Conhecer produtor</button>
+                                <button onClick={() => scrollToSection('rastreabilidade')} className="premium-cta-ghost flex-1 justify-center border-transparent bg-[#1a1a1a] text-[#a3a3a3] hover:text-white py-3 text-xs">Ver rastreabilidade</button>
+                             </div>
                           </div>
                        </motion.div>
                     )}
@@ -368,8 +414,19 @@ export default function Origin() {
                           exit={{ opacity: 0 }}
                           className="absolute inset-0 border border-dashed border-[#a3a3a3]/20 rounded-[2rem] flex flex-col items-center justify-center text-center p-8 text-[#a3a3a3]"
                        >
-                          <MapPin size={32} className="opacity-50 mb-4" />
-                          <p className="text-sm">Selecione uma fazenda no mapa para ver todas as informações de rastreabilidade, produtor e lote CofCof vinculado.</p>
+                          {filteredFarms.length === 0 ? (
+                            <>
+                              <MapPin size={32} className="opacity-50 mb-4" />
+                              <p className="text-sm font-bold text-white mb-2">Nenhuma fazenda encontrada com esse filtro.</p>
+                              <p className="text-sm mb-6">Hoje não temos lote ativo nesse perfil. Veja todos os produtores ou explore outro processo.</p>
+                              <button onClick={() => setMapFilter('Todos')} className="premium-cta">Limpar filtros</button>
+                            </>
+                          ) : (
+                            <>
+                              <MapPin size={32} className="opacity-50 mb-4" />
+                              <p className="text-sm">Selecione uma fazenda no mapa para ver todas as informações de rastreabilidade, produtor e lote CofCof vinculado.</p>
+                            </>
+                          )}
                        </motion.div>
                     )}
                  </AnimatePresence>
@@ -415,17 +472,28 @@ export default function Origin() {
       </section>
 
       {/* 5. LISTA PRODUTORES SEÇÃO */}
-      <section className="py-24 px-6 max-w-7xl mx-auto border-t border-[#a3a3a3]/10">
+      <section id="produtores" className="py-24 px-6 max-w-7xl mx-auto border-t border-[#a3a3a3]/10 scroll-mt-24">
         <h2 className="text-3xl md:text-5xl font-serif text-white mb-12">Produtores por trás dos lotes CofCof</h2>
         
         <div className="grid md:grid-cols-3 gap-8">
            {mockOriginFarms.filter(f => f.active).slice(0,3).map(farm => (
-              <div key={farm.id} className="premium-card p-0 overflow-hidden flex flex-col">
+              <div key={farm.id} className="premium-card p-0 overflow-hidden flex flex-col relative group">
+                 {/* Fallback image strategy */}
                  <div className="aspect-[4/3] bg-[#111111] overflow-hidden relative">
-                    <img src={farm.producerImage || farm.image} alt={farm.producer} className="w-full h-full object-cover mix-blend-lighten opacity-80" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111] to-transparent" />
+                    {farm.producerImage || farm.image ? (
+                        <img src={farm.producerImage || farm.image} alt={farm.producer} className="w-full h-full object-cover mix-blend-lighten opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+                    ) : (
+                        <div className="w-full h-full bg-[#160f0a] flex items-center justify-center text-[#c9a263]/20 relative overflow-hidden">
+                           <Mountain size={120} strokeWidth={1} className="absolute rotate-12 scale-150 opacity-10" />
+                           <div className="text-center relative z-10 p-6">
+                              <span className="premium-badge inline-flex mb-2">Produtor CofCof</span>
+                              <div className="text-xs uppercase tracking-widest">{farm.farmName}</div>
+                           </div>
+                        </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent" />
                  </div>
-                 <div className="p-8 flex-1 flex flex-col">
+                 <div className="p-8 flex-1 flex flex-col bg-[#111111]">
                     <div className="text-[10px] text-[#c9a263] uppercase tracking-widest font-bold mb-2">{farm.farmName}</div>
                     <h3 className="font-serif text-2xl text-white mb-2">{farm.producer}</h3>
                     <p className="text-xs text-[#a3a3a3] mb-6">{farm.city}, {farm.region}</p>
@@ -433,11 +501,11 @@ export default function Origin() {
                     <div className="space-y-3 mb-8 text-xs font-medium border-t border-[#a3a3a3]/10 pt-6">
                        <div className="flex justify-between">
                           <span className="text-[#a3a3a3]">Lote:</span>
-                          <span className="text-white">{farm.lotName}</span>
+                          <span className="text-white max-w-[50%] text-right truncate bg-[#1a1a1a] px-2 py-0.5 rounded border border-white/5">{farm.lotName}</span>
                        </div>
                        <div className="flex justify-between">
                           <span className="text-[#a3a3a3]">SCA:</span>
-                          <span className="text-[#c9a263]">{farm.scaScore}</span>
+                          <span className="text-[#c9a263]">{farm.scaScore || 'TBD'}</span>
                        </div>
                        <div className="flex justify-between">
                           <span className="text-[#a3a3a3]">Processo:</span>
@@ -449,8 +517,12 @@ export default function Origin() {
                        </div>
                     </div>
                     
-                    <div className="mt-auto">
-                      <Link to={farm.linkedProductSlug ? `/cafes/${farm.linkedProductSlug}` : '/cafes'} className="premium-cta-ghost w-full justify-center">Ver Café</Link>
+                    <div className="mt-auto grid grid-cols-2 gap-3">
+                      <Link to={farm.linkedProductSlug ? `/cafes/${farm.linkedProductSlug}` : '/cafes'} className="premium-cta w-full justify-center px-0 text-xs py-3 border-transparent bg-[#c9a263] text-black">Ver Café</Link>
+                      <button onClick={() => {
+                          setActiveFarm(farm);
+                          scrollToSection('fazendas');
+                      }} className="premium-cta-ghost w-full justify-center px-0 text-xs py-3 border-transparent bg-[#1a1a1a] hover:bg-white text-[#a3a3a3]">Ver no mapa</button>
                     </div>
                  </div>
               </div>
@@ -459,96 +531,110 @@ export default function Origin() {
       </section>
 
       {/* 6. TIMELINE: DA FAZENDA À XÍCARA */}
-      <section className="py-24 px-6 bg-[#111111] border-y border-[#a3a3a3]/10">
-         <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">Da fazenda à sua xícara</h2>
-              <p className="text-[#a3a3a3] md:text-lg font-light">Uma cadeia curta, transparente e focada em preservar a qualidade e o frescor.</p>
+      <section className="py-24 px-6 bg-[#0a0a0a] border-y border-[#a3a3a3]/10 relative overflow-hidden">
+         <div className="absolute inset-x-0  top-0 h-px bg-gradient-to-r from-transparent via-[#c9a263]/20 to-transparent"></div>
+         <div className="max-w-6xl mx-auto relative z-10">
+            <div className="text-center mb-20">
+              <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">Da origem até você</h2>
+              <p className="text-[#a3a3a3] md:text-lg font-light">Uma cadeia curta, rastreável e focada em preservar a qualidade e o frescor de cada gota.</p>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-y-12 gap-x-6">
-               <div className="text-center group">
-                 <div className="text-3xl font-serif text-[#c9a263]/30 mb-2 group-hover:text-[#c9a263] transition-colors">1.</div>
-                 <h4 className="text-sm md:text-base font-bold text-white uppercase tracking-wider mb-2">Seleção do Produtor</h4>
-                 <p className="text-xs md:text-sm text-[#a3a3a3]">Parceria direta com fazendas voltadas para microlotes.</p>
-               </div>
-               <div className="text-center group">
-                 <div className="text-3xl font-serif text-[#c9a263]/30 mb-2 group-hover:text-[#c9a263] transition-colors">2.</div>
-                 <h4 className="text-sm md:text-base font-bold text-white uppercase tracking-wider mb-2">Colheita e Processo</h4>
-                 <p className="text-xs md:text-sm text-[#a3a3a3]">Manejo cuidadoso, secagem lenta e fermentações impecáveis.</p>
-               </div>
-               <div className="text-center group">
-                 <div className="text-3xl font-serif text-[#c9a263]/30 mb-2 group-hover:text-[#c9a263] transition-colors">3.</div>
-                 <h4 className="text-sm md:text-base font-bold text-white uppercase tracking-wider mb-2">Avaliação Sensorial</h4>
-                 <p className="text-xs md:text-sm text-[#a3a3a3]">Aprovação apenas de lotes com mais de 86 pontos SCA.</p>
-               </div>
-               <div className="text-center group">
-                 <div className="text-3xl font-serif text-[#c9a263]/30 mb-2 group-hover:text-[#c9a263] transition-colors">4.</div>
-                 <h4 className="text-sm md:text-base font-bold text-white uppercase tracking-wider mb-2">Torra sob demanda</h4>
-                 <p className="text-xs md:text-sm text-[#a3a3a3]">Grãos torrados apenas após seu pedido, garantindo frescor.</p>
-               </div>
-               <div className="text-center group">
-                 <div className="text-3xl font-serif text-[#c9a263]/30 mb-2 group-hover:text-[#c9a263] transition-colors">5.</div>
-                 <h4 className="text-sm md:text-base font-bold text-white uppercase tracking-wider mb-2">Embalagem Rastreável</h4>
-                 <p className="text-xs md:text-sm text-[#a3a3a3]">Todos os pacotes contam com QR Code e dados da origem.</p>
-               </div>
-               <div className="text-center group">
-                 <div className="text-3xl font-serif text-[#c9a263]/30 mb-2 group-hover:text-[#c9a263] transition-colors">6.</div>
-                 <h4 className="text-sm md:text-base font-bold text-white uppercase tracking-wider mb-2">Sua Entrega</h4>
-                 <p className="text-xs md:text-sm text-[#a3a3a3]">Despacho rápido para você provar o café no pico do sabor.</p>
+            <div className="relative">
+               <div className="hidden md:block absolute top-[45px] left-[5%] right-[5%] h-px bg-gradient-to-r from-[#c9a263]/10 via-[#c9a263]/40 to-[#c9a263]/10 border-t border-dashed border-[#c9a263]/30"></div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-4 gap-y-12 gap-x-6 relative text-center">
+                  <div className="group relative">
+                     <div className="w-24 h-24 mx-auto bg-[#111111] border-2 border-[#1a1a1a] group-hover:border-[#c9a263] rounded-full flex items-center justify-center mb-6 transition-colors shadow-xl relative z-10">
+                        <Mountain size={32} className="text-[#a3a3a3] group-hover:text-[#c9a263] transition-colors" />
+                     </div>
+                     <h4 className="font-serif text-xl text-white mb-2">1. Fazenda</h4>
+                     <p className="text-xs text-[#a3a3a3] leading-relaxed">Seleção de produtores focados em microlotes e manejo cuidadoso do terroir.</p>
+                  </div>
+                  
+                  <div className="group relative">
+                     <div className="w-24 h-24 mx-auto bg-[#111111] border-2 border-[#1a1a1a] group-hover:border-[#c9a263] rounded-full flex items-center justify-center mb-6 transition-colors shadow-xl relative z-10">
+                        <Award size={32} className="text-[#a3a3a3] group-hover:text-[#c9a263] transition-colors" />
+                     </div>
+                     <h4 className="font-serif text-xl text-white mb-2">2. Avaliação SCA</h4>
+                     <p className="text-xs text-[#a3a3a3] leading-relaxed">Apenas lotes acima de 86 pontos, com doçura extrema, entram na curadoria.</p>
+                  </div>
+                  
+                  <div className="group relative">
+                     <div className="w-24 h-24 mx-auto bg-[#111111] border-2 border-[#1a1a1a] group-hover:border-[#c9a263] rounded-full flex items-center justify-center mb-6 transition-colors shadow-xl relative z-10">
+                        <Flame size={32} className="text-[#a3a3a3] group-hover:text-[#c9a263] transition-colors" />
+                     </div>
+                     <h4 className="font-serif text-xl text-white mb-2">3. Torra sob demanda</h4>
+                     <p className="text-xs text-[#a3a3a3] leading-relaxed">Grãos torrados apenas após seu pedido. Frescor garante o pico do sabor.</p>
+                  </div>
+                  
+                  <div className="group relative">
+                     <div className="w-24 h-24 mx-auto bg-[#111111] border-2 border-[#1a1a1a] group-hover:border-[#c9a263] rounded-full flex items-center justify-center mb-6 transition-colors shadow-xl relative z-10">
+                        <QrCode size={32} className="text-[#a3a3a3] group-hover:text-[#c9a263] transition-colors" />
+                     </div>
+                     <h4 className="font-serif text-xl text-white mb-2">4. QR Code do Lote</h4>
+                     <p className="text-xs text-[#a3a3a3] leading-relaxed">O pacote leva você de volta à origem: produtor, pontuação e notas do dossiê.</p>
+                  </div>
                </div>
             </div>
          </div>
       </section>
 
       {/* 7. DO QR AO PRODUTOR */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
+      <section id="rastreabilidade" className="py-24 px-6 max-w-7xl mx-auto scroll-mt-24">
         <div className="flex flex-col md:flex-row items-center gap-16">
            <div className="md:w-1/2">
              <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Do QR ao produtor</h2>
              <p className="text-lg text-[#a3a3a3] font-light leading-relaxed mb-8">
-               Você não compra um café genérico. Você conhece o caminho dele. Do produtor ao pacote, cada lote CofCof pode carregar dados de origem, safra, torra e perfil sensorial.
+               Você não compra um café genérico. Você conhece o caminho dele. Do produtor ao pacote, cada lote CofCof pode carregar dados de origem, safra, torra e perfil sensorial na palma da sua mão.
              </p>
              <Link to="/cafes" className="premium-cta inline-flex items-center gap-2">
-                 Ver exemplo de rastreabilidade <ChevronRight size={18} />
+                 Ver cafés rastreáveis <ChevronRight size={18} />
              </Link>
            </div>
            
            <div className="md:w-1/2 w-full flex justify-center">
-              <div className="w-full max-w-[340px] bg-[#111111] rounded-[3rem] p-6 border-4 border-[#1a1a1a] shadow-2xl relative">
-                  <div className="w-40 h-6 bg-[#1a1a1a] rounded-b-xl absolute top-0 left-1/2 -translate-x-1/2" />
+              <div className="w-full max-w-[340px] bg-[#111111] rounded-[3rem] p-4 border-[6px] border-[#1a1a1a] shadow-2xl relative shadow-[#c9a263]/5">
+                  <div className="w-32 h-6 bg-[#1a1a1a] rounded-b-xl absolute top-0 left-1/2 -translate-x-1/2 z-20" />
                   
-                  <div className="bg-[#0a0a0a] rounded-2xl h-[600px] mt-6 overflow-y-auto no-scrollbar border border-white/5 relative p-6">
-                     <div className="text-center mb-8 pt-4">
-                        <QrCode size={40} className="text-[#c9a263] mx-auto mb-4" />
-                        <h4 className="font-serif text-2xl text-white mb-2">Origem Validada</h4>
-                        <p className="text-xs text-[#a3a3a3]">Este pacote é rastreável.</p>
-                     </div>
-                     
-                     <div className="space-y-4">
-                        <div className="bg-[#111111] p-4 rounded-xl">
-                           <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1">Fazenda</div>
-                           <div className="text-sm text-white font-medium">Alto da Serra</div>
-                        </div>
-                        <div className="bg-[#111111] p-4 rounded-xl">
-                           <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1">Produtor</div>
-                           <div className="text-sm text-white font-medium">Eliane Garcia</div>
-                        </div>
-                        <div className="bg-[#111111] p-4 rounded-xl grid grid-cols-2 gap-4">
-                           <div>
-                             <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1">Processo</div>
-                             <div className="text-sm text-white font-medium">Fermentado</div>
-                           </div>
-                           <div>
-                             <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1">SCA</div>
-                             <div className="text-sm text-[#c9a263] font-bold">88.5 pt</div>
-                           </div>
-                        </div>
-                        <div className="bg-[#111111] p-4 rounded-xl">
-                           <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1">Data da Torra</div>
-                           <div className="text-sm text-white font-medium">Hoje</div>
-                           <div className="text-[10px] text-green-500 mt-2">Torra fresca verificada</div>
-                        </div>
+                  <div className="bg-[#0a0a0a] rounded-[2rem] h-[600px] overflow-y-auto no-scrollbar border border-white/5 relative bg-gradient-to-b from-[#111111] to-[#0a0a0a]">
+                     <div className="p-6 pb-20">
+                         <div className="flex justify-center mb-6 pt-6">
+                            <span className="premium-badge text-[10px] bg-[#c9a263]/10 text-[#c9a263] border-none">Origem Validada</span>
+                         </div>
+                         <div className="text-center mb-8">
+                            <h4 className="font-serif text-3xl text-white mb-1">Alto da Serra</h4>
+                            <p className="text-xs text-[#a3a3a3]">Eliane Garcia · Cerrado Mineiro</p>
+                         </div>
+                         
+                         <div className="space-y-3">
+                            <div className="bg-[#111111] p-4 rounded-xl border border-white/5">
+                               <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1">Processo & SCA</div>
+                               <div className="flex justify-between items-center">
+                                  <span className="text-sm text-white font-medium">Fermentado Natural</span>
+                                  <span className="text-sm text-[#c9a263] font-bold">88.5 pt</span>
+                               </div>
+                            </div>
+                            <div className="bg-[#111111] p-4 rounded-xl border border-white/5">
+                               <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1">Notas Sensoriais</div>
+                               <div className="text-sm text-white font-medium break-words">Melaço de cana, frutas vermelhas maduras e licor.</div>
+                            </div>
+                            <div className="bg-[#111111] p-4 rounded-xl border border-white/5">
+                               <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1">Altitude & Safra</div>
+                               <div className="flex justify-between items-center">
+                                  <span className="text-sm text-white font-medium">1.250m</span>
+                                  <span className="text-sm text-white font-medium">2024</span>
+                               </div>
+                            </div>
+                            <div className="bg-[#111111] p-4 rounded-xl border border-[#c9a263]/30 bg-gradient-to-r from-[#111111] to-[#c9a263]/5">
+                               <div className="text-[10px] uppercase tracking-widest text-[#a3a3a3] mb-1 flex justify-between">
+                                  <span>Data da Torra</span>
+                                  <span className="text-green-500 flex items-center gap-1"><CheckCircle2 size={10} /> Fresca</span>
+                               </div>
+                               <div className="text-sm text-white font-medium">Hoje</div>
+                            </div>
+                            
+                            <button className="w-full bg-[#c9a263] text-black text-xs font-bold uppercase tracking-widest py-3 mt-4 rounded-lg">Comprar Novamente</button>
+                         </div>
                      </div>
                   </div>
               </div>
@@ -597,6 +683,10 @@ export default function Origin() {
 
       {/* 9. CTA FINAL */}
       <section className="bg-[#111111] text-white py-32 px-6 text-center relative overflow-hidden border-y border-[#a3a3a3]/10">
+        <div className="absolute inset-0 z-0">
+           <Mountain size={400} className="text-[#a3a3a3]/5 absolute -right-20 -top-20" />
+           <Coffee size={300} className="text-[#a3a3a3]/5 absolute -left-10 bottom-0" />
+        </div>
         <div className="max-w-4xl mx-auto relative z-10">
           <h2 className="text-4xl md:text-5xl font-serif mb-6 text-white leading-tight">
             Agora que você sabe de onde vem, escolha seu próximo café.
@@ -605,12 +695,15 @@ export default function Origin() {
             Microlotes do Cerrado Mineiro, com produtor, fazenda, processo, pontuação sensorial e torra sob demanda.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/cafes" className="premium-cta w-full sm:w-auto text-center">
-               Ver cafés
+            <Link to="/cafes" className="premium-cta w-full sm:w-auto text-center border-transparent bg-[#c9a263] text-black hover:bg-white transition-colors">
+               Comprar cafés do Cerrado
             </Link>
-            <Link to="/assinatura" className="premium-cta-ghost w-full sm:w-auto text-center">
+            <Link to="/assinatura" className="premium-cta-ghost w-full sm:w-auto text-center border-transparent bg-[#1a1a1a] hover:bg-white text-[#a3a3a3] hover:text-black">
                Entrar para o Clube
             </Link>
+            <button onClick={() => scrollToSection('fazendas')} className="premium-cta-ghost w-full sm:w-auto text-center border-transparent bg-transparent hover:text-white text-[#a3a3a3]">
+               Ver mapa da origem novamente
+            </button>
           </div>
         </div>
       </section>

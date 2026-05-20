@@ -23,9 +23,10 @@ import { PackagingTab } from '../components/admin/PackagingTab';
 import { HoursTab } from '../components/admin/HoursTab';
 import { canAccessModule } from '../lib/permissions';
 import { AdminEmptyState } from '../components/admin/AdminEmptyState';
+import { BrandLogo } from '../components/brand/BrandLogo';
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState('operation');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAdminAuthStore();
@@ -72,7 +73,9 @@ export default function Admin() {
     return (
       <div className={`flex-1 min-w-0 w-full ${activeTab === 'operation' ? '' : 'p-4 md:p-8'}`}>
         <header className="flex md:hidden justify-between items-center p-4 border-b border-[#a3a3a3]/10 bg-[#fcfaf8] sticky top-0 z-40">
-           <h2 className="text-xl font-serif cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/')}>Admin <span className="text-[#c9a263]">COFCOF</span></h2>
+           <h2 className="text-xl font-serif cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2" onClick={() => navigate('/')}>
+             Admin <BrandLogo size="admin" className="text-[#0a0a0a]" asLink={false} />
+           </h2>
            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}><Menu /></button>
         </header>
 
@@ -193,9 +196,9 @@ export default function Admin() {
       <aside className={`fixed md:sticky top-0 h-screen inset-y-0 left-0 bg-[#0a0a0a] text-white border-r border-[#c9a263]/20 w-[260px] flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="p-6 border-b border-white/5 flex justify-between items-center shrink-0 relative overflow-hidden">
           <div className="absolute inset-0 bg-[#c9a263]/5 mix-blend-overlay"></div>
-          <div onClick={() => navigate('/')} className="cursor-pointer hover:opacity-80 transition-opacity min-w-0 relative z-10 w-full">
+          <div onClick={() => navigate('/')} className="cursor-pointer hover:opacity-80 transition-opacity min-w-0 relative z-10 w-full flex flex-col items-start gap-1">
             <h2 className="text-2xl font-serif text-white truncate flex items-baseline gap-2">Admin <span className="text-[#c9a263] text-sm">/</span></h2>
-            <p className="text-[10px] font-bold text-[#c9a263] tracking-[0.2em] uppercase mt-1 truncate">COFCOF.CO</p>
+            <BrandLogo size="admin" className="text-[#c9a263]" asLink={false} />
           </div>
           <button className="md:hidden p-2 text-[#a3a3a3] shrink-0 relative z-10 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
             <X size={20} />

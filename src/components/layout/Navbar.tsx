@@ -4,6 +4,7 @@ import { ShoppingBag, Menu, X, User } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../lib/utils';
+import { BrandLogo } from '../brand/BrandLogo';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -73,9 +74,9 @@ export default function Navbar() {
           )}
         >
           <div className="w-full flex items-center justify-between h-full">
-            <Link to="/" className="text-lg md:text-xl font-serif font-bold tracking-tight z-50 shrink-0">
-              COFCOF<span className="text-[#c9a263]">.CO</span>
-            </Link>
+            <div className="z-50 shrink-0">
+              <BrandLogo size="nav" />
+            </div>
 
             {/* Desktop Nav - lg breakpoint for showing all links */}
             <div className="hidden lg:flex flex-1 justify-center items-center gap-1 xl:gap-2">

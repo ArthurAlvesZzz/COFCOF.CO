@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAdminAuthStore } from '../store/adminAuthStore';
-import { Lock, AlertCircle, Mail, KeyRound, Eye, EyeOff, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Lock, AlertCircle, Mail, KeyRound, Eye, EyeOff, ShieldCheck, ArrowRight, Trash2 } from 'lucide-react';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -9,19 +9,45 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { login, user } = useAdminAuthStore();
+  const { login, isValidAdminUser, clearInvalidSession } = useAdminAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location.state?.from?.pathname || '/admin/cofcof-secure';
   // @ts-ignore
-  const enableDevLogin = import.meta.env.VITE_ENABLE_DEV_ADMIN_LOGIN === 'true' || true;
+  const locationError = location.state?.error;
+  // @ts-ignore
+  const enableDevLogin = (import.meta as any).env?.DEV || (import.meta as any).env?.VITE_ENABLE_DEV_ADMIN_LOGIN === 'true';
 
   useEffect(() => {
-    if (user && user.role !== 'customer' && user.active) {
-      navigate('/admin/cofcof-secure', { replace: true });
+    if (locationError) {
+       setError(locationError);
     }
-  }, [user, navigate]);
+  }, [locationError]);
+
+  if (isValidAdminUser()) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-[#111111] p-10 rounded-[2rem] border border-[#a3a3a3]/10 text-center">
+          <ShieldCheck size={48} className="mx-auto text-[#c9a263] mb-6" />
+          <h2 className="text-2xl font-serif text-white mb-2">Já está autenticado</h2>
+          <p className="text-[#a3a3a3] text-sm mb-8">Sua sessão está ativa e segura.</p>
+          <button 
+             onClick={() => navigate(from, { replace: true })}
+             className="w-full premium-cta justify-center mb-4 bg-[#c9a263] text-black border-transparent"
+          >
+             Ir para o painel
+          </button>
+          <button 
+             onClick={() => clearInvalidSession()}
+             className="w-full text-xs text-[#a3a3a3] uppercase font-bold tracking-widest underline decoration-[#a3a3a3]/30 hover:text-white"
+          >
+             Sair / Limpar sessão
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,9 +68,21 @@ export default function AdminLogin() {
     setEmail('admin@cofcof.local');
     setPassword('CofcofAdmin@2026');
   };
+  
+  const handleDevAutoLogin = async () => {
+    handleDevFill();
+    setLoading(true);
+    try {
+      await login('admin@cofcof.local', 'CofcofAdmin@2026');
+      navigate(from, { replace: true });
+    } catch (err: any) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4 md:p-6 font-sans">
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4 md:p-6 font-sans">
       <div className="max-w-md w-full bg-[#111111] p-6 md:p-10 rounded-[2rem] shadow-[0_20px_50px_rgba(26,15,10,0.08)] border border-[#a3a3a3]/10 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-5">
            <Lock size={150} className="text-[#c9a263]" />
@@ -134,16 +172,56 @@ export default function AdminLogin() {
               <p className="text-[10px] text-center text-[#a3a3a3] tracking-[0.2em] uppercase font-bold px-4">DEV MODE</p>
               <div className="h-px flex-1 bg-[#a3a3a3]/10" />
             </div>
+            
+            <p className="text-[10px] text-center text-[#a3a3a3] mb-4">
+               Credencial: <span className="text-white">admin@cofcof.local</span> / <span className="text-white">CofcofAdmin@2026</span>
+            </p>
+            
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <button
+                type="button"
+                onClick={handleDevFill}
+                className="w-full py-3 bg-[#1a1a1a] text-[#a3a3a3] text-xs font-bold tracking-widest uppercase rounded-2xl hover:bg-[#c9a263]/10 hover:border-[#c9a263]/50 hover:text-[#c9a263] transition-all border border-[#a3a3a3]/10"
+              >
+                Preencher
+              </button>
+              <button
+                type="button"
+                onClick={handleDevAutoLogin}
+                className="w-full py-3 bg-[#c9a263]/10 text-[#c9a263] text-xs font-bold tracking-widest uppercase rounded-2xl hover:bg-[#c9a263]/20 border border-[#c9a263]/30 transition-all"
+              >
+                Auto Login
+              </button>
+            </div>
+            
             <button
-              type="button"
-              onClick={handleDevFill}
-              className="w-full py-3.5 bg-[#1a1a1a] text-[#a3a3a3] text-xs font-bold tracking-widest uppercase rounded-2xl hover:bg-[#1a1a1a] hover:border-[#c9a263] hover:text-[#c9a263] transition-all border border-[#a3a3a3]/10"
+               type="button"
+               onClick={() => {
+                  clearInvalidSession();
+                  setError("Sessão local limpa com sucesso.");
+               }}
+               className="w-full py-3 bg-red-900/10 text-red-500 text-xs font-bold tracking-widest uppercase rounded-2xl hover:bg-red-900/20 border border-red-900/30 transition-all flex items-center justify-center gap-2"
             >
-              Preencher Teste
+               <Trash2 size={14} /> Limpar sessão local
             </button>
           </div>
         )}
       </div>
+      
+      {!enableDevLogin && (
+         <div className="mt-8 text-center">
+            <p className="text-[#a3a3a3] text-xs mb-2">Problemas para acessar?</p>
+            <button
+               onClick={() => {
+                  clearInvalidSession();
+                  setError("A sessão local foi redefinida. Tente novamente.");
+               }}
+               className="text-xs text-[#a3a3a3] font-bold tracking-widest uppercase underline decoration-[#a3a3a3]/50 hover:text-white"
+            >
+               Limpar sessão e tentar novamente
+            </button>
+         </div>
+      )}
     </div>
   );
 }

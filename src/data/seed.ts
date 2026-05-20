@@ -781,8 +781,8 @@ export const mockPartners: Partner[] = rawPartners.map(p => {
     coordinatesConfirmed: p.coordinatesConfirmed !== undefined ? p.coordinatesConfirmed : false,
     locationSource: p.locationSource || (isConfirmedExplicitly ? "google_maps" : "manual"),
     locationNotes: p.locationNotes || "",
-    active: isConfirmedExplicitly ? p.active : false,
-    status: isConfirmedExplicitly ? p.status : "draft",
+    active: p.active,
+    status: p.status,
     aliases
   };
 });
@@ -795,8 +795,16 @@ export const hasConfirmedLocation = (partner: Partner): boolean => {
   return partner.coordinatesConfirmed === true && partner.locationStatus === 'confirmed' && hasValidCoordinates(partner);
 };
 
+export const getListedPartners = (partners: Partner[] = mockPartners): Partner[] => {
+  return partners.filter((p) => p.active && p.status === 'published');
+};
+
 export const getPublicPartners = (partners: Partner[] = mockPartners): Partner[] => {
-  return partners.filter((p) => p.active && p.status === 'published' && hasConfirmedLocation(p));
+  return getListedPartners(partners); // Now public partners means all listed ones
+};
+
+export const getMappablePartners = (partners: Partner[] = mockPartners): Partner[] => {
+  return getPublicPartners(partners).filter(hasValidCoordinates);
 };
 
 export const getPartnerRouteUrl = (partner: Partner): string => {

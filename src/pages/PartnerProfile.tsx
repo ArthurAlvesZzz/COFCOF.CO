@@ -314,10 +314,10 @@ export default function PartnerProfile() {
                     )}
                   <button
                     onClick={handleOpenGoogleMaps}
-                    className="premium-cta w-full justify-center bg-[#c9a263] text-black border-none py-3 text-xs"
+                    className={`premium-cta w-full justify-center ${hasConfirmedLocation(partner) ? 'bg-[#c9a263] text-black border-none' : 'bg-[#1a1a1a] text-[#a3a3a3] border border-[#a3a3a3]/20 hover:text-white'} py-3 text-xs`}
                     disabled={partner.locationStatus === "invalid"}
                   >
-                    Como chegar
+                    {hasConfirmedLocation(partner) ? 'Como chegar' : 'Abrir busca no Google Maps'}
                   </button>
                 </div>
               </div>
@@ -390,9 +390,9 @@ export default function PartnerProfile() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 onClick={handleOpenGoogleMaps}
-                className="premium-cta w-full sm:w-auto justify-center bg-[#c9a263] text-black border-transparent hover:bg-white text-sm py-4 px-8"
+                className={`premium-cta w-full sm:w-auto justify-center ${hasConfirmedLocation(partner) ? 'bg-[#c9a263] text-black border-transparent hover:bg-white' : 'bg-[#1a1a1a] text-[#a3a3a3] border border-[#a3a3a3]/20 hover:text-white'} text-sm py-4 px-8`}
               >
-                Como chegar
+                {hasConfirmedLocation(partner) ? 'Como chegar' : 'Abrir busca no Google Maps'}
               </button>
               <button
                 onClick={handleShare}

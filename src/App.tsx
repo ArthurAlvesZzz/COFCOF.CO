@@ -20,6 +20,15 @@ import OrderFailure from './pages/OrderFailure';
 
 import ProtectedAdminRoute from './components/layout/ProtectedAdminRoute';
 import AdminLogin from './pages/AdminLogin';
+import { useAdminAuthStore } from './store/adminAuthStore';
+
+function AdminRedirect() {
+  const { isValidAdminUser } = useAdminAuthStore();
+  if (isValidAdminUser()) {
+    return <Navigate to="/admin/cofcof-secure" replace />;
+  }
+  return <Navigate to="/admin/login" replace />;
+}
 
 export default function App() {
   return (
@@ -52,8 +61,9 @@ export default function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route element={<ProtectedAdminRoute />}>
           <Route path="/admin/cofcof-secure" element={<Admin />} />
+          <Route path="/admin/painel" element={<Navigate to="/admin/cofcof-secure" replace />} />
         </Route>
-        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+        <Route path="/admin" element={<AdminRedirect />} />
       </Routes>
     </BrowserRouter>
   );

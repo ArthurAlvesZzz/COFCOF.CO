@@ -9,11 +9,11 @@ import {
 import { mockPartners, getPublicPartners, getPartnerRouteUrl, hasConfirmedLocation } from "../data/seed";
 import L from "leaflet";
 import {
+  MapPin,
   Search,
   Navigation,
   ExternalLink,
   X,
-  MapPin,
   Clock,
   Coffee,
   Store,
@@ -24,6 +24,7 @@ import {
   MessageCircle,
   ShoppingBag,
   Utensils,
+  Wheat,
 } from "lucide-react";
 import { Partner } from "../types";
 import { motion, AnimatePresence } from "motion/react";
@@ -79,6 +80,30 @@ export default function MapPartners() {
   ];
 
   const getPartnerCategory = (partner: Partner) => {
+    return partner.category || "Outros";
+  };
+
+  const getPartnerCategoryIcon = (partner: Partner) => {
+    const cat = (partner.category || "").toLowerCase();
+    if (cat === "restaurante") return <Utensils size={14} className="text-[#c9a263]" />;
+    if (cat === "empório" || cat === "revenda" || cat === "delicatessen") return <ShoppingBag size={14} className="text-[#c9a263]" />;
+    if (cat === "padaria" || cat === "confeitaria") return <Wheat size={14} className="text-[#c9a263]" />;
+    if (cat === "hotel") return <Bed size={14} className="text-[#c9a263]" />;
+    if (cat === "posto" || cat === "rota cofcof" || cat.includes("rota") || partner.isRoutePartner) return <Fuel size={14} className="text-[#c9a263]" />;
+    if (cat === "conveniência") return <Store size={14} className="text-[#c9a263]" />;
+    if (cat === "cafeteria") return <Coffee size={14} className="text-[#c9a263]" />;
+    return <MapPin size={14} className="text-[#c9a263]" />;
+  };
+
+  const getPartnerCategoryLabel = (partner: Partner) => {
+    const cat = (partner.category || "").toLowerCase();
+    if (cat === "empório" || cat === "delicatessen") return "Empório";
+    if (cat === "padaria" || cat === "confeitaria") return "Padaria";
+    if (cat === "posto" || cat === "rota cofcof" || cat.includes("rota") || partner.isRoutePartner) return "Rota CofCof";
+    if (cat === "cafeteria") return "Cafeteria";
+    if (cat === "restaurante") return "Restaurante";
+    if (cat === "hotel") return "Hotel";
+    if (cat === "conveniência") return "Conveniência";
     return partner.category || "Outros";
   };
 
@@ -246,22 +271,22 @@ export default function MapPartners() {
   };
 
   const getIconSvg = (category: string, isFeatured: boolean) => {
-    const cat = category.toLowerCase();
+    const cat = (category || "").toLowerCase();
     let path =
       '<path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/>';
     if (cat === "restaurante")
       path =
         '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>';
-    else if (cat === "empório" || cat === "revenda")
+    else if (cat === "empório" || cat === "revenda" || cat === "delicatessen")
       path =
         '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>';
-    else if (cat === "padaria")
+    else if (cat === "padaria" || cat === "confeitaria")
       path =
         '<path d="M12 2A10 10 0 0 0 2 12c0 2.2.8 4.2 2.2 5.8a2 2 0 0 0 2.6.2l3-2.3a2 2 0 0 1 2.4 0l3 2.3a2 2 0 0 0 2.6-.2A10.1 10.1 0 0 0 22 12 10 10 0 0 0 12 2z"/><path d="M12 2v20"/><path d="M2 12h20"/>';
     else if (cat === "hotel")
       path =
         '<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>';
-    else if (cat === "posto")
+    else if (cat === "posto" || cat === "rota cofcof" || cat.includes("rota"))
       path =
         '<line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/>';
     else if (cat === "conveniência")
@@ -411,8 +436,9 @@ export default function MapPartners() {
                 </div>
                 <div className="p-5 flex-1 flex flex-col justify-center min-w-0">
                   <div className="flex items-center gap-2 mb-1.5">
+                    {getPartnerCategoryIcon(partner)}
                     <span className="text-[10px] uppercase tracking-widest font-bold text-[#c9a263] truncate">
-                      {partner.category}
+                      {getPartnerCategoryLabel(partner)}
                     </span>
                   </div>
                   <h3 className="font-serif text-lg text-white mb-1.5 line-clamp-2 leading-tight">
@@ -571,7 +597,7 @@ export default function MapPartners() {
               <div className="absolute bottom-5 left-6 flex flex-col gap-1.5 z-10 text-white">
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0a0a0a]/90 backdrop-blur border border-[#c9a263]/30 text-[9px] font-bold uppercase tracking-widest text-[#c9a263]">
-                    {activePartner.category}
+                    {getPartnerCategoryLabel(activePartner)}
                   </span>
                   {activePartner.isOpen24h && (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-green-500/10 backdrop-blur border border-green-500/30 text-[9px] font-bold uppercase tracking-widest text-green-500">
@@ -685,17 +711,21 @@ export default function MapPartners() {
 
             {/* Sticky Footer CTAs */}
             <div className="p-4 bg-[#111111] border-t border-[#a3a3a3]/10 shrink-0">
-              {(activePartner.coordinatesConfirmed || activePartner.locationStatus === 'confirmed') && (
+              {hasConfirmedLocation(activePartner) ? (
                 <div className="text-[10px] text-center text-[#a3a3a3] mb-2 font-medium">
                   Rota baseada na localização confirmada do parceiro.
+                </div>
+              ) : (
+                <div className="text-[10px] text-center text-yellow-500/80 mb-2 font-medium flex items-center justify-center gap-1">
+                  ⚠️ Localização em validação
                 </div>
               )}
               <div className="flex gap-2 mb-4">
                 <button
                   onClick={(e) => handleOpenGoogleMaps(activePartner, e)}
-                  className="premium-cta w-full justify-center text-xs py-3.5 bg-[#c9a263] text-black border-transparent hover:bg-white hover:text-black"
+                  className={`premium-cta w-full justify-center text-xs py-3.5 border-transparent ${hasConfirmedLocation(activePartner) ? 'bg-[#c9a263] text-black hover:bg-white hover:text-black' : 'bg-[#1a1a1a] text-[#a3a3a3] hover:text-white border-[#a3a3a3]/20 hover:border-[#c9a263]/50'}`}
                 >
-                  Como chegar
+                  {hasConfirmedLocation(activePartner) ? 'Como chegar' : 'Abrir busca no Google Maps'}
                 </button>
               </div>
               <div className="flex justify-between items-center px-1">

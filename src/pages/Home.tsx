@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle2, MapPin, Package, Sprout, Store, Coffee, Chevr
 import { mockProducts } from '../data/seed';
 import { useCartStore } from '../store/cartStore';
 import { usePublicContent } from '../hooks/usePublicContent';
+import { BrandLogo } from '../components/brand/BrandLogo';
 
 const ProofMarquee = ({ items, className = "" }: { items: string[], className?: string }) => {
   return (
@@ -407,8 +408,8 @@ export default function Home() {
             {/* CofCof */}
             <div className="p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-[#c9a263]/40 bg-[#1a1a1a] shadow-[0_10px_40px_rgba(201,162,99,0.05)] flex flex-col relative overflow-hidden transition-transform hover:-translate-y-2">
                <div className="absolute top-0 right-0 p-8 opacity-5 text-[#c9a263]"><Star fill="currentColor" size={120} /></div>
-               <h3 className="text-3xl font-serif text-[#c9a263] mb-8 border-b border-[#c9a263]/20 pb-6 flex items-center gap-3 relative z-10">
-                 COFCOF.CO
+               <h3 className="mb-8 border-b border-[#c9a263]/20 pb-6 flex items-center gap-3 relative z-10">
+                 <BrandLogo size="custom" className="text-3xl text-[#c9a263]" asLink={false} />
                </h3>
                <ul className="space-y-6 flex-1 text-white font-medium relative z-10">
                  <li className="flex gap-4"><CheckCircle2 className="text-[#c9a263] shrink-0" size={24}/><span>Origem rastreada</span></li>

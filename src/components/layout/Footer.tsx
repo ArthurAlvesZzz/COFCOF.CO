@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, MapPin, Package, CheckCircle2, ChevronRight, Instagram, Building2 } from 'lucide-react';
 
+import { BrandLogo } from '../brand/BrandLogo';
+
 export default function Footer() {
   return (
     <footer className="bg-[#0a0a0a] text-white pt-32 pb-16 px-6 border-t border-[#a3a3a3]/10 relative overflow-hidden">
@@ -10,9 +12,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Top Massive Branding Logotype */}
         <div className="mb-24 flex flex-col items-center md:items-start text-center md:text-left border-b border-[#a3a3a3]/10 pb-16">
-          <Link to="/" className="text-7xl md:text-9xl font-serif font-black tracking-tighter mb-6 block drop-shadow-sm hover:opacity-90 transition-opacity">
-            COFCOF<span className="text-[#c9a263]">.</span>
-          </Link>
+          <BrandLogo size="footer" className="mb-6 drop-shadow-sm hover:opacity-90 transition-opacity" asLink={true} to="/" />
           <p className="text-xl md:text-3xl font-serif text-[#a3a3a3] leading-snug max-w-4xl font-light">
              Cafés especiais do Cerrado Mineiro.<br className="hidden md:block"/> 
              <span className="italic text-[#c9a263]">Premiados pela Cup of Excellence. Entrega mensal, rastreabilidade QR, torra sob demanda.</span>
